@@ -28,7 +28,5 @@ pub fn routes(state: AppState) -> Router {
         .with_state(state)
         .split_for_parts();
 
-    let router = router.merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api));
-
-    router
+    router.merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
 }

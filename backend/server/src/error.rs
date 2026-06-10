@@ -23,14 +23,22 @@ impl ErrorResponse {
     }
 
     fn error(status: StatusCode, message: impl Into<String>) -> axum::response::Response {
-        (status, Json(Self { error: message.into() })).into_response()
+        (
+            status,
+            Json(Self {
+                error: message.into(),
+            }),
+        )
+            .into_response()
     }
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
-            Self::DatabaseError(e) => ErrorResponse::internal_server_error(format!("database error: {e:?}")),
+            Self::DatabaseError(e) => {
+                ErrorResponse::internal_server_error(format!("database error: {e:?}"))
+            }
             Self::Unauthorized => ErrorResponse::error(StatusCode::UNAUTHORIZED, "unauthorized"),
         }
     }

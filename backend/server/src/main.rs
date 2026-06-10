@@ -40,9 +40,7 @@ async fn main() -> Result<(), AppError> {
 
     let port: u16 = get_env!("PORT", "3000").parse().expect("valid port number");
 
-    let listener = tokio::net::TcpListener::bind((host, port))
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind((host, port)).await.unwrap();
 
     tracing::info!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();

@@ -7,9 +7,7 @@ pub struct AppState {
 
 impl AppState {
     pub fn new(pool: sqlx::PgPool) -> Self {
-        Self {
-            pool,
-        }
+        Self { pool }
     }
 
     pub async fn transaction(&self) -> sqlx::Result<sqlx::PgTransaction<'_>> {

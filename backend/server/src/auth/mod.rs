@@ -9,9 +9,7 @@ const SESSION_COOKIE: &str = "rms_session";
 
 // We are generic here, rather than being specifically for users, so we can support API tokens later
 pub enum AuthContext {
-    User {
-        user: User,
-    },
+    User { user: User },
 }
 
 impl FromRequestParts<AppState> for AuthContext {
@@ -24,7 +22,9 @@ impl FromRequestParts<AppState> for AuthContext {
         let mut txn = state.transaction().await?;
 
         let jar = CookieJar::from_request_parts(parts, state).await.unwrap();
-        let Some(cookie) = jar.get(SESSION_COOKIE) else { return Err(AppError::Unauthorized); };
+        let Some(cookie) = jar.get(SESSION_COOKIE) else {
+            return Err(AppError::Unauthorized);
+        };
 
         let Ok(token) = Uuid::parse_str(cookie.value()) else {
             return Err(AppError::Unauthorized);
@@ -34,8 +34,6 @@ impl FromRequestParts<AppState> for AuthContext {
             return Err(AppError::Unauthorized);
         };
 
-        Ok(Self::User {
-            user,
-        })
+        Ok(Self::User { user })
     }
 }
