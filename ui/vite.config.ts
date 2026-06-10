@@ -8,6 +8,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
+  base: process.env.UI_BASE_URL ?? '/ui/',
   plugins: [
     devtools(),
     tailwindcss(),
