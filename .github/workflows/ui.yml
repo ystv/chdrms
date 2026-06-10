@@ -17,3 +17,18 @@ jobs:
         working-directory: ui
       - run: yarn build
         working-directory: ui
+
+  check-format:
+    name: Check Web UI formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: "yarn"
+          cache-dependency-path: "ui/yarn.lock"
+      - run: yarn install --immutable --inline-builds
+        working-directory: ui
+      - run: yarn check
+        working-directory: ui
