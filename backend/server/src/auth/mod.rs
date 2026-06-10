@@ -5,6 +5,8 @@ use uuid::Uuid;
 
 use crate::{error::AppError, state::AppState};
 
+const SESSION_COOKIE: &str = "rms_session";
+
 // We are generic here, rather than being specifically for users, so we can support API tokens later
 pub enum AuthContext {
     User {
@@ -22,7 +24,7 @@ impl FromRequestParts<AppState> for AuthContext {
         let mut txn = state.transaction().await?;
 
         let jar = CookieJar::from_request_parts(parts, state).await.unwrap();
-        let Some(cookie) = jar.get("rms_session") else { return Err(AppError::Unauthorized); };
+        let Some(cookie) = jar.get(SESSION_COOKIE) else { return Err(AppError::Unauthorized); };
 
         let Ok(token) = Uuid::parse_str(cookie.value()) else {
             return Err(AppError::Unauthorized);

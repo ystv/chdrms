@@ -7,6 +7,9 @@ macro_rules! get_env {
     ($name:expr) => {
         std::env::var($name).expect(concat!("environment variable ", $name, " to be set"))
     };
+    ($name:expr, $default:expr) => {
+        std::env::var($name).unwrap_or_else(|_| "3000".to_string())
+    };
 }
 
 #[tokio::main]
@@ -24,7 +27,7 @@ async fn main() -> Result<(), AppError> {
         .connect(&get_env!("DATABASE_URL"))
         .await?;
 
-    if let Err(e) = sqlx::migrate!("../database/migrations").run(&pool).await {
+    if let Err(e) = chdrms_database::migrate(&pool).await {
         tracing::error!(?e, "failed to migrate database");
         return Ok(());
     };
@@ -33,14 +36,11 @@ async fn main() -> Result<(), AppError> {
 
     let app = chdrms_server::routes::routes(state).layer(TraceLayer::new_for_http());
 
-    let host = std::env::var("HOST").unwrap_or_else(|_| "[::]".to_string());
+    let host = get_env!("HOST", "[::]");
 
-    let port: u16 = std::env::var("PORT")
-        .unwrap_or_else(|_| "3000".to_string())
-        .parse()
-        .expect("valid port number");
+    let port: u16 = get_env!("PORT", "3000").parse().expect("valid port number");
 
-    let listener = tokio::net::TcpListener::bind(format!("{}:{}", host, port))
+    let listener = tokio::net::TcpListener::bind((host, port))
         .await
         .unwrap();
 
