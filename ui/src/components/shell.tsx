@@ -1,11 +1,11 @@
-import { AppShell, Burger, Group, Stack, Text } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
-import { XIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { AppShell, Burger, Group, Stack, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { XIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 export function Shell(props: { children: ReactNode }) {
-  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure()
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true)
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
   return (
     <AppShell
@@ -36,5 +36,5 @@ export function Shell(props: { children: ReactNode }) {
       <AppShell.Navbar p="md">Nav</AppShell.Navbar>
       <AppShell.Main>{props.children}</AppShell.Main>
     </AppShell>
-  )
+  );
 }

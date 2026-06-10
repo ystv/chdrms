@@ -1,15 +1,15 @@
-import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { Outlet, createRootRoute } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { TanStackDevtools } from '@tanstack/react-devtools';
 
-import '@mantine/core/styles.css'
-import '../styles.css'
-import { MantineProvider } from '@mantine/core'
-import { Shell } from '#/components/shell'
+import '@mantine/core/styles.css';
+import '../styles.css';
+import { MantineProvider } from '@mantine/core';
+import { Shell } from '#/components/shell';
 
 export const Route = createRootRoute({
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
@@ -31,5 +31,5 @@ function RootComponent() {
         ]}
       />
     </>
-  )
+  );
 }
