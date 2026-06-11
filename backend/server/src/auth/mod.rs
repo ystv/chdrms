@@ -5,7 +5,17 @@ use uuid::Uuid;
 
 use crate::{error::AppError, state::AppState};
 
-const SESSION_COOKIE: &str = "rms_session";
+pub mod oidc;
+
+macro_rules! cookie_name {
+    ($name:expr) => {
+        concat!("rms_", $name)
+    };
+}
+
+use cookie_name;
+
+const SESSION_COOKIE: &str = cookie_name!("session");
 
 // We are generic here, rather than being specifically for users, so we can support API tokens later
 pub enum AuthContext {

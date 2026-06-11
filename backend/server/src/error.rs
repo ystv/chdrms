@@ -1,13 +1,7 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use serde::Serialize;
 
-#[derive(Debug, thiserror::Error)]
-pub enum AppError {
-    #[error("database error: {0}")]
-    DatabaseError(#[from] sqlx::Error),
-    #[error("unauthorized")]
-    Unauthorized,
-}
+pub type Result<T, E = AppError> = std::result::Result<T, E>;
 
 #[derive(Serialize)]
 pub struct ErrorResponse {
@@ -33,6 +27,22 @@ impl ErrorResponse {
     }
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum AppError {
+    #[error("database error: {0}")]
+    DatabaseError(#[from] sqlx::Error),
+    #[error("unauthorized")]
+    Unauthorized,
+    #[error("bad request: {0}")]
+    BadRequest(String),
+}
+
+impl AppError {
+    pub fn bad_request(message: impl Into<String>) -> Self {
+        Self::BadRequest(message.into())
+    }
+}
+
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         match self {
@@ -40,6 +50,7 @@ impl IntoResponse for AppError {
                 ErrorResponse::internal_server_error(format!("database error: {e:?}"))
             }
             Self::Unauthorized => ErrorResponse::error(StatusCode::UNAUTHORIZED, "unauthorized"),
+            Self::BadRequest(message) => ErrorResponse::error(StatusCode::BAD_REQUEST, message),
         }
     }
 }

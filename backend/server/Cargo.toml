@@ -5,9 +5,9 @@ edition = "2024"
 
 [dependencies]
 axum = { version = "0.8.9", features = ["macros"] }
-axum-extra = { version = "0.12.6", features = ["typed-header"] }
+axum-extra = { version = "0.12.6", features = ["cookie", "cookie-private", "typed-header"] }
 chdrms_database = { version = "0.1.0", path = "../database" }
-openidconnect = "4.0.1"
+openidconnect = { version = "4.0.1", default-features = false, features = ["reqwest", "rustls-tls"] }
 serde = { version = "1.0.228", features = ["derive"] }
 sqlx = { version = "0.9.0", default-features = false, features = ["runtime-tokio", "migrate", "postgres", "macros", "uuid"] }
 thiserror = "2.0.18"
