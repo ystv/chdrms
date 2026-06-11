@@ -123,4 +123,14 @@ impl User {
         .await?;
         Ok(result.token)
     }
+
+    pub async fn destroy_session(
+        txn: &mut sqlx::PgTransaction<'_>,
+        token: Uuid,
+    ) -> sqlx::Result<bool> {
+        let res = sqlx::query!("DELETE FROM user_sessions WHERE token = $1;", token)
+            .execute(&mut **txn)
+            .await?;
+        Ok(res.rows_affected() != 0)
+    }
 }

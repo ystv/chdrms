@@ -2,15 +2,17 @@ use axum::{
     Json, Router,
     extract::{Path, Query, State},
     response::Redirect,
-    routing::get,
+    routing::{get, post},
 };
-use axum_extra::extract::{CookieJar, PrivateCookieJar};
+use axum_extra::extract::{CookieJar, PrivateCookieJar, cookie::Cookie};
+use chdrms_database::user::User;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
+use uuid::Uuid;
 
 use crate::{
-    auth::oidc::OIDCProvider,
+    auth::{SESSION_COOKIE, oidc::OIDCProvider},
     error::{AppError, Result},
     state::AppState,
 };
@@ -66,6 +68,28 @@ async fn callback(
     Ok(res)
 }
 
+async fn logout(jar: CookieJar, State(state): State<AppState>) -> Result<(CookieJar, Redirect)> {
+    let mut txn = state.transaction().await?;
+
+    let cookie = jar.get(SESSION_COOKIE).ok_or(AppError::Unauthorized)?;
+
+    let Ok(token) = Uuid::parse_str(cookie.value()) else {
+        return Err(AppError::Unauthorized);
+    };
+
+    let jar = jar.remove({
+        let mut cookie = Cookie::from(SESSION_COOKIE);
+        cookie.set_path("/");
+        cookie
+    });
+
+    if !User::destroy_session(&mut txn, token).await? {
+        return Err(AppError::Unauthorized);
+    }
+
+    Ok((jar, Redirect::to("/")))
+}
+
 #[utoipa::path(
     method(get),
     path = "/providers",
@@ -91,6 +115,7 @@ pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/{provider}/begin", get(begin))
         .route("/{provider}/callback", get(callback))
+        .route("/logout", post(logout))
 }
 
 pub fn api_routes() -> OpenApiRouter<AppState> {
