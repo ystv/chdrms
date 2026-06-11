@@ -184,7 +184,7 @@ impl OIDCProvider {
         code: String,
         state: String,
     ) -> Result<(PrivateCookieJar, CookieJar, Redirect), AuthError> {
-        let (csrf_token, pkce_verifier, nonce) = {
+        let (csrf_token, pkce_verifier, nonce, private_jar) = {
             let Some(mut csrf_cookie) = private_jar.get(OIDC_CSRF_COOKIE) else {
                 return Err(AuthError::MissingCookie(OIDC_CSRF_COOKIE));
             };
@@ -197,10 +197,14 @@ impl OIDCProvider {
             let csrf_token = CsrfToken::new(csrf_cookie.value().to_string());
             let pkce_verifier = PkceCodeVerifier::new(pkce_cookie.value().to_string());
             let nonce = Nonce::new(nonce_cookie.value().to_string());
-            csrf_cookie.make_removal();
-            pkce_cookie.make_removal();
-            nonce_cookie.make_removal();
-            (csrf_token, pkce_verifier, nonce)
+            // set the path before removing, otherwise they don't get cleared properly
+            csrf_cookie.set_path("/");
+            pkce_cookie.set_path("/");
+            nonce_cookie.set_path("/");
+            let private_jar = private_jar.remove(csrf_cookie);
+            let private_jar = private_jar.remove(pkce_cookie);
+            let private_jar = private_jar.remove(nonce_cookie);
+            (csrf_token, pkce_verifier, nonce, private_jar)
         };
 
         if &state != csrf_token.secret() {
