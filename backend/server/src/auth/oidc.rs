@@ -17,7 +17,11 @@ use openidconnect::{
     url::Url,
 };
 
-use crate::{auth::SESSION_COOKIE, config::OIDCProviderConfig, error::Result};
+use crate::{
+    auth::SESSION_COOKIE,
+    config::OIDCProviderConfig,
+    error::{AppError, Result},
+};
 
 type ConfiguredCoreClient = openidconnect::Client<
     EmptyAdditionalClaims,
@@ -75,6 +79,31 @@ pub enum AuthError {
     UserNotFound,
 }
 
+// TODO: we probably want to handle auth errors separately, and return some sort of user-friendly error page.
+impl From<AuthError> for AppError {
+    fn from(val: AuthError) -> Self {
+        match val {
+            AuthError::MissingCookie(cookie) => {
+                AppError::BadRequest(format!("missing `{cookie}` cookie"))
+            }
+            AuthError::InvalidState => AppError::bad_request("invalid state"),
+            AuthError::TokenRequest(e) => AppError::internal_server_error(e.to_string()),
+            AuthError::Configuration(e) => AppError::internal_server_error(e.to_string()),
+            AuthError::ClaimVerification(e) => AppError::internal_server_error(e.to_string()),
+            AuthError::MissingIDToken => {
+                AppError::internal_server_error("provider did not return an ID token")
+            }
+            AuthError::MissingClaim(claim) => {
+                AppError::internal_server_error(format!("ID token is missing `{claim}` claim"))
+            }
+            AuthError::DatabaseError(e) => AppError::DatabaseError(e),
+            AuthError::UserNotFound => {
+                AppError::Forbidden("user registration or account linking is disabled".to_string())
+            }
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct OIDCProvider {
     config: OIDCProviderConfig,
@@ -89,6 +118,7 @@ const OIDC_NONCE_COOKIE: &str = super::cookie_name!("oidc_nonce");
 impl OIDCProvider {
     pub async fn new(
         base_url: &Url,
+        id: &str,
         config: OIDCProviderConfig,
         client: reqwest::Client,
     ) -> Result<Self, AuthSetupError> {
@@ -100,7 +130,7 @@ impl OIDCProvider {
             Some(config.client_secret.clone()),
         )
         .set_redirect_uri(RedirectUrl::from_url(
-            base_url.join(&format!("/api/auth/{}/callback", config.name))?,
+            base_url.join(&format!("/auth/{}/callback", id))?,
         ));
         Ok(Self {
             config,

@@ -8,7 +8,7 @@ macro_rules! get_env {
         std::env::var($name).expect(concat!("environment variable ", $name, " to be set"))
     };
     ($name:expr, $default:expr) => {
-        std::env::var($name).unwrap_or_else(|_| "3000".to_string())
+        std::env::var($name).unwrap_or_else(|_| $default.to_string())
     };
 }
 
@@ -22,6 +22,12 @@ async fn main() -> Result<(), AppError> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    let config =
+        chdrms_server::config::load_configuration(get_env!("CONFIGURATION_PATH", "config.toml"))
+            .await;
+
+    let key = chdrms_server::config::load_key(get_env!("SECRET_KEY_PATH", ".secretkey")).await;
+
     let pool = PgPoolOptions::new()
         .max_connections(8)
         .connect(&get_env!("DATABASE_URL"))
@@ -32,11 +38,11 @@ async fn main() -> Result<(), AppError> {
         return Ok(());
     };
 
-    let state = AppState::new(pool);
+    let state = AppState::new(pool, config, key);
 
     let app = chdrms_server::routes::routes(state).layer(TraceLayer::new_for_http());
 
-    let host = get_env!("HOST", "[::]");
+    let host = get_env!("HOST", "::");
 
     let port: u16 = get_env!("PORT", "3000").parse().expect("valid port number");
 

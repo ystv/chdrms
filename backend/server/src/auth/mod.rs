@@ -22,6 +22,14 @@ pub enum AuthContext {
     User { user: User },
 }
 
+impl AuthContext {
+    pub fn user(&self) -> &User {
+        match self {
+            AuthContext::User { user } => user,
+        }
+    }
+}
+
 impl FromRequestParts<AppState> for AuthContext {
     type Rejection = AppError;
 

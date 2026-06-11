@@ -5,6 +5,9 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::state::AppState;
 
+pub mod auth;
+pub mod user;
+
 #[derive(OpenApi)]
 #[openapi()]
 struct ApiDoc;
@@ -25,8 +28,12 @@ async fn health() -> &'static str {
 pub fn routes(state: AppState) -> Router {
     let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
-        .with_state(state)
+        .nest("/api/auth", auth::api_routes())
+        .nest("/api/user", user::routes())
         .split_for_parts();
 
-    router.merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
+    router
+        .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
+        .nest("/auth", auth::routes())
+        .with_state(state)
 }
