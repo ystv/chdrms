@@ -1,6 +1,11 @@
+use std::path::PathBuf;
+
 use chdrms_server::{error::AppError, state::AppState};
 use sqlx::postgres::PgPoolOptions;
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    services::{ServeDir, ServeFile},
+    trace::TraceLayer,
+};
 use tracing_subscriber::prelude::*;
 
 macro_rules! get_env {
@@ -8,7 +13,13 @@ macro_rules! get_env {
         std::env::var($name).expect(concat!("environment variable ", $name, " to be set"))
     };
     ($name:expr, $default:expr) => {
-        std::env::var($name).unwrap_or_else(|_| $default.to_string())
+        std::env::var($name)
+            .ok()
+            .map(|val| {
+                val.parse()
+                    .unwrap_or_else(|err| panic!("variable '{}' wrong format: {:?}", $name, err))
+            })
+            .unwrap_or_else(|| $default)
     };
 }
 
@@ -22,11 +33,15 @@ async fn main() -> Result<(), AppError> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let config =
-        chdrms_server::config::load_configuration(get_env!("CONFIGURATION_PATH", "config.toml"))
-            .await;
+    let config = chdrms_server::config::load_configuration(get_env!(
+        "CONFIGURATION_PATH",
+        "config.toml".to_string()
+    ))
+    .await;
 
-    let key = chdrms_server::config::load_key(get_env!("SECRET_KEY_PATH", ".secretkey")).await;
+    let key =
+        chdrms_server::config::load_key(get_env!("SECRET_KEY_PATH", ".secretkey".to_string()))
+            .await;
 
     let pool = PgPoolOptions::new()
         .max_connections(8)
@@ -40,11 +55,22 @@ async fn main() -> Result<(), AppError> {
 
     let state = AppState::new(pool, config, key);
 
-    let app = chdrms_server::routes::routes(state).layer(TraceLayer::new_for_http());
+    let mut app = chdrms_server::routes::routes(state);
 
-    let host = get_env!("HOST", "::");
+    // if we're running in production, we want to serve the static files from `dist`,
+    // otherwise, we let Vite proxy the requests to us.
+    if get_env!("ENVIRONMENT", "DEVELOPMENT".to_string()).as_str() == "PRODUCTION" {
+        let directory: PathBuf = get_env!("UI_DIRECTORY", "dist".to_string()).into();
+        app = app.fallback_service(
+            ServeDir::new(&directory)
+                .not_found_service(ServeFile::new(&directory.join("index.html"))),
+        )
+    }
 
-    let port: u16 = get_env!("PORT", "3000").parse().expect("valid port number");
+    app = app.layer(TraceLayer::new_for_http());
+
+    let host: String = get_env!("HOST", "::".to_string());
+    let port: u16 = get_env!("PORT", 3000);
 
     let listener = tokio::net::TcpListener::bind((host, port)).await.unwrap();
 
