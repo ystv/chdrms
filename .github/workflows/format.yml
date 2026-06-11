@@ -2,8 +2,8 @@ on:
   push:
 
 jobs:
-  build:
-    name: Build Backend
+  check-backend-format:
+    name: Check Backend formatting
     runs-on: ubuntu-latest
 
     steps:
@@ -25,4 +25,19 @@ jobs:
         run: rustup update stable && rustup default stable
 
       - name: Check code formatting
-        run: cargo build
+        run: cargo fmt --check
+
+  check-ui-format:
+    name: Check Web UI formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: "yarn"
+          cache-dependency-path: "ui/yarn.lock"
+      - run: yarn install --immutable --inline-builds
+        working-directory: ui
+      - run: yarn check
+        working-directory: ui
