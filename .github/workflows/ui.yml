@@ -17,6 +17,7 @@ jobs:
         working-directory: ui
       - run: yarn check
         working-directory: ui
+
   build:
     name: Build Web UI
     runs-on: ubuntu-latest
