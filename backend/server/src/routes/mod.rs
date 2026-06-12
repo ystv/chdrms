@@ -11,7 +11,7 @@ pub mod user;
 #[derive(OpenApi)]
 #[openapi(
     servers(
-        (url = "/api")
+        (url = "/api/v1")
     )
 )]
 struct ApiDoc;
