@@ -30,16 +30,19 @@ async fn health() -> &'static str {
 }
 
 pub fn routes(state: AppState) -> Router {
-    let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    let (v1, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
         .nest("/auth", auth::api_routes())
         .nest("/user", user::routes())
-        .fallback(|| async { ErrorResponse::not_found() })
         .split_for_parts();
+
+    let router = Router::new()
+        .nest("/v1", v1)
+        .fallback(|| async { ErrorResponse::not_found() });
 
     Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
-        .nest("/api/v1", router)
+        .nest("/api", router)
         .nest("/auth", auth::routes())
         .with_state(state)
 }
