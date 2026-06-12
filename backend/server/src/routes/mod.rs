@@ -28,8 +28,8 @@ async fn health() -> &'static str {
 pub fn routes(state: AppState) -> Router {
     let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
-        .nest("/api/auth", auth::api_routes())
-        .nest("/api/user", user::routes())
+        .nest("/api/v1/auth", auth::api_routes())
+        .nest("/api/v1/user", user::routes())
         .split_for_parts();
 
     router
