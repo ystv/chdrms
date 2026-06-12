@@ -5,11 +5,29 @@ use uuid::Uuid;
 
 use crate::{error::AppError, state::AppState};
 
-const SESSION_COOKIE: &str = "rms_session";
+pub mod oidc;
+
+macro_rules! cookie_name {
+    ($name:expr) => {
+        concat!("rms_", $name)
+    };
+}
+
+use cookie_name;
+
+pub const SESSION_COOKIE: &str = cookie_name!("session");
 
 // We are generic here, rather than being specifically for users, so we can support API tokens later
 pub enum AuthContext {
     User { user: User },
+}
+
+impl AuthContext {
+    pub fn user(&self) -> &User {
+        match self {
+            AuthContext::User { user } => user,
+        }
+    }
 }
 
 impl FromRequestParts<AppState> for AuthContext {
