@@ -2,7 +2,7 @@ base_url = "http://localhost:3000"
 
 [oidc_provider.keycloak]
 name = "Display name"
-issuer_url = "https://account.example.org/realms/master/"
+issuer_url = "https://account.example.org/realms/master"
 client_id = ""
 client_secret = ""
 allow_registration = true

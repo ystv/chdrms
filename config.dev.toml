@@ -1,0 +1,9 @@
+base_url = "http://localhost:3000"
+
+[oidc_provider.keycloak]
+name = "Keycloak (localhost)"
+issuer_url = "http://localhost:8080/realms/dev"
+client_id = "dev"
+client_secret = "KFUjxgMCDn6AG0RuVqZnrhfxzNDLZnNI"
+allow_registration = true
+auto_account_linking = true
