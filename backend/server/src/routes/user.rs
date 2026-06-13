@@ -7,8 +7,10 @@ use uuid::Uuid;
 
 use crate::{auth::AuthContext, state::AppState};
 
+pub(super) const TAG: &str = "user";
+
 #[derive(Serialize, ToSchema)]
-struct UserInfo {
+pub struct UserInfo {
     pub id: Uuid,
     pub email: String,
     pub name: String,
@@ -24,9 +26,11 @@ impl From<&User> for UserInfo {
     }
 }
 
+/// Get current user.
 #[utoipa::path(
-    method(get),
+    get,
     path = "/@me",
+    tag = TAG,
     responses(
         (status = OK, description = "Success", body = [UserInfo]),
     ),

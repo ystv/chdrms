@@ -69,7 +69,8 @@ impl User {
             JOIN users ON user_identities.user_id = users.id
             WHERE
                 user_identities.provider = $1
-                AND user_identities.provider_id = $2"#,
+                AND user_identities.provider_id = $2;
+            "#,
             provider,
             provider_id,
         )
