@@ -3,19 +3,23 @@ use utoipa::OpenApi;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::state::AppState;
+use crate::{error::ErrorResponse, state::AppState};
 
 pub mod auth;
 pub mod user;
 
 #[derive(OpenApi)]
-#[openapi()]
+#[openapi(
+    servers(
+        (url = "/api/v1")
+    )
+)]
 struct ApiDoc;
 
 /// Get health of the API.
 #[utoipa::path(
     method(get, head),
-    path = "/api/health",
+    path = "/health",
     responses(
         (status = OK, description = "Success", body = str, content_type = "text/plain")
     )
@@ -26,14 +30,19 @@ async fn health() -> &'static str {
 }
 
 pub fn routes(state: AppState) -> Router {
-    let (router, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
+    let (v1, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
-        .nest("/api/v1/auth", auth::api_routes())
-        .nest("/api/v1/user", user::routes())
+        .nest("/auth", auth::api_routes())
+        .nest("/user", user::routes())
         .split_for_parts();
 
-    router
+    let router = Router::new()
+        .nest("/v1", v1)
+        .fallback(|| async { ErrorResponse::not_found() });
+
+    Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
+        .nest("/api", router)
         .nest("/auth", auth::routes())
         .with_state(state)
 }
