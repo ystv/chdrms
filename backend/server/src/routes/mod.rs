@@ -6,13 +6,19 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::{error::ErrorResponse, state::AppState};
 
 pub mod auth;
+pub mod group;
 pub mod user;
 
 #[derive(OpenApi)]
 #[openapi(
     servers(
         (url = "/api/v1")
-    )
+    ),
+    tags(
+        (name = user::TAG, description = "Users"),
+        (name = auth::TAG, description = "Auth"),
+        (name = group::TAG, description = "Groups"),
+    ),
 )]
 struct ApiDoc;
 
@@ -33,6 +39,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
     let (v1, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
         .nest("/auth", auth::api_routes())
+        .nest("/group", group::routes())
         .nest("/user", user::routes())
         .split_for_parts();
 

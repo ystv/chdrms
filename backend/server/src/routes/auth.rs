@@ -17,6 +17,8 @@ use crate::{
     state::AppState,
 };
 
+pub(super) const TAG: &str = "auth";
+
 #[derive(Deserialize)]
 struct CallbackQuery {
     code: String,
@@ -90,9 +92,11 @@ async fn logout(jar: CookieJar, State(state): State<AppState>) -> Result<(Cookie
     Ok((jar, Redirect::to("/")))
 }
 
+/// List authentication providers.
 #[utoipa::path(
     method(get),
     path = "/providers",
+    tag = TAG,
     responses(
         (status = OK, description = "Success", body = [Vec<ProviderInfo>]),
     ),
