@@ -29,7 +29,7 @@ async fn health() -> &'static str {
     "ok"
 }
 
-pub fn routes(state: AppState) -> Router {
+pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
     let (v1, api) = OpenApiRouter::with_openapi(ApiDoc::openapi())
         .routes(routes!(health))
         .nest("/auth", auth::api_routes())
@@ -40,9 +40,11 @@ pub fn routes(state: AppState) -> Router {
         .nest("/v1", v1)
         .fallback(|| async { ErrorResponse::not_found() });
 
-    Router::new()
-        .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api))
-        .nest("/api", router)
-        .nest("/auth", auth::routes())
-        .with_state(state)
+    (
+        Router::new()
+            .merge(SwaggerUi::new("/swagger-ui").url("/apidoc/openapi.json", api.clone()))
+            .nest("/api", router)
+            .nest("/auth", auth::routes()),
+        api,
+    )
 }

@@ -55,7 +55,9 @@ async fn main() -> Result<(), AppError> {
 
     let state = AppState::new(pool, config, key);
 
-    let mut app = chdrms_server::routes::routes(state);
+    let (app, _) = chdrms_server::routes::routes();
+
+    let mut app = app.with_state(state);
 
     // if we're running in production, we want to serve the static files from `dist`,
     // otherwise, we let Vite proxy the requests to us.
@@ -63,7 +65,7 @@ async fn main() -> Result<(), AppError> {
         let directory: PathBuf = get_env!("UI_DIRECTORY", "dist".to_string()).into();
         app = app.fallback_service(
             ServeDir::new(&directory)
-                .not_found_service(ServeFile::new(&directory.join("index.html"))),
+                .not_found_service(ServeFile::new(directory.join("index.html"))),
         )
     }
 
