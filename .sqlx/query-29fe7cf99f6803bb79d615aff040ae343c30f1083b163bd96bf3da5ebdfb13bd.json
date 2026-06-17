@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, email, name FROM users WHERE id = $1",
+  "query": "INSERT INTO groups(name) VALUES ($1) RETURNING id, name;",
   "describe": {
     "columns": [
       {
@@ -9,29 +9,18 @@
         "type_info": "Uuid",
         "origin": {
           "Table": {
-            "table": "users",
+            "table": "groups",
             "name": "id"
           }
         }
       },
       {
         "ordinal": 1,
-        "name": "email",
-        "type_info": "Text",
-        "origin": {
-          "Table": {
-            "table": "users",
-            "name": "email"
-          }
-        }
-      },
-      {
-        "ordinal": 2,
         "name": "name",
         "type_info": "Text",
         "origin": {
           "Table": {
-            "table": "users",
+            "table": "groups",
             "name": "name"
           }
         }
@@ -39,14 +28,13 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid"
+        "Text"
       ]
     },
     "nullable": [
       false,
-      false,
       false
     ]
   },
-  "hash": "c49a553b0b71d37ae8e9563c22700cd3bc275bc4500b38edc178b05a6f55021e"
+  "hash": "29fe7cf99f6803bb79d615aff040ae343c30f1083b163bd96bf3da5ebdfb13bd"
 }
