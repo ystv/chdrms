@@ -3,40 +3,20 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::{user::User, user_group::Group};
+use chdrms_database::{
+    user::User,
+    user_group::{self, Group},
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use crate::{
-    auth::AuthContext,
+    auth::permissions::RequirePermission,
     error::{AppError, Result},
     routes::user::UserInfo,
     state::AppState,
 };
-
-pub(super) const TAG: &str = "group";
-
-#[derive(Serialize, ToSchema)]
-pub struct GroupInfo {
-    pub id: Uuid,
-    pub name: String,
-}
-
-impl From<&Group> for GroupInfo {
-    fn from(value: &Group) -> Self {
-        Self {
-            id: value.id,
-            name: value.name.clone(),
-        }
-    }
-}
-
-#[derive(Deserialize, ToSchema)]
-pub struct CreateGroup {
-    name: String,
-}
 
 #[derive(Serialize, ToSchema)]
 pub struct GroupMembers {
@@ -48,82 +28,20 @@ pub struct ModifyMember {
     member: Uuid,
 }
 
-/// List groups.
-#[utoipa::path(
-    get,
-    path = "",
-    tag = TAG,
-    responses(
-        (status = OK, description = "Success", body = [Vec<GroupInfo>]),
-    ),
-)]
-async fn list(State(state): State<AppState>, _auth: AuthContext) -> Result<Json<Vec<GroupInfo>>> {
-    let mut txn = state.transaction().await?;
-    Ok(Json(
-        Group::list(&mut txn)
-            .await?
-            .iter()
-            .map(From::from)
-            .collect(),
-    ))
-}
-
-/// Create group.
-#[utoipa::path(
-    post,
-    path = "",
-    tag = TAG,
-    responses(
-        (status = OK, description = "Success", body = [GroupInfo]),
-    ),
-)]
-async fn create(
-    State(state): State<AppState>,
-    _auth: AuthContext,
-    Json(create): Json<CreateGroup>,
-) -> Result<Json<GroupInfo>> {
-    let mut txn = state.transaction().await?;
-    let group = Group::create(&mut txn, &create.name).await?;
-    txn.commit().await?;
-    Ok(Json((&group).into()))
-}
-
-/// Get group.
-#[utoipa::path(
-    get,
-    path = "/{group_id}",
-    tag = TAG,
-    responses(
-        (status = OK, description = "Success", body = [GroupInfo]),
-        (status = NOT_FOUND, description = "Not found"),
-    ),
-)]
-async fn get(
-    State(state): State<AppState>,
-    Path(id): Path<Uuid>,
-    _auth: AuthContext,
-) -> Result<Json<GroupInfo>> {
-    let mut txn = state.transaction().await?;
-    Group::get_by_id(&mut txn, id)
-        .await?
-        .map(|g| Json((&g).into()))
-        .ok_or_else(|| AppError::NotFound)
-}
-
 /// List group members.
 #[utoipa::path(
     get,
     path = "/{group_id}/members",
-    tag = TAG,
+    tag = super::TAG,
     responses(
         (status = OK, description = "Success", body = [GroupMembers]),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]
-async fn list_members(
+pub(super) async fn list(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _auth: AuthContext,
+    _auth: RequirePermission<user_group::permission::ManageMembers>,
 ) -> Result<Json<GroupMembers>> {
     let mut txn = state.transaction().await?;
     let Some(group) = Group::get_by_id(&mut txn, id).await? else {
@@ -142,16 +60,16 @@ async fn list_members(
 #[utoipa::path(
     post,
     path = "/{group_id}/members",
-    tag = TAG,
+    tag = super::TAG,
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]
-async fn add_member(
+pub(super) async fn add(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _auth: AuthContext,
+    _auth: RequirePermission<user_group::permission::ManageMembers>,
     Json(member): Json<ModifyMember>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
@@ -174,16 +92,16 @@ async fn add_member(
 #[utoipa::path(
     delete,
     path = "/{group_id}/members",
-    tag = TAG,
+    tag = super::TAG,
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]
-async fn remove_member(
+pub(super) async fn remove(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _auth: AuthContext,
+    _auth: RequirePermission<user_group::permission::ManageMembers>,
     Json(member): Json<ModifyMember>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
@@ -204,11 +122,4 @@ async fn remove_member(
     } else {
         StatusCode::BAD_REQUEST
     }) // TODO: return a body?
-}
-
-pub fn routes() -> OpenApiRouter<AppState> {
-    OpenApiRouter::new()
-        .routes(routes!(list, create))
-        .routes(routes!(get))
-        .routes(routes!(list_members, add_member, remove_member))
 }

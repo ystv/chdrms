@@ -37,6 +37,7 @@
             yarn-berry
             rust-analyzer
             sqlx-cli
+            cargo-expand
           ] ++ dependencies;
         };
       }
