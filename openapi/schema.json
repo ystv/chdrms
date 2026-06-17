@@ -16,6 +16,10 @@
   "paths": {
     "/auth/providers": {
       "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "List authentication providers.",
         "operationId": "list_providers",
         "responses": {
           "200": {
@@ -25,14 +29,316 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ProviderInfo"
-                    }
+                    "$ref": "#/components/schemas/ProviderInfo"
                   }
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/group": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "List groups.",
+        "operationId": "list",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Create group.",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGroup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/group/{group_id}": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Get group.",
+        "operationId": "get",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/group/{group_id}/members": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "List group members.",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupMembers"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Add user to group.",
+        "operationId": "add",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Remove user from group.",
+        "operationId": "remove",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModifyMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/group/{group_id}/permissions": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "List group permissions.",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ObjectPermissions"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Grant permission to group.",
+        "operationId": "add",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionRef"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Revoke permission from group.",
+        "operationId": "remove",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PermissionRef"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not found"
           }
         }
       }
@@ -71,9 +377,13 @@
         }
       }
     },
-    "/user/@me": {
+    "/user": {
       "get": {
-        "operationId": "current_user",
+        "tags": [
+          "user"
+        ],
+        "summary": "List all users.",
+        "operationId": "list_users",
         "responses": {
           "200": {
             "description": "Success",
@@ -90,10 +400,141 @@
           }
         }
       }
+    },
+    "/user/@me": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get current user.",
+        "operationId": "current_user",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/@me/permissions": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get the current user's permissions.",
+        "operationId": "current_user_permissions",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ObjectPermissions"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CreateGroup": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupMembers": {
+        "type": "object",
+        "required": [
+          "members"
+        ],
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserInfo"
+            }
+          }
+        }
+      },
+      "ModifyMember": {
+        "type": "object",
+        "required": [
+          "member"
+        ],
+        "properties": {
+          "member": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ObjectPermissions": {
+        "type": "object",
+        "required": [
+          "name",
+          "actions"
+        ],
+        "properties": {
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "PermissionRef": {
+        "type": "object",
+        "required": [
+          "object",
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          }
+        }
+      },
       "ProviderInfo": {
         "type": "object",
         "required": [
@@ -130,5 +571,19 @@
         }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "user",
+      "description": "Users"
+    },
+    {
+      "name": "auth",
+      "description": "Auth"
+    },
+    {
+      "name": "group",
+      "description": "Groups"
+    }
+  ]
 }
