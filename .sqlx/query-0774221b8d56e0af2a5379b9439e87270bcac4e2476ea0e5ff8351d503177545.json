@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT\n                id, email, name\n            FROM users\n            WHERE\n                email = $1\n            ",
+  "query": "\n            SELECT\n                users.id, users.email, users.name, users.is_admin\n            FROM user_sessions\n            JOIN users ON user_sessions.user_id = users.id\n            WHERE user_sessions.token = $1;\n            ",
   "describe": {
     "columns": [
       {
@@ -35,18 +35,30 @@
             "name": "name"
           }
         }
+      },
+      {
+        "ordinal": 3,
+        "name": "is_admin",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "is_admin"
+          }
+        }
       }
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "14bbf3bbe18289882a2ddf4b4e7144b4a51e3ec561b4e7b87d78a5f7c1b22275"
+  "hash": "0774221b8d56e0af2a5379b9439e87270bcac4e2476ea0e5ff8351d503177545"
 }

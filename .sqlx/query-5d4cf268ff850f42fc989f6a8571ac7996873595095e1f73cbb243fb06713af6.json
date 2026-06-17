@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO group_permissions(group_id, object, action) VALUES($1, $2, $3) ON CONFLICT DO NOTHING;",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5d4cf268ff850f42fc989f6a8571ac7996873595095e1f73cbb243fb06713af6"
+}

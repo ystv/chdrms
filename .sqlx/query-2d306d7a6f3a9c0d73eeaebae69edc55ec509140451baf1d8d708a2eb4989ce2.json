@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM group_permissions WHERE group_id = $1 AND object = $2 AND action = $3;",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2d306d7a6f3a9c0d73eeaebae69edc55ec509140451baf1d8d708a2eb4989ce2"
+}
