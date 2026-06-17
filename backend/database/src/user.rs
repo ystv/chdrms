@@ -1,9 +1,14 @@
+use std::collections::HashSet;
+
 use uuid::Uuid;
+
+use crate::permission::define_permissions;
 
 pub struct User {
     pub id: Uuid,
     pub email: String,
     pub name: String,
+    pub is_admin: bool,
 }
 
 pub struct UserCreation {
@@ -19,7 +24,7 @@ impl User {
         // TODO: validate email?
         sqlx::query_as!(
             User,
-            "INSERT INTO users(email, name) VALUES ($1, $2) RETURNING id, email, name;",
+            "INSERT INTO users(email, name) VALUES ($1, $2) RETURNING id, email, name, is_admin;",
             create.email,
             create.name
         )
@@ -31,9 +36,13 @@ impl User {
         txn: &mut sqlx::PgTransaction<'_>,
         id: Uuid,
     ) -> sqlx::Result<Option<Self>> {
-        sqlx::query_as!(User, "SELECT id, email, name FROM users WHERE id = $1", id)
-            .fetch_optional(&mut **txn)
-            .await
+        sqlx::query_as!(
+            User,
+            "SELECT id, email, name, is_admin FROM users WHERE id = $1",
+            id
+        )
+        .fetch_optional(&mut **txn)
+        .await
     }
 
     pub async fn get_by_session(
@@ -44,7 +53,7 @@ impl User {
             User,
             r#"
             SELECT
-                users.id, users.email, users.name
+                users.id, users.email, users.name, users.is_admin
             FROM user_sessions
             JOIN users ON user_sessions.user_id = users.id
             WHERE user_sessions.token = $1;
@@ -64,7 +73,7 @@ impl User {
             User,
             r#"
             SELECT
-                users.id, users.email, users.name
+                users.id, users.email, users.name, users.is_admin
             FROM user_identities
             JOIN users ON user_identities.user_id = users.id
             WHERE
@@ -86,7 +95,7 @@ impl User {
             User,
             r#"
             SELECT
-                id, email, name
+                id, email, name, is_admin
             FROM users
             WHERE
                 email = $1
@@ -114,6 +123,30 @@ impl User {
         Ok(())
     }
 
+    pub async fn list_permissions(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+    ) -> sqlx::Result<HashSet<(String, String)>> {
+        let permissions = sqlx::query!(
+            "
+        SELECT
+            DISTINCT ON (group_permissions.object, group_permissions.action)
+            group_permissions.object, group_permissions.action
+        FROM user_groups
+        JOIN group_permissions
+            ON group_permissions.group_id = user_groups.group_id
+        WHERE user_groups.user_id = $1;
+        ",
+            self.id
+        )
+        .fetch_all(&mut **txn)
+        .await?;
+        Ok(permissions
+            .into_iter()
+            .map(|r| (r.object, r.action))
+            .collect())
+    }
+
     /// Create a new session for this user, returning the token
     pub async fn create_session(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Uuid> {
         let result = sqlx::query!(
@@ -134,4 +167,12 @@ impl User {
             .await?;
         Ok(res.rows_affected() != 0)
     }
+
+    pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<User>> {
+        sqlx::query_as!(User, "SELECT id, email, name, is_admin FROM users;")
+            .fetch_all(&mut **txn)
+            .await
+    }
 }
+
+define_permissions!("users" => List, Invite);
