@@ -62,7 +62,7 @@ impl ObjectPermissions {
     path = "/@me",
     tag = TAG,
     responses(
-        (status = OK, description = "Success", body = [UserInfo]),
+        (status = OK, description = "Success", body = UserInfo),
     ),
 )]
 async fn current_user(auth: AuthContext) -> Json<UserInfo> {
@@ -75,7 +75,7 @@ async fn current_user(auth: AuthContext) -> Json<UserInfo> {
     path = "/@me/permissions",
     tag = TAG,
     responses(
-        (status = OK, description = "Success", body = [Vec<ObjectPermissions>]),
+        (status = OK, description = "Success", body = [ObjectPermissions]),
     ),
 )]
 async fn current_user_permissions(auth: AuthContext) -> Json<Vec<ObjectPermissions>> {
@@ -88,7 +88,7 @@ async fn current_user_permissions(auth: AuthContext) -> Json<Vec<ObjectPermissio
     path = "",
     tag = TAG,
     responses(
-        (status = OK, description = "Success", body = [Vec<UserInfo>])
+        (status = OK, description = "Success", body = [UserInfo])
     )
 )]
 async fn list_users(

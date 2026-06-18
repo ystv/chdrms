@@ -20,7 +20,7 @@ use crate::{
     path = "/{group_id}/permissions",
     tag = super::TAG,
     responses(
-        (status = OK, description = "Success", body = [Vec<ObjectPermissions>]),
+        (status = OK, description = "Success", body = [ObjectPermissions]),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]

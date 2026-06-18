@@ -98,7 +98,7 @@ async fn logout(jar: CookieJar, State(state): State<AppState>) -> Result<(Cookie
     path = "/providers",
     tag = TAG,
     responses(
-        (status = OK, description = "Success", body = [Vec<ProviderInfo>]),
+        (status = OK, description = "Success", body = [ProviderInfo]),
     ),
 )]
 async fn list_providers(State(state): State<AppState>) -> Json<Vec<ProviderInfo>> {
