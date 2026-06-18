@@ -39,7 +39,7 @@ pub struct CreateGroup {
     path = "",
     tag = super::TAG,
     responses(
-        (status = OK, description = "Success", body = [Vec<GroupInfo>]),
+        (status = OK, description = "Success", body = [GroupInfo]),
     ),
 )]
 pub(super) async fn list(
@@ -62,7 +62,7 @@ pub(super) async fn list(
     path = "",
     tag = super::TAG,
     responses(
-        (status = OK, description = "Success", body = [GroupInfo]),
+        (status = OK, description = "Success", body = GroupInfo),
     ),
 )]
 pub(super) async fn create(
@@ -82,7 +82,7 @@ pub(super) async fn create(
     path = "/{group_id}",
     tag = super::TAG,
     responses(
-        (status = OK, description = "Success", body = [GroupInfo]),
+        (status = OK, description = "Success", body = GroupInfo),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]

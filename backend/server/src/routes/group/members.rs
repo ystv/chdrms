@@ -34,7 +34,7 @@ pub struct ModifyMember {
     path = "/{group_id}/members",
     tag = super::TAG,
     responses(
-        (status = OK, description = "Success", body = [GroupMembers]),
+        (status = OK, description = "Success", body = GroupMembers),
         (status = NOT_FOUND, description = "Not found"),
     ),
 )]
