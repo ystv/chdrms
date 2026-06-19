@@ -1,11 +1,12 @@
 use axum::{Json, http::StatusCode, response::IntoResponse};
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use crate::auth::oidc::AuthSetupError;
 
 pub type Result<T, E = AppError> = std::result::Result<T, E>;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ErrorResponse {
     error: String,
 }

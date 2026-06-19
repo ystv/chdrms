@@ -1,5 +1,6 @@
 use sqlx::PgPool;
 
+pub mod manufacturer;
 pub mod permission;
 pub mod user;
 pub mod user_group;
