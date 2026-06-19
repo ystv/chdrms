@@ -12,7 +12,7 @@ pub struct Manufacturer {
     pub phone: Option<String>,
 }
 
-pub struct ManufacturerCreation {
+pub struct ManufacturerData {
     pub name: String,
     pub description: Option<String>,
 
@@ -24,7 +24,7 @@ pub struct ManufacturerCreation {
 impl Manufacturer {
     pub async fn create(
         txn: &mut sqlx::PgTransaction<'_>,
-        create: ManufacturerCreation,
+        create: ManufacturerData,
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Manufacturer,
@@ -77,6 +77,28 @@ impl Manufacturer {
         )
         .fetch_all(&mut **txn)
         .await
+    }
+
+    pub async fn update(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+        data: ManufacturerData,
+    ) -> sqlx::Result<Manufacturer> {
+        Ok(sqlx::query_as!(
+            Manufacturer,
+            "UPDATE manufacturers
+            SET name = $2, description = $3, website = $4, email = $5, phone = $6
+            WHERE id = $1
+            RETURNING id, name, description, website, email, phone;",
+            self.id,
+            data.name,
+            data.description,
+            data.website,
+            data.email,
+            data.phone,
+        )
+        .fetch_one(&mut **txn)
+        .await?)
     }
 }
 

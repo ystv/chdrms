@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::manufacturer::{self, Manufacturer};
+use chdrms_database::manufacturer::{self as database};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -28,8 +28,8 @@ pub struct ManufacturerInfo {
     pub phone: Option<String>,
 }
 
-impl From<&Manufacturer> for ManufacturerInfo {
-    fn from(manufacturer: &Manufacturer) -> Self {
+impl From<&database::Manufacturer> for ManufacturerInfo {
+    fn from(manufacturer: &database::Manufacturer) -> Self {
         Self {
             id: manufacturer.id,
             name: manufacturer.name.clone(),
@@ -43,7 +43,7 @@ impl From<&Manufacturer> for ManufacturerInfo {
 }
 
 #[derive(Deserialize, ToSchema)]
-pub struct CreateManufacturer {
+pub struct Manufacturer {
     name: String,
     description: Option<String>,
 
@@ -52,8 +52,8 @@ pub struct CreateManufacturer {
     phone: Option<String>,
 }
 
-impl From<&CreateManufacturer> for chdrms_database::manufacturer::ManufacturerCreation {
-    fn from(manufacturer: &CreateManufacturer) -> Self {
+impl From<&Manufacturer> for database::ManufacturerData {
+    fn from(manufacturer: &Manufacturer) -> Self {
         Self {
             name: manufacturer.name.clone(),
             description: manufacturer.description.clone(),
@@ -74,11 +74,11 @@ impl From<&CreateManufacturer> for chdrms_database::manufacturer::ManufacturerCr
 )]
 async fn get_by_id(
     State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::View>,
     Path(id): Path<Uuid>,
-    _auth: RequirePermission<manufacturer::permission::View>,
 ) -> Result<Json<ManufacturerInfo>> {
     Ok(Json(
-        (&Manufacturer::get_by_id(&mut state.transaction().await?, id)
+        (&database::Manufacturer::get_by_id(&mut state.transaction().await?, id)
             .await?
             .ok_or_else(|| AppError::NotFound)?)
             .into(),
@@ -95,10 +95,10 @@ async fn get_by_id(
 )]
 async fn list(
     State(state): State<AppState>,
-    _auth: RequirePermission<manufacturer::permission::View>,
+    _auth: RequirePermission<database::permission::View>,
 ) -> Result<Json<Vec<ManufacturerInfo>>> {
     Ok(Json(
-        Manufacturer::list(&mut state.transaction().await?)
+        database::Manufacturer::list(&mut state.transaction().await?)
             .await?
             .iter()
             .map(From::from)
@@ -114,13 +114,13 @@ async fn list(
         (status = OK, description = "Success", body = ManufacturerInfo),
     ),
 )]
-pub async fn create(
+async fn create(
     State(state): State<AppState>,
-    _auth: RequirePermission<manufacturer::permission::Manage>,
-    Json(create): Json<CreateManufacturer>,
+    _auth: RequirePermission<database::permission::Manage>,
+    Json(create): Json<Manufacturer>,
 ) -> Result<Json<ManufacturerInfo>> {
     let mut txn = state.transaction().await?;
-    let manufacturer = Manufacturer::create(&mut txn, (&create).into()).await?;
+    let manufacturer = database::Manufacturer::create(&mut txn, (&create).into()).await?;
     txn.commit().await?;
 
     Ok(Json((&manufacturer).into()))
@@ -136,13 +136,13 @@ pub async fn create(
         (status = NOT_FOUND, description = "Manufacturer by that ID not found", body = ErrorResponse)
     ),
 )]
-pub async fn delete(
+async fn delete(
     State(state): State<AppState>,
-    _auth: RequirePermission<manufacturer::permission::Manage>,
+    _auth: RequirePermission<database::permission::Manage>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
-    Manufacturer::get_by_id(&mut txn, id)
+    database::Manufacturer::get_by_id(&mut txn, id)
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .delete(&mut txn)
@@ -152,9 +152,37 @@ pub async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    put,
+    path = "/{id}",
+    tag = TAG,
+    responses(
+        (status = OK, description = "Success", body = ManufacturerInfo),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Manufacturer by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn update(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::Manage>,
+    Path(id): Path<Uuid>,
+    Json(manufacturer): Json<Manufacturer>,
+) -> Result<Json<ManufacturerInfo>> {
+    let mut txn = state.transaction().await?;
+    let manufacturer = database::Manufacturer::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .update(&mut txn, (&manufacturer).into())
+        .await?;
+    txn.commit().await?;
+
+    Ok(Json((&manufacturer).into()))
+}
+
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
         .routes(routes!(list, create))
         .routes(routes!(delete))
+        .routes(routes!(update))
 }
