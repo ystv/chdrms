@@ -36,7 +36,7 @@ impl Manufacturer {
         create: ManufacturerData,
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
-            Manufacturer,
+            Self,
             "INSERT INTO manufacturers(name, description, website, email, phone)
             VALUES ($1, $2, $3, $4, $5)
             RETURNING id, name, description, website, email, phone;",
@@ -55,7 +55,7 @@ impl Manufacturer {
         id: Uuid,
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
-            Manufacturer,
+            Self,
             "SELECT id, name, description, website, email, phone
             FROM manufacturers
             WHERE id = $1;",
@@ -65,9 +65,9 @@ impl Manufacturer {
         .await
     }
 
-    pub async fn delete(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<bool> {
+    pub async fn delete(self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<bool> {
         let result = sqlx::query_as!(
-            Manufacturer,
+            Self,
             "DELETE FROM manufacturers
             WHERE id = $1;",
             self.id,
@@ -78,9 +78,9 @@ impl Manufacturer {
         Ok(result.rows_affected() != 0)
     }
 
-    pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Manufacturer>> {
+    pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
-            Manufacturer,
+            Self,
             "SELECT id, name, description, website, email, phone
             FROM manufacturers;",
         )
@@ -89,12 +89,12 @@ impl Manufacturer {
     }
 
     pub async fn update(
-        &self,
+        self,
         txn: &mut sqlx::PgTransaction<'_>,
         data: ManufacturerData,
-    ) -> sqlx::Result<Manufacturer> {
+    ) -> sqlx::Result<Self> {
         Ok(sqlx::query_as!(
-            Manufacturer,
+            Self,
             "UPDATE manufacturers
             SET name = $2, description = $3, website = $4, email = $5, phone = $6
             WHERE id = $1
@@ -111,10 +111,10 @@ impl Manufacturer {
     }
 
     pub async fn patch(
-        &self,
+        self,
         txn: &mut sqlx::PgTransaction<'_>,
         patch: ManufacturerPatch,
-    ) -> sqlx::Result<Manufacturer> {
+    ) -> sqlx::Result<Self> {
         let (name_provided, name) = patch.name.into_case_pair();
         let (description_provided, description) = patch.description.into_nullable_case_pair();
         let (website_provided, website) = patch.website.into_nullable_case_pair();
@@ -122,7 +122,7 @@ impl Manufacturer {
         let (phone_provided, phone) = patch.phone.into_nullable_case_pair();
 
         sqlx::query_as!(
-            Manufacturer,
+            Self,
             "UPDATE manufacturers
             SET
                 name = CASE WHEN $1 THEN $2 ELSE name END,
