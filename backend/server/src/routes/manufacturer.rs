@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::manufacturer::{self as database};
+use chdrms_database::manufacturer as database;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::{
     auth::permissions::RequirePermission,
     error::{AppError, ErrorResponse, Result},
+    routes::PatchField,
     state::AppState,
 };
 
@@ -60,6 +61,38 @@ impl From<&Manufacturer> for database::ManufacturerData {
             website: manufacturer.website.clone(),
             email: manufacturer.email.clone(),
             phone: manufacturer.phone.clone(),
+        }
+    }
+}
+
+#[derive(Deserialize, ToSchema)]
+pub struct PatchManufacturer {
+    #[serde(default)]
+    #[schema(value_type = Option<String>)]
+    name: PatchField<String>,
+    #[serde(default)]
+    #[schema(value_type = Option<String>)]
+    description: PatchField<Option<String>>,
+
+    #[serde(default)]
+    #[schema(value_type = Option<String>)]
+    website: PatchField<Option<String>>,
+    #[serde(default)]
+    #[schema(value_type = Option<String>)]
+    email: PatchField<Option<String>>,
+    #[serde(default)]
+    #[schema(value_type = Option<String>)]
+    phone: PatchField<Option<String>>,
+}
+
+impl From<&PatchManufacturer> for database::ManufacturerPatch {
+    fn from(manufacturer: &PatchManufacturer) -> Self {
+        Self {
+            name: (&manufacturer.name).into(),
+            description: (&manufacturer.description).into(),
+            website: (&manufacturer.website).into(),
+            email: (&manufacturer.email).into(),
+            phone: (&manufacturer.phone).into(),
         }
     }
 }
@@ -179,10 +212,38 @@ async fn update(
     Ok(Json((&manufacturer).into()))
 }
 
+#[utoipa::path(
+    patch,
+    path = "/{id}",
+    tag = TAG,
+    responses(
+        (status = OK, description = "Success", body = ManufacturerInfo),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Manufacturer by that ID not found", body = ErrorResponse)
+    )
+)]
+async fn patch(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::Manage>,
+    Path(id): Path<Uuid>,
+    Json(manufacturer): Json<PatchManufacturer>,
+) -> Result<Json<ManufacturerInfo>> {
+    let mut txn = state.transaction().await?;
+    let manufacturer = database::Manufacturer::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .patch(&mut txn, (&manufacturer).into())
+        .await?;
+    txn.commit().await?;
+
+    Ok(Json((&manufacturer).into()))
+}
+
 pub fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
         .routes(routes!(list, create))
         .routes(routes!(delete))
         .routes(routes!(update))
+        .routes(routes!(patch))
 }

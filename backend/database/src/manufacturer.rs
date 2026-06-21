@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::permission::define_permissions;
+use crate::{PatchField, permission::define_permissions};
 
 pub struct Manufacturer {
     pub id: Uuid,
@@ -19,6 +19,15 @@ pub struct ManufacturerData {
     pub website: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
+}
+
+pub struct ManufacturerPatch {
+    pub name: PatchField<String>,
+    pub description: PatchField<Option<String>>,
+
+    pub website: PatchField<Option<String>>,
+    pub email: PatchField<Option<String>>,
+    pub phone: PatchField<Option<String>>,
 }
 
 impl Manufacturer {
@@ -99,6 +108,44 @@ impl Manufacturer {
         )
         .fetch_one(&mut **txn)
         .await?)
+    }
+
+    pub async fn patch(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+        patch: ManufacturerPatch,
+    ) -> sqlx::Result<Manufacturer> {
+        let (name_provided, name) = patch.name.into_case_pair();
+        let (description_provided, description) = patch.description.into_nullable_case_pair();
+        let (website_provided, website) = patch.website.into_nullable_case_pair();
+        let (email_provided, email) = patch.email.into_nullable_case_pair();
+        let (phone_provided, phone) = patch.phone.into_nullable_case_pair();
+
+        sqlx::query_as!(
+            Manufacturer,
+            "UPDATE manufacturers
+            SET
+                name = CASE WHEN $1 THEN $2 ELSE name END,
+                description = CASE WHEN $3 THEN $4 ELSE description END,
+                website = CASE WHEN $5 THEN $6 ELSE website END,
+                email = CASE WHEN $7 THEN $8 ELSE email END,
+                phone = CASE WHEN $9 THEN $10 ELSE phone END
+            WHERE id = $11
+            RETURNING id, name, description, website, email, phone;",
+            name_provided,
+            name,
+            description_provided,
+            description,
+            website_provided,
+            website,
+            email_provided,
+            email,
+            phone_provided,
+            phone,
+            self.id,
+        )
+        .fetch_one(&mut **txn)
+        .await
     }
 }
 
