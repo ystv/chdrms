@@ -29,8 +29,8 @@ pub struct ManufacturerInfo {
     pub phone: Option<String>,
 }
 
-impl From<&database::Manufacturer> for ManufacturerInfo {
-    fn from(manufacturer: &database::Manufacturer) -> Self {
+impl From<database::Manufacturer> for ManufacturerInfo {
+    fn from(manufacturer: database::Manufacturer) -> Self {
         Self {
             id: manufacturer.id,
             name: manufacturer.name.clone(),
@@ -53,14 +53,26 @@ pub struct Manufacturer {
     phone: Option<String>,
 }
 
-impl From<&Manufacturer> for database::ManufacturerData {
-    fn from(manufacturer: &Manufacturer) -> Self {
+impl From<Manufacturer> for database::CreateManufacturer {
+    fn from(manufacturer: Manufacturer) -> Self {
         Self {
-            name: manufacturer.name.clone(),
-            description: manufacturer.description.clone(),
-            website: manufacturer.website.clone(),
-            email: manufacturer.email.clone(),
-            phone: manufacturer.phone.clone(),
+            name: manufacturer.name,
+            description: manufacturer.description,
+            website: manufacturer.website,
+            email: manufacturer.email,
+            phone: manufacturer.phone,
+        }
+    }
+}
+
+impl From<Manufacturer> for database::UpdateManufacturer {
+    fn from(manufacturer: Manufacturer) -> Self {
+        Self {
+            name: manufacturer.name,
+            description: manufacturer.description,
+            website: manufacturer.website,
+            email: manufacturer.email,
+            phone: manufacturer.phone,
         }
     }
 }
@@ -85,14 +97,14 @@ pub struct PatchManufacturer {
     phone: PatchField<Option<String>>,
 }
 
-impl From<&PatchManufacturer> for database::ManufacturerPatch {
-    fn from(manufacturer: &PatchManufacturer) -> Self {
+impl From<PatchManufacturer> for database::PatchManufacturer {
+    fn from(manufacturer: PatchManufacturer) -> Self {
         Self {
-            name: (&manufacturer.name).into(),
-            description: (&manufacturer.description).into(),
-            website: (&manufacturer.website).into(),
-            email: (&manufacturer.email).into(),
-            phone: (&manufacturer.phone).into(),
+            name: manufacturer.name.into(),
+            description: manufacturer.description.into(),
+            website: manufacturer.website.into(),
+            email: manufacturer.email.into(),
+            phone: manufacturer.phone.into(),
         }
     }
 }
@@ -103,6 +115,8 @@ impl From<&PatchManufacturer> for database::ManufacturerPatch {
     tag = TAG,
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Manufacturer by that ID not found", body = ErrorResponse),
     )
 )]
 async fn get_by_id(
@@ -111,9 +125,9 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<ManufacturerInfo>> {
     Ok(Json(
-        (&database::Manufacturer::get_by_id(&mut state.transaction().await?, id)
+        database::Manufacturer::get_by_id(&mut state.transaction().await?, id)
             .await?
-            .ok_or_else(|| AppError::NotFound)?)
+            .ok_or_else(|| AppError::NotFound)?
             .into(),
     ))
 }
@@ -124,6 +138,7 @@ async fn get_by_id(
     tag = TAG,
     responses(
         (status = OK, description = "Success", body = [ManufacturerInfo]),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse)
     )
 )]
 async fn list(
@@ -133,7 +148,7 @@ async fn list(
     Ok(Json(
         database::Manufacturer::list(&mut state.transaction().await?)
             .await?
-            .iter()
+            .into_iter()
             .map(From::from)
             .collect(),
     ))
@@ -145,6 +160,7 @@ async fn list(
     tag = TAG,
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse)
     ),
 )]
 async fn create(
@@ -153,10 +169,10 @@ async fn create(
     Json(create): Json<Manufacturer>,
 ) -> Result<Json<ManufacturerInfo>> {
     let mut txn = state.transaction().await?;
-    let manufacturer = database::Manufacturer::create(&mut txn, (&create).into()).await?;
+    let manufacturer = database::Manufacturer::create(&mut txn, create.into()).await?;
     txn.commit().await?;
 
-    Ok(Json((&manufacturer).into()))
+    Ok(Json(manufacturer.into()))
 }
 
 #[utoipa::path(
@@ -205,11 +221,11 @@ async fn update(
     let manufacturer = database::Manufacturer::get_by_id(&mut txn, id)
         .await?
         .ok_or_else(|| AppError::NotFound)?
-        .update(&mut txn, (&manufacturer).into())
+        .update(&mut txn, manufacturer.into())
         .await?;
     txn.commit().await?;
 
-    Ok(Json((&manufacturer).into()))
+    Ok(Json(manufacturer.into()))
 }
 
 #[utoipa::path(
@@ -232,11 +248,11 @@ async fn patch(
     let manufacturer = database::Manufacturer::get_by_id(&mut txn, id)
         .await?
         .ok_or_else(|| AppError::NotFound)?
-        .patch(&mut txn, (&manufacturer).into())
+        .patch(&mut txn, manufacturer.into())
         .await?;
     txn.commit().await?;
 
-    Ok(Json((&manufacturer).into()))
+    Ok(Json(manufacturer.into()))
 }
 
 pub fn routes() -> OpenApiRouter<AppState> {

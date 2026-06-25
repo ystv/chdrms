@@ -55,8 +55,8 @@ where
     }
 }
 
-impl<T: Clone> From<&PatchField<T>> for chdrms_database::PatchField<T> {
-    fn from(field: &PatchField<T>) -> Self {
+impl<T: Clone> From<PatchField<T>> for chdrms_database::PatchField<T> {
+    fn from(field: PatchField<T>) -> Self {
         match field {
             PatchField::Present(value) => chdrms_database::PatchField::Present(value.clone()),
             PatchField::Absent => chdrms_database::PatchField::Absent,

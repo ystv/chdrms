@@ -1,8 +1,11 @@
+use chdrms_database_macros::schema;
 use uuid::Uuid;
 
-use crate::{PatchField, permission::define_permissions};
+use crate::permission::define_permissions;
 
+#[schema]
 pub struct Manufacturer {
+    #[schema(generated, immutable)]
     pub id: Uuid,
     pub name: String,
     pub description: Option<String>,
@@ -12,28 +15,10 @@ pub struct Manufacturer {
     pub phone: Option<String>,
 }
 
-pub struct ManufacturerData {
-    pub name: String,
-    pub description: Option<String>,
-
-    pub website: Option<String>,
-    pub email: Option<String>,
-    pub phone: Option<String>,
-}
-
-pub struct ManufacturerPatch {
-    pub name: PatchField<String>,
-    pub description: PatchField<Option<String>>,
-
-    pub website: PatchField<Option<String>>,
-    pub email: PatchField<Option<String>>,
-    pub phone: PatchField<Option<String>>,
-}
-
 impl Manufacturer {
     pub async fn create(
         txn: &mut sqlx::PgTransaction<'_>,
-        create: ManufacturerData,
+        create: CreateManufacturer,
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
@@ -91,7 +76,7 @@ impl Manufacturer {
     pub async fn update(
         self,
         txn: &mut sqlx::PgTransaction<'_>,
-        data: ManufacturerData,
+        update: UpdateManufacturer,
     ) -> sqlx::Result<Self> {
         Ok(sqlx::query_as!(
             Self,
@@ -100,11 +85,11 @@ impl Manufacturer {
             WHERE id = $1
             RETURNING id, name, description, website, email, phone;",
             self.id,
-            data.name,
-            data.description,
-            data.website,
-            data.email,
-            data.phone,
+            update.name,
+            update.description,
+            update.website,
+            update.email,
+            update.phone,
         )
         .fetch_one(&mut **txn)
         .await?)
@@ -113,7 +98,7 @@ impl Manufacturer {
     pub async fn patch(
         self,
         txn: &mut sqlx::PgTransaction<'_>,
-        patch: ManufacturerPatch,
+        patch: PatchManufacturer,
     ) -> sqlx::Result<Self> {
         let (name_provided, name) = patch.name.into_case_pair();
         let (description_provided, description) = patch.description.into_nullable_case_pair();

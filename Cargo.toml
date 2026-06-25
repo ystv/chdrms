@@ -2,5 +2,6 @@
 resolver = "3"
 members = [
     "backend/database/",
+    "backend/database_macros/",
     "backend/server/",
 ]
