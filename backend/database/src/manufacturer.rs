@@ -5,20 +5,20 @@ use uuid::Uuid;
 use crate::permission::define_permissions;
 
 #[schema]
-pub struct Manufacturer {
+struct Manufacturer {
     #[schema(generated, immutable)]
-    pub id: Uuid,
-    pub name: String,
-    pub description: Option<String>,
+    id: Uuid,
+    name: String,
+    description: Option<String>,
 
-    pub website: Option<String>,
-    pub email: Option<String>,
-    pub phone: Option<String>,
+    website: Option<String>,
+    email: Option<String>,
+    phone: Option<String>,
 
     #[schema(generated, immutable)]
-    pub created_at: DateTime<Utc>,
+    created_at: DateTime<Utc>,
     #[schema(immutable)]
-    pub created_by: Uuid,
+    created_by: Uuid,
 }
 
 impl Manufacturer {
@@ -85,7 +85,7 @@ impl Manufacturer {
         txn: &mut sqlx::PgTransaction<'_>,
         update: UpdateManufacturer,
     ) -> sqlx::Result<Self> {
-        Ok(sqlx::query_as!(
+        sqlx::query_as!(
             Self,
             "UPDATE manufacturers
             SET name = $2, description = $3, website = $4, email = $5, phone = $6
@@ -99,7 +99,7 @@ impl Manufacturer {
             update.phone,
         )
         .fetch_one(&mut **txn)
-        .await?)
+        .await
     }
 
     pub async fn patch(

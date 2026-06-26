@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::manufacturer as database;
+use chdrms_database::{PatchField, manufacturer as database};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -12,7 +12,6 @@ use uuid::Uuid;
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
-    routes::PatchField,
     state::AppState,
 };
 
@@ -33,12 +32,12 @@ impl From<database::Manufacturer> for ManufacturerInfo {
     fn from(manufacturer: database::Manufacturer) -> Self {
         Self {
             id: manufacturer.id,
-            name: manufacturer.name.clone(),
-            description: manufacturer.description.clone(),
+            name: manufacturer.name,
+            description: manufacturer.description,
 
-            website: manufacturer.website.clone(),
-            email: manufacturer.email.clone(),
-            phone: manufacturer.phone.clone(),
+            website: manufacturer.website,
+            email: manufacturer.email,
+            phone: manufacturer.phone,
         }
     }
 }
@@ -99,11 +98,11 @@ pub struct PatchManufacturer {
 impl From<PatchManufacturer> for database::PatchManufacturer {
     fn from(manufacturer: PatchManufacturer) -> Self {
         Self {
-            name: manufacturer.name.into(),
-            description: manufacturer.description.into(),
-            website: manufacturer.website.into(),
-            email: manufacturer.email.into(),
-            phone: manufacturer.phone.into(),
+            name: manufacturer.name,
+            description: manufacturer.description,
+            website: manufacturer.website,
+            email: manufacturer.email,
+            phone: manufacturer.phone,
         }
     }
 }
