@@ -1,28 +1,34 @@
 use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 
-use crate::{location::Location, permission::define_permissions};
+use crate::{
+    asset_type::AssetTypeId,
+    bundle::BundleId,
+    define_id,
+    location::{Location, LocationId},
+    permission::define_permissions,
+    user::UserId,
+};
 
 #[schema]
 struct Asset {
     #[schema(generated, immutable)]
-    id: Uuid,
+    id: AssetId,
     #[schema(immutable)]
-    r#type: Uuid,
+    r#type: AssetTypeId,
     alias: Option<String>,
     notes: Option<String>,
     tag: String,
 
-    bundle: Option<Uuid>,
+    bundle: Option<BundleId>,
 
-    home_location: Uuid,
-    location: Uuid,
+    home_location: LocationId,
+    location: LocationId,
 
     #[schema(generated, immutable)]
     created_at: DateTime<Utc>,
     #[schema(immutable)]
-    created_by: Uuid,
+    created_by: UserId,
 }
 
 impl Asset {
@@ -34,15 +40,25 @@ impl Asset {
             Self,
             r#"INSERT INTO assets(type, alias, notes, tag, bundle, home_location, location, created_by)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
-            asset.r#type,
+            RETURNING
+                id AS "id: _",
+                type AS "type: _",
+                alias,
+                notes,
+                tag,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
+                created_at,
+                created_by AS "created_by: _";"#,
+            asset.r#type as _,
             asset.alias,
             asset.notes,
             asset.tag,
-            asset.bundle,
-            asset.home_location,
-            asset.location,
-            asset.created_by,
+            asset.bundle as _,
+            asset.home_location as _,
+            asset.location as _,
+            asset.created_by as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -50,14 +66,24 @@ impl Asset {
 
     pub async fn get_by_id(
         txn: &mut sqlx::PgTransaction<'_>,
-        id: Uuid,
+        id: AssetId,
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            r#"SELECT
+                id AS "id: _",
+                type AS "type: _",
+                alias,
+                notes,
+                tag,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
+                created_at,
+                created_by AS "created_by: _"
             FROM assets
             WHERE id = $1;"#,
-            id,
+            id as _,
         )
         .fetch_optional(&mut **txn)
         .await
@@ -66,7 +92,17 @@ impl Asset {
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            r#"SELECT
+                id AS "id: _",
+                type AS "type: _",
+                alias,
+                notes,
+                tag,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
+                created_at,
+                created_by AS "created_by: _"
             FROM assets;"#,
         )
         .fetch_all(&mut **txn)
@@ -74,25 +110,25 @@ impl Asset {
     }
 
     pub async fn list_of_type(
-        r#type: Uuid,
+        r#type: AssetTypeId,
         txn: &mut sqlx::PgTransaction<'_>,
     ) -> sqlx::Result<Vec<Asset>> {
         sqlx::query_as!(
             Asset,
             r#"SELECT
-                id,
-                type,
+                id AS "id: _",
+                type AS "type: _",
                 alias,
                 notes,
                 tag,
-                bundle,
-                home_location,
-                location,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
                 created_at,
-                created_by
+                created_by AS "created_by: _"
             FROM assets
             WHERE type = $1;"#,
-            r#type,
+            r#type as _,
         )
         .fetch_all(&mut **txn)
         .await
@@ -103,7 +139,7 @@ impl Asset {
             Self,
             r#"DELETE FROM assets
             WHERE id = $1;"#,
-            self.id,
+            self.id as _,
         )
         .execute(&mut **txn)
         .await?;
@@ -128,23 +164,23 @@ impl Asset {
                 location = $7
             WHERE id = $1
             RETURNING
-                id,
-                type,
+                id AS "id: _",
+                type AS "type: _",
                 alias,
                 notes,
                 tag,
-                bundle,
-                home_location,
-                location,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
                 created_at,
-                created_by;"#,
-            self.id,
+                created_by AS "created_by: _";"#,
+            self.id as _,
             update.alias,
             update.notes,
             update.tag,
-            update.bundle,
-            update.home_location,
-            update.location,
+            update.bundle as _,
+            update.home_location as _,
+            update.location as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -153,16 +189,26 @@ impl Asset {
     pub async fn set_location(
         &self,
         txn: &mut sqlx::PgTransaction<'_>,
-        location: Uuid,
+        location: LocationId,
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
             r#"UPDATE assets
             SET location = $2
             WHERE id = $1
-            RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
-            &self.id,
-            location,
+            RETURNING
+                id AS "id: _",
+                type AS "type: _",
+                alias,
+                notes,
+                tag,
+                bundle AS "bundle: _",
+                home_location AS "home_location: _",
+                location AS "location: _",
+                created_at,
+                created_by AS "created_by: _";"#,
+            self.id as _,
+            location as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -171,12 +217,18 @@ impl Asset {
     pub async fn get_location(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Location> {
         sqlx::query_as!(
             Location,
-            r#"SELECT locations.id, locations.name, locations.description, locations.coordinates, locations.created_at, locations.created_by
+            r#"SELECT
+                locations.id AS "id: _",
+                locations.name,
+                locations.description,
+                locations.coordinates,
+                locations.created_at,
+                locations.created_by AS "created_by: _"
             FROM locations
             LEFT JOIN assets
             ON locations.id = assets.location
             WHERE assets.id = $1;"#,
-            &self.id,
+            self.id as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -184,3 +236,4 @@ impl Asset {
 }
 
 define_permissions!("assets" => View, Manage);
+define_id!(AssetId);

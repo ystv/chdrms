@@ -1,11 +1,13 @@
 use std::collections::HashSet;
 
+use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-use crate::permission::define_permissions;
+use crate::{define_id, permission::define_permissions};
 
+#[derive(Debug, FromRow)]
 pub struct User {
-    pub id: Uuid,
+    pub id: UserId,
     pub email: String,
     pub name: String,
     pub is_admin: bool,
@@ -24,7 +26,9 @@ impl User {
         // TODO: validate email?
         sqlx::query_as!(
             User,
-            "INSERT INTO users(email, name) VALUES ($1, $2) RETURNING id, email, name, is_admin;",
+            r#"INSERT INTO users(email, name)
+            VALUES ($1, $2)
+            RETURNING id AS "id: _", email, name, is_admin;"#,
             create.email,
             create.name
         )
@@ -34,12 +38,14 @@ impl User {
 
     pub async fn get_by_id(
         txn: &mut sqlx::PgTransaction<'_>,
-        id: Uuid,
+        id: UserId,
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             User,
-            "SELECT id, email, name, is_admin FROM users WHERE id = $1",
-            id
+            r#"SELECT id AS "id: _", email, name, is_admin
+            FROM users
+            WHERE id = $1;"#,
+            id as _,
         )
         .fetch_optional(&mut **txn)
         .await
@@ -51,13 +57,11 @@ impl User {
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             User,
-            r#"
-            SELECT
-                users.id, users.email, users.name, users.is_admin
+            r#"SELECT
+                users.id AS "id: _", users.email, users.name, users.is_admin
             FROM user_sessions
             JOIN users ON user_sessions.user_id = users.id
-            WHERE user_sessions.token = $1;
-            "#,
+            WHERE user_sessions.token = $1;"#,
             token
         )
         .fetch_optional(&mut **txn)
@@ -71,15 +75,13 @@ impl User {
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             User,
-            r#"
-            SELECT
-                users.id, users.email, users.name, users.is_admin
+            r#"SELECT
+                users.id AS "id: _", users.email, users.name, users.is_admin
             FROM user_identities
             JOIN users ON user_identities.user_id = users.id
             WHERE
                 user_identities.provider = $1
-                AND user_identities.provider_id = $2;
-            "#,
+                AND user_identities.provider_id = $2;"#,
             provider,
             provider_id,
         )
@@ -93,13 +95,11 @@ impl User {
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             User,
-            r#"
-            SELECT
-                id, email, name, is_admin
+            r#"SELECT
+                id AS "id: _", email, name, is_admin
             FROM users
             WHERE
-                email = $1
-            "#,
+                email = $1;"#,
             email,
         )
         .fetch_optional(&mut **txn)
@@ -114,7 +114,7 @@ impl User {
     ) -> sqlx::Result<()> {
         sqlx::query!(
             "INSERT INTO user_identities(user_id, provider, provider_id) VALUES ($1, $2, $3);",
-            self.id,
+            self.id as _,
             provider,
             provider_id
         )
@@ -137,7 +137,7 @@ impl User {
             ON group_permissions.group_id = user_groups.group_id
         WHERE user_groups.user_id = $1;
         ",
-            self.id
+            self.id as _
         )
         .fetch_all(&mut **txn)
         .await?;
@@ -151,7 +151,7 @@ impl User {
     pub async fn create_session(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Uuid> {
         let result = sqlx::query!(
             "INSERT INTO user_sessions(user_id) VALUES ($1) RETURNING token;",
-            &self.id
+            self.id as _
         )
         .fetch_one(&mut **txn)
         .await?;
@@ -169,10 +169,14 @@ impl User {
     }
 
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<User>> {
-        sqlx::query_as!(User, "SELECT id, email, name, is_admin FROM users;")
-            .fetch_all(&mut **txn)
-            .await
+        sqlx::query_as!(
+            User,
+            r#"SELECT id AS "id: _", email, name, is_admin FROM users;"#
+        )
+        .fetch_all(&mut **txn)
+        .await
     }
 }
 
 define_permissions!("users" => List, Invite, Manage);
+define_id!(UserId);

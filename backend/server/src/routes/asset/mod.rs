@@ -14,7 +14,12 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::asset::{self as database, CreateAsset, UpdateAsset};
+use chdrms_database::{
+    asset::{self as database, AssetId, CreateAsset, UpdateAsset},
+    asset_type::AssetTypeId,
+    bundle::BundleId,
+    location::LocationId,
+};
 
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -57,20 +62,20 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<AssetDto>> {
     let mut txn = state.transaction().await?;
-    let asset = database::Asset::get_by_id(&mut txn, id)
+    let asset = database::Asset::get_by_id(&mut txn, AssetId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?;
 
     Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
+        id: asset.id.into(),
+        r#type: asset.r#type.into(),
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
-        bundle: asset.bundle,
+        bundle: asset.bundle.map(Into::into),
         locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
+            current: asset.location.into(),
+            home: asset.home_location.into(),
         },
     }))
 }
@@ -97,13 +102,17 @@ async fn create(
     let asset = database::Asset::create(
         &mut txn,
         CreateAsset {
-            r#type: asset.r#type,
+            // todo:
+            // at the moment, we trust the client has provided us with valid IDs.
+            // however, we should probably do lookups so that the error provided
+            // back to the client is more precise.
+            r#type: AssetTypeId::new(asset.r#type),
             alias: asset.alias,
             notes: asset.notes,
             tag: asset.tag,
-            bundle: asset.bundle,
-            home_location: asset.locations.home,
-            location: asset.locations.current,
+            bundle: asset.bundle.map(BundleId::new),
+            home_location: LocationId::new(asset.locations.home),
+            location: LocationId::new(asset.locations.current),
             created_by: auth.user().id,
         },
     )
@@ -112,15 +121,15 @@ async fn create(
     txn.commit().await?;
 
     Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
+        id: asset.id.into(),
+        r#type: asset.r#type.into(),
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
-        bundle: asset.bundle,
+        bundle: asset.bundle.map(Into::into),
         locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
+            current: asset.location.into(),
+            home: asset.home_location.into(),
         },
     }))
 }
@@ -148,7 +157,7 @@ async fn update(
 ) -> Result<Json<AssetDto>> {
     let mut txn = state.transaction().await?;
 
-    let asset = database::Asset::get_by_id(&mut txn, id)
+    let asset = database::Asset::get_by_id(&mut txn, AssetId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?;
 
@@ -160,23 +169,24 @@ async fn update(
                 alias: update.alias,
                 notes: update.notes,
                 tag: update.tag,
-                bundle: update.bundle,
-                home_location: update.locations.home,
+                // todo: we should verify these IDs are valid first.
+                bundle: update.bundle.map(BundleId::new),
+                home_location: LocationId::new(update.locations.home),
                 location,
             },
         )
         .await?;
 
     Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
+        id: asset.id.into(),
+        r#type: asset.r#type.into(),
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
-        bundle: asset.bundle,
+        bundle: asset.bundle.map(Into::into),
         locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
+            current: asset.location.into(),
+            home: asset.home_location.into(),
         },
     }))
 }
@@ -201,15 +211,15 @@ async fn list(
             .await?
             .into_iter()
             .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
+                id: asset.id.into(),
+                r#type: asset.r#type.into(),
                 alias: asset.alias,
                 notes: asset.notes,
                 tag: asset.tag,
-                bundle: asset.bundle,
+                bundle: asset.bundle.map(Into::into),
                 locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
+                    current: asset.location.into(),
+                    home: asset.home_location.into(),
                 },
             })
             .collect(),
@@ -238,7 +248,7 @@ async fn delete(
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
 
-    database::Asset::get_by_id(&mut txn, id)
+    database::Asset::get_by_id(&mut txn, AssetId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .delete(&mut txn)
@@ -271,7 +281,7 @@ async fn get_location(
     let mut txn = state.transaction().await?;
 
     Ok(Json(
-        database::Asset::get_by_id(&mut txn, id)
+        database::Asset::get_by_id(&mut txn, AssetId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)?
             .get_location(&mut txn)
@@ -303,24 +313,24 @@ async fn put_location(
 ) -> Result<Json<AssetDto>> {
     let mut txn = state.transaction().await?;
 
-    let asset = database::Asset::get_by_id(&mut txn, id)
+    let asset = database::Asset::get_by_id(&mut txn, AssetId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
-        .set_location(&mut txn, location)
+        .set_location(&mut txn, LocationId::new(location)) // todo: we should check the existence of the location beforehand
         .await?;
 
     txn.commit().await?;
 
     Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
+        id: asset.id.into(),
+        r#type: asset.r#type.into(),
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
-        bundle: asset.bundle,
+        bundle: asset.bundle.map(Into::into),
         locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
+            current: asset.location.into(),
+            home: asset.home_location.into(),
         },
     }))
 }
