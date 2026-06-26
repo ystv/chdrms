@@ -2,7 +2,7 @@ use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::permission::define_permissions;
+use crate::{asset_type::AssetType, permission::define_permissions};
 
 #[schema]
 struct Manufacturer {
@@ -75,6 +75,21 @@ impl Manufacturer {
             Self,
             "SELECT id, name, description, website, email, phone, created_at, created_by
             FROM manufacturers;",
+        )
+        .fetch_all(&mut **txn)
+        .await
+    }
+
+    pub async fn list_asset_types(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+    ) -> sqlx::Result<Vec<AssetType>> {
+        sqlx::query_as!(
+            AssetType,
+            r#"SELECT id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by
+            FROM asset_types
+            WHERE manufacturer = $1;"#,
+            self.id
         )
         .fetch_all(&mut **txn)
         .await
