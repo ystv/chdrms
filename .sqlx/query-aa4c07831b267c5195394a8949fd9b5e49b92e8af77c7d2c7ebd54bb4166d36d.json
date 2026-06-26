@@ -1,0 +1,104 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE asset_types\n            SET name = $2, manufacturer = $3, product_url = $4, value = $5\n            WHERE id = $1\n            RETURNING id, name, manufacturer, product_url AS \"product_url: _\", value, created_at, created_by;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "manufacturer",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "manufacturer"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "product_url: _",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "product_url"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "value",
+        "type_info": "Numeric",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "value"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "asset_types",
+            "name": "created_by"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid",
+        "Text",
+        "Numeric"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "aa4c07831b267c5195394a8949fd9b5e49b92e8af77c7d2c7ebd54bb4166d36d"
+}

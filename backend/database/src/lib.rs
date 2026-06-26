@@ -1,6 +1,7 @@
 use serde::{Deserialize, Deserializer};
 use sqlx::PgPool;
 
+pub mod asset_type;
 pub mod manufacturer;
 pub mod permission;
 pub mod user;
