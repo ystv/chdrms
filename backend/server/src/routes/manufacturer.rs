@@ -10,7 +10,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
 use crate::{
-    auth::permissions::RequirePermission,
+    auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
     routes::PatchField,
     state::AppState,
@@ -53,26 +53,25 @@ pub struct Manufacturer {
     phone: Option<String>,
 }
 
-impl From<Manufacturer> for database::CreateManufacturer {
-    fn from(manufacturer: Manufacturer) -> Self {
-        Self {
-            name: manufacturer.name,
-            description: manufacturer.description,
-            website: manufacturer.website,
-            email: manufacturer.email,
-            phone: manufacturer.phone,
+impl Manufacturer {
+    fn into_create(self, created_by: Uuid) -> database::CreateManufacturer {
+        database::CreateManufacturer {
+            name: self.name,
+            description: self.description,
+            website: self.website,
+            email: self.email,
+            phone: self.phone,
+            created_by,
         }
     }
-}
 
-impl From<Manufacturer> for database::UpdateManufacturer {
-    fn from(manufacturer: Manufacturer) -> Self {
-        Self {
-            name: manufacturer.name,
-            description: manufacturer.description,
-            website: manufacturer.website,
-            email: manufacturer.email,
-            phone: manufacturer.phone,
+    fn into_update(self) -> database::UpdateManufacturer {
+        database::UpdateManufacturer {
+            name: self.name,
+            description: self.description,
+            website: self.website,
+            email: self.email,
+            phone: self.phone,
         }
     }
 }
@@ -166,10 +165,12 @@ async fn list(
 async fn create(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::Manage>,
+    auth: AuthContext,
     Json(create): Json<Manufacturer>,
 ) -> Result<Json<ManufacturerInfo>> {
     let mut txn = state.transaction().await?;
-    let manufacturer = database::Manufacturer::create(&mut txn, create.into()).await?;
+    let manufacturer =
+        database::Manufacturer::create(&mut txn, create.into_create(auth.user().id)).await?;
     txn.commit().await?;
 
     Ok(Json(manufacturer.into()))
@@ -221,7 +222,7 @@ async fn update(
     let manufacturer = database::Manufacturer::get_by_id(&mut txn, id)
         .await?
         .ok_or_else(|| AppError::NotFound)?
-        .update(&mut txn, manufacturer.into())
+        .update(&mut txn, manufacturer.into_update())
         .await?;
     txn.commit().await?;
 

@@ -5,5 +5,8 @@ CREATE TABLE manufacturers(
 
     website TEXT,
     email TEXT,
-    phone TEXT
+    phone TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by UUID REFERENCES users(id) NOT NULL
 );

@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, name, description, website, email, phone\n            FROM manufacturers;",
+  "query": "SELECT id, name, description, website, email, phone, created_at, created_by\n            FROM manufacturers;",
   "describe": {
     "columns": [
       {
@@ -68,6 +68,28 @@
             "name": "phone"
           }
         }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_by"
+          }
+        }
       }
     ],
     "parameters": {
@@ -79,8 +101,10 @@
       true,
       true,
       true,
-      true
+      true,
+      false,
+      false
     ]
   },
-  "hash": "5b8b26cba9c552afdf0636da0e50ae109efacae4d56744b080d1dd6f96676bb4"
+  "hash": "9a25cc38beacd7e3270302624dfeeab39d10dc8ab98fdb92c5c6c736be368dd5"
 }

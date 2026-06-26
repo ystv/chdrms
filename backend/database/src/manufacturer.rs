@@ -1,4 +1,5 @@
 use chdrms_database_macros::schema;
+use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use crate::permission::define_permissions;
@@ -13,6 +14,11 @@ pub struct Manufacturer {
     pub website: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
+
+    #[schema(generated, immutable)]
+    pub created_at: DateTime<Utc>,
+    #[schema(immutable)]
+    pub created_by: Uuid,
 }
 
 impl Manufacturer {
@@ -22,14 +28,15 @@ impl Manufacturer {
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
-            "INSERT INTO manufacturers(name, description, website, email, phone)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, name, description, website, email, phone;",
+            "INSERT INTO manufacturers(name, description, website, email, phone, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, name, description, website, email, phone, created_at, created_by;",
             create.name,
             create.description,
             create.website,
             create.email,
             create.phone,
+            create.created_by,
         )
         .fetch_one(&mut **txn)
         .await
@@ -41,7 +48,7 @@ impl Manufacturer {
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             Self,
-            "SELECT id, name, description, website, email, phone
+            "SELECT id, name, description, website, email, phone, created_at, created_by
             FROM manufacturers
             WHERE id = $1;",
             id
@@ -66,7 +73,7 @@ impl Manufacturer {
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
-            "SELECT id, name, description, website, email, phone
+            "SELECT id, name, description, website, email, phone, created_at, created_by
             FROM manufacturers;",
         )
         .fetch_all(&mut **txn)
@@ -83,7 +90,7 @@ impl Manufacturer {
             "UPDATE manufacturers
             SET name = $2, description = $3, website = $4, email = $5, phone = $6
             WHERE id = $1
-            RETURNING id, name, description, website, email, phone;",
+            RETURNING id, name, description, website, email, phone, created_at, created_by;",
             self.id,
             update.name,
             update.description,
@@ -116,7 +123,7 @@ impl Manufacturer {
                 email = CASE WHEN $7 THEN $8 ELSE email END,
                 phone = CASE WHEN $9 THEN $10 ELSE phone END
             WHERE id = $11
-            RETURNING id, name, description, website, email, phone;",
+            RETURNING id, name, description, website, email, phone, created_at, created_by;",
             name_provided,
             name,
             description_provided,

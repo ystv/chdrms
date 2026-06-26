@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE manufacturers\n            SET name = $2, description = $3, website = $4, email = $5, phone = $6\n            WHERE id = $1\n            RETURNING id, name, description, website, email, phone;",
+  "query": "UPDATE manufacturers\n            SET name = $2, description = $3, website = $4, email = $5, phone = $6\n            WHERE id = $1\n            RETURNING id, name, description, website, email, phone, created_at, created_by;",
   "describe": {
     "columns": [
       {
@@ -68,6 +68,28 @@
             "name": "phone"
           }
         }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_by"
+          }
+        }
       }
     ],
     "parameters": {
@@ -86,8 +108,10 @@
       true,
       true,
       true,
-      true
+      true,
+      false,
+      false
     ]
   },
-  "hash": "1adb77abd5ec64be2ac0242003cbda252d7e0b041da2a81fc0b44248c4156141"
+  "hash": "f21625440bfec0ecaffc25a52555138de98319f0b0b1c3dc517b9ff318d25c19"
 }

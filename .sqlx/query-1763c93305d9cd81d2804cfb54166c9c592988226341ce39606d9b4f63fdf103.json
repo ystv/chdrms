@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO manufacturers(name, description, website, email, phone)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING id, name, description, website, email, phone;",
+  "query": "SELECT id, name, description, website, email, phone, created_at, created_by\n            FROM manufacturers\n            WHERE id = $1;",
   "describe": {
     "columns": [
       {
@@ -68,15 +68,33 @@
             "name": "phone"
           }
         }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "manufacturers",
+            "name": "created_by"
+          }
+        }
       }
     ],
     "parameters": {
       "Left": [
-        "Text",
-        "Text",
-        "Text",
-        "Text",
-        "Text"
+        "Uuid"
       ]
     },
     "nullable": [
@@ -85,8 +103,10 @@
       true,
       true,
       true,
-      true
+      true,
+      false,
+      false
     ]
   },
-  "hash": "a682dbde363c9599ef36f8ba78a6db394e0e1c3367b73854f8b5bae70491a0aa"
+  "hash": "1763c93305d9cd81d2804cfb54166c9c592988226341ce39606d9b4f63fdf103"
 }
