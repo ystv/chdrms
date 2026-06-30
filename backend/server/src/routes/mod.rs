@@ -7,6 +7,7 @@ use crate::{error::ErrorResponse, state::AppState};
 
 pub mod auth;
 pub mod group;
+pub mod manufacturer;
 pub mod user;
 
 #[derive(OpenApi)]
@@ -18,6 +19,7 @@ pub mod user;
         (name = user::TAG, description = "Users"),
         (name = auth::TAG, description = "Auth"),
         (name = group::TAG, description = "Groups"),
+        (name = manufacturer::TAG, description = "Manufacturers"),
     ),
 )]
 struct ApiDoc;
@@ -41,6 +43,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
         .nest("/auth", auth::api_routes())
         .nest("/group", group::routes())
         .nest("/user", user::routes())
+        .nest("/manufacturer", manufacturer::routes())
         .split_for_parts();
 
     let router = Router::new()

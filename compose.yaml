@@ -2,7 +2,7 @@ services:
   postgres:
     image: "docker.io/library/postgres:18"
     ports:
-     - "5432:5432/tcp"
+      - "5432:5432/tcp"
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: chdrms
@@ -10,10 +10,21 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.host
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
     ports:
@@ -27,3 +38,4 @@ services:
 
 volumes:
   postgres-data:
+  pgadmin-data:
