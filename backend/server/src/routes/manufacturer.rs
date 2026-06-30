@@ -147,7 +147,7 @@ async fn list(
         database::Manufacturer::list(&mut state.transaction().await?)
             .await?
             .into_iter()
-            .map(From::from)
+            .map(Into::into)
             .collect(),
     ))
 }

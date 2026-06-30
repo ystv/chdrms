@@ -450,6 +450,7 @@ dependencies = [
  "axum-valid",
  "chdrms_database",
  "openidconnect",
+ "rust_decimal",
  "serde",
  "serde_json",
  "sqlx",
@@ -459,6 +460,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "url",
  "utoipa",
  "utoipa-axum",
  "utoipa-swagger-ui",
@@ -3741,6 +3743,7 @@ dependencies = [
  "quote",
  "regex",
  "syn 2.0.118",
+ "url",
  "uuid",
 ]
 
@@ -4455,9 +4458,9 @@ dependencies = [
 
 [[package]]
 name = "zlib-rs"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3be3d40e40a133f9c916ee3f9f4fa2d9d63435b5fbe1bfc6d9dae0aa0ada1513"
+checksum = "977347db8caa080403f6b6b7c1cda9479a8e869316f7e13a59b19076a40f94e3"
 
 [[package]]
 name = "zmij"
