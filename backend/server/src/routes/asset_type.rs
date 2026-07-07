@@ -125,6 +125,7 @@ impl From<PatchAssetType> for database::PatchAssetType {
     }
 }
 
+/// Get an asset type by its ID.
 #[utoipa::path(
     get,
     path = "/{id}",
@@ -148,6 +149,7 @@ async fn get_by_id(
     ))
 }
 
+/// List all asset types.
 #[utoipa::path(
     get,
     path = "/",
@@ -170,6 +172,7 @@ async fn list(
     ))
 }
 
+/// Create an asset type.
 #[utoipa::path(
     post,
     path = "/",
@@ -197,6 +200,7 @@ async fn create(
     Ok(Json(asset_type.into()))
 }
 
+/// Delete an asset type by its ID.
 #[utoipa::path(
     delete,
     path = "/{id}",
@@ -223,6 +227,7 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Update all fields of an asset type by its ID.
 #[utoipa::path(
     put,
     path = "/{id}",
@@ -250,6 +255,7 @@ async fn update(
     Ok(Json(asset_type.into()))
 }
 
+/// Patch individual fields of an asset type by its ID.
 #[utoipa::path(
     patch,
     path = "/{id}",

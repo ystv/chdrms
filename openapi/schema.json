@@ -19,6 +19,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "List all asset types.",
         "operationId": "list",
         "responses": {
           "200": {
@@ -50,6 +51,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "Create an asset type.",
         "operationId": "create",
         "requestBody": {
           "content": {
@@ -100,6 +102,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "Get an asset type by its ID.",
         "operationId": "get_by_id",
         "parameters": [
           {
@@ -149,6 +152,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "Update all fields of an asset type by its ID.",
         "operationId": "update",
         "parameters": [
           {
@@ -208,6 +212,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "Delete an asset type by its ID.",
         "operationId": "delete",
         "parameters": [
           {
@@ -250,6 +255,7 @@
         "tags": [
           "asset_type"
         ],
+        "summary": "Patch individual fields of an asset type by its ID.",
         "operationId": "patch",
         "parameters": [
           {
@@ -674,6 +680,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "List all manufacturers.",
         "operationId": "list",
         "responses": {
           "200": {
@@ -705,6 +712,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "Create a manufacturer.",
         "operationId": "create",
         "requestBody": {
           "content": {
@@ -745,6 +753,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "Get a manufacturer by its ID.",
         "operationId": "get_by_id",
         "parameters": [
           {
@@ -794,6 +803,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "Update all fields of a manufacturer by its ID.",
         "operationId": "update",
         "parameters": [
           {
@@ -853,6 +863,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "Delete a manufacturer by its ID.",
         "operationId": "delete",
         "parameters": [
           {
@@ -895,6 +906,7 @@
         "tags": [
           "manufacturer"
         ],
+        "summary": "Patch individual fields of a manufacturer by its ID.",
         "operationId": "patch",
         "parameters": [
           {
