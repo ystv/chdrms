@@ -45,22 +45,22 @@ pub fn schema(_: TokenStream, input: TokenStream) -> TokenStream {
         .collect();
 
     quote! {
-        #[derive(Debug, Clone, PartialEq, Eq, ::sqlx::FromRow)]
+        #[derive(Debug, Clone, PartialEq, ::sqlx::FromRow)]
         pub struct #struct_name {
             #(#fields,)*
         }
 
-        #[derive(Debug, Clone, PartialEq, Eq, ::sqlx::FromRow)]
+        #[derive(Debug, Clone, PartialEq, ::sqlx::FromRow)]
         pub struct #create_name {
             #(#create_fields,)*
         }
 
-        #[derive(Debug, Clone, PartialEq, Eq, ::sqlx::FromRow)]
+        #[derive(Debug, Clone, PartialEq, ::sqlx::FromRow)]
         pub struct #update_name {
             #(#update_fields,)*
         }
 
-        #[derive(Debug, Clone, PartialEq, Eq, ::sqlx::FromRow)]
+        #[derive(Debug, Clone, PartialEq, ::sqlx::FromRow)]
         pub struct #patch_name {
             #(#patch_fields,)*
         }
