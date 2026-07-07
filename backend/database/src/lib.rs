@@ -34,12 +34,32 @@ impl<T> PatchField<T> {
             },
         )
     }
+
+    pub fn map<U, F>(self, mapper: F) -> PatchField<U>
+    where
+        F: Fn(T) -> U,
+    {
+        match self {
+            PatchField::Present(v) => PatchField::Present(mapper(v)),
+            PatchField::Absent => PatchField::Absent,
+        }
+    }
 }
 
 impl<T> PatchField<Option<T>> {
     pub fn into_nullable_case_pair(self) -> (bool, Option<T>) {
         let (is_present, option) = self.into_case_pair();
         (is_present, option.flatten())
+    }
+
+    pub fn flat_map<U, F>(self, mapper: F) -> PatchField<Option<U>>
+    where
+        F: Fn(T) -> U,
+    {
+        match self {
+            PatchField::Present(v) => PatchField::Present(v.map(mapper)),
+            PatchField::Absent => PatchField::Absent,
+        }
     }
 }
 
