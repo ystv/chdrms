@@ -8,6 +8,7 @@ use crate::{error::ErrorResponse, state::AppState};
 pub mod asset_type;
 pub mod auth;
 pub mod group;
+mod location;
 pub mod manufacturer;
 pub mod user;
 
@@ -22,6 +23,7 @@ pub mod user;
         (name = group::TAG, description = "Groups"),
         (name = manufacturer::TAG, description = "Manufacturers"),
         (name = asset_type::TAG, description = "Asset Types"),
+        (name = location::TAG, description = "Locations"),
     ),
 )]
 struct ApiDoc;
@@ -47,6 +49,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
         .nest("/user", user::routes())
         .nest("/manufacturer", manufacturer::routes())
         .nest("/asset/type", asset_type::routes())
+        .nest("/location", location::routes())
         .split_for_parts();
 
     let router = Router::new()
