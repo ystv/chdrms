@@ -107,6 +107,7 @@ impl From<PatchManufacturer> for database::PatchManufacturer {
     }
 }
 
+/// Get a manufacturer by its ID.
 #[utoipa::path(
     get,
     path = "/{id}",
@@ -130,6 +131,7 @@ async fn get_by_id(
     ))
 }
 
+/// List all manufacturers.
 #[utoipa::path(
     get,
     path = "/",
@@ -152,6 +154,7 @@ async fn list(
     ))
 }
 
+/// Create a manufacturer.
 #[utoipa::path(
     post,
     path = "/",
@@ -175,6 +178,7 @@ async fn create(
     Ok(Json(manufacturer.into()))
 }
 
+/// Delete a manufacturer by its ID.
 #[utoipa::path(
     delete,
     path = "/{id}",
@@ -201,6 +205,7 @@ async fn delete(
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// Update all fields of a manufacturer by its ID.
 #[utoipa::path(
     put,
     path = "/{id}",
@@ -228,6 +233,7 @@ async fn update(
     Ok(Json(manufacturer.into()))
 }
 
+/// Patch individual fields of a manufacturer by its ID.
 #[utoipa::path(
     patch,
     path = "/{id}",
