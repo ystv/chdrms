@@ -267,7 +267,7 @@ async fn patch(
     Ok(Json(manufacturer.into()))
 }
 
-pub fn routes() -> OpenApiRouter<AppState> {
+pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
         .routes(routes!(list, create))

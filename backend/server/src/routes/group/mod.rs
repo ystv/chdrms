@@ -8,7 +8,7 @@ mod permissions;
 
 pub(super) const TAG: &str = "group";
 
-pub fn routes() -> OpenApiRouter<AppState> {
+pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(manage::list, manage::create))
         .routes(routes!(manage::get))
