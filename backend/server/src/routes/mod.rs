@@ -5,12 +5,12 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{error::ErrorResponse, state::AppState};
 
-pub mod asset_type;
-pub mod auth;
-pub mod group;
+mod asset_type;
+mod auth;
+mod group;
 mod location;
-pub mod manufacturer;
-pub mod user;
+mod manufacturer;
+mod user;
 
 #[derive(OpenApi)]
 #[openapi(

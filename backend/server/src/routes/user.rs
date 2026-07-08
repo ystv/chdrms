@@ -109,7 +109,7 @@ async fn list_users(
     ))
 }
 
-pub fn routes() -> OpenApiRouter<AppState> {
+pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(current_user))
         .routes(routes!(current_user_permissions))

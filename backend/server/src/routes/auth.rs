@@ -116,13 +116,13 @@ async fn list_providers(State(state): State<AppState>) -> Json<Vec<ProviderInfo>
     )
 }
 
-pub fn routes() -> Router<AppState> {
+pub(super) fn routes() -> Router<AppState> {
     Router::new()
         .route("/{provider}/begin", get(begin))
         .route("/{provider}/callback", get(callback))
         .route("/logout", post(logout))
 }
 
-pub fn api_routes() -> OpenApiRouter<AppState> {
+pub(super) fn api_routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new().routes(routes!(list_providers))
 }
