@@ -19,6 +19,7 @@ use crate::{
     get,
     path = "/{group_id}/permissions",
     tag = super::TAG,
+    operation_id = "list_group_permissions",
     responses(
         (status = OK, description = "Success", body = [ObjectPermissions]),
         (status = NOT_FOUND, description = "Not found"),
@@ -43,6 +44,7 @@ pub(super) async fn list(
     post,
     path = "/{group_id}/permissions",
     tag = super::TAG,
+    operation_id = "add_permission_to_group",
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),
@@ -73,6 +75,7 @@ pub(super) async fn add(
     delete,
     path = "/{group_id}/permissions",
     tag = super::TAG,
+    operation_id = "remove_permission_from_group",
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),

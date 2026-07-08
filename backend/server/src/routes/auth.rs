@@ -97,6 +97,7 @@ async fn logout(jar: CookieJar, State(state): State<AppState>) -> Result<(Cookie
     method(get),
     path = "/providers",
     tag = TAG,
+    operation_id = "list_auth_providers",
     responses(
         (status = OK, description = "Success", body = [ProviderInfo]),
     ),

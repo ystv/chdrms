@@ -38,6 +38,7 @@ pub struct CreateGroup {
     get,
     path = "",
     tag = super::TAG,
+    operation_id = "list_groups",
     responses(
         (status = OK, description = "Success", body = [GroupInfo]),
     ),
@@ -61,6 +62,7 @@ pub(super) async fn list(
     post,
     path = "",
     tag = super::TAG,
+    operation_id = "create_group",
     responses(
         (status = OK, description = "Success", body = GroupInfo),
     ),
@@ -81,6 +83,7 @@ pub(super) async fn create(
     get,
     path = "/{group_id}",
     tag = super::TAG,
+    operation_id = "get_group_by_id",
     responses(
         (status = OK, description = "Success", body = GroupInfo),
         (status = NOT_FOUND, description = "Not found"),

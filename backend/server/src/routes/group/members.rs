@@ -33,6 +33,7 @@ pub struct ModifyMember {
     get,
     path = "/{group_id}/members",
     tag = super::TAG,
+    operation_id = "list_group_members",
     responses(
         (status = OK, description = "Success", body = GroupMembers),
         (status = NOT_FOUND, description = "Not found"),
@@ -61,6 +62,7 @@ pub(super) async fn list(
     post,
     path = "/{group_id}/members",
     tag = super::TAG,
+    operation_id = "add_user_to_group",
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),
@@ -93,6 +95,7 @@ pub(super) async fn add(
     delete,
     path = "/{group_id}/members",
     tag = super::TAG,
+    operation_id = "remove_user_from_group",
     responses(
         (status = CREATED, description = "Success"),
         (status = NOT_FOUND, description = "Not found"),

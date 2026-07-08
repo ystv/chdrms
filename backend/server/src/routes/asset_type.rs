@@ -130,6 +130,7 @@ impl From<PatchAssetType> for database::PatchAssetType {
     get,
     path = "/{id}",
     tag = TAG,
+    operation_id = "get_asset_type_by_id",
     responses(
         (status = OK, description = "Success", body = AssetTypeDto),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -154,6 +155,7 @@ async fn get_by_id(
     get,
     path = "/",
     tag = TAG,
+    operation_id = "list_asset_types",
     responses(
         (status = OK, description = "Success", body = [AssetTypeDto]),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -177,6 +179,7 @@ async fn list(
     post,
     path = "/",
     tag = TAG,
+    operation_id = "create_asset_type",
     responses(
         (status = OK, description = "Success", body = AssetTypeDto),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -205,6 +208,7 @@ async fn create(
     delete,
     path = "/{id}",
     tag = TAG,
+    operation_id = "delete_asset_type_by_id",
     responses(
         (status = NO_CONTENT, description = "Success"),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -232,6 +236,7 @@ async fn delete(
     put,
     path = "/{id}",
     tag = TAG,
+    operation_id = "update_asset_type_by_id",
     responses(
         (status = OK, description = "Success", body = AssetTypeDto),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -260,6 +265,7 @@ async fn update(
     patch,
     path = "/{id}",
     tag = TAG,
+    operation_id = "patch_asset_type_by_id",
     responses(
         (status = OK, description = "Success", body = AssetTypeDto),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),

@@ -112,6 +112,7 @@ impl From<PatchManufacturer> for database::PatchManufacturer {
     get,
     path = "/{id}",
     tag = TAG,
+    operation_id = "get_manufacturer_by_id",
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -136,6 +137,7 @@ async fn get_by_id(
     get,
     path = "/",
     tag = TAG,
+    operation_id = "list_manufacturers",
     responses(
         (status = OK, description = "Success", body = [ManufacturerInfo]),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse)
@@ -159,6 +161,7 @@ async fn list(
     post,
     path = "/",
     tag = TAG,
+    operation_id = "create_manufacturer",
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse)
@@ -183,6 +186,7 @@ async fn create(
     delete,
     path = "/{id}",
     tag = TAG,
+    operation_id = "delete_manufacturer_by_id",
     responses(
         (status = NO_CONTENT, description = "Success"),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -210,6 +214,7 @@ async fn delete(
     put,
     path = "/{id}",
     tag = TAG,
+    operation_id = "update_manufacturer_by_id",
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
@@ -238,6 +243,7 @@ async fn update(
     patch,
     path = "/{id}",
     tag = TAG,
+    operation_id = "patch_manufacturer_by_id",
     responses(
         (status = OK, description = "Success", body = ManufacturerInfo),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
