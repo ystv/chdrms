@@ -46,6 +46,9 @@ jobs:
     name: Check openapi schema is up to date
     runs-on: ubuntu-latest
     steps:
+      - name: Setup Mold
+        uses: rui314/setup-mold@v1
+
       - uses: actions/checkout@v6
       - name: Cache build artifacts
         uses: actions/cache@v5

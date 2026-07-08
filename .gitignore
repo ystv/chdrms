@@ -1,5 +1,5 @@
 .direnv/
 target/
 /.env
-config.toml
+/config.toml
 .secretkey

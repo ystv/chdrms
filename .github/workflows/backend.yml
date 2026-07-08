@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup Mold
+        uses: rui314/setup-mold@v1
+
       - name: Checkout code
         uses: actions/checkout@v6
 

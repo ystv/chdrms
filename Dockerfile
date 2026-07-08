@@ -9,6 +9,8 @@ RUN apk add --no-cache mold curl
 RUN rustup show && \
     cargo install cargo-chef --locked
 
+COPY .cargo ./
+
 # ---
 FROM backend-base AS backend-planner
 
