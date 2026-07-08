@@ -6,19 +6,29 @@ import '@mantine/core/styles.css';
 import '../styles.css';
 import { MantineProvider } from '@mantine/core';
 import { Shell } from '#/components/shell';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
+import { getCurrentUserOptions } from '#/client/@tanstack/react-query.gen';
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
 
 function RootComponent() {
+  const queryClient = new QueryClient();
+
+  // const me = useQuery({ ...getCurrentUserOptions({}) });
+
   return (
     <>
-      <MantineProvider>
-        <Shell>
+      <QueryClientProvider client={queryClient}>
+        <MantineProvider defaultColorScheme="auto">
           <Outlet />
-        </Shell>
-      </MantineProvider>
+        </MantineProvider>
+      </QueryClientProvider>
       <TanStackDevtools
         config={{
           position: 'bottom-right',
