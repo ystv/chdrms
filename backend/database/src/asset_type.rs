@@ -138,3 +138,358 @@ impl AssetType {
 }
 
 define_permissions!("asset_types" => View, Manage);
+
+#[cfg(test)]
+mod tests {
+    use std::assert_matches;
+
+    use rust_decimal::Decimal;
+    use sqlx::{PgPool, types::Text};
+    use url::Url;
+    use uuid::{Uuid, uuid};
+
+    use crate::{
+        PatchField,
+        asset_type::{AssetType, CreateAssetType, PatchAssetType, UpdateAssetType},
+    };
+
+    const ASSET_TYPE_ID: Uuid = uuid!("f1c8508a-7c1d-436d-a867-0849dddf5f87");
+    const MANUFACTURER_ID: Uuid = uuid!("3d6fd755-8d90-4a86-881f-4870049bf5f9");
+    const USER_ID: Uuid = uuid!("736bcb69-ae67-4ec1-8868-cca4662aa3b1");
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_get_by_id(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        assert_eq!(asset_type.id, ASSET_TYPE_ID);
+        assert_eq!(asset_type.name, "Test Asset Type");
+        assert_eq!(asset_type.manufacturer, MANUFACTURER_ID);
+        assert_eq!(
+            asset_type.product_url,
+            Some(Text(
+                Url::parse("https://example.com").expect("failed to parse URL")
+            ))
+        );
+        assert_eq!(asset_type.value, None);
+        assert_eq!(asset_type.created_by, USER_ID);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_get_by_id_non_existent(pool: PgPool) {
+        let non_existent_id = uuid!("76435093-ce9b-4464-8335-6e20e8a17180");
+
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, non_existent_id)
+            .await
+            .expect("failed to get asset type");
+
+        assert_eq!(asset_type, None);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_create(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let name: String = "Test Asset Type".into();
+        let value = Some(Decimal::new(6942, 2));
+
+        let asset_type = AssetType::create(
+            &mut txn,
+            CreateAssetType {
+                name: name.clone(),
+                manufacturer: MANUFACTURER_ID,
+                product_url: None,
+                value,
+                created_by: USER_ID,
+            },
+        )
+        .await
+        .expect("failed to create asset type");
+
+        assert_eq!(asset_type.name, name);
+        assert_eq!(asset_type.manufacturer, MANUFACTURER_ID);
+        assert_eq!(asset_type.product_url, None);
+        assert_eq!(asset_type.value, value);
+        assert_eq!(asset_type.created_by, USER_ID);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_create_non_existent_manufacturer(pool: PgPool) {
+        let non_existent_manufacturer_id = uuid!("8abe6c36-6533-44be-ab63-1eb54d303eea");
+
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::create(
+            &mut txn,
+            CreateAssetType {
+                name: "Test Asset Type".into(),
+                manufacturer: non_existent_manufacturer_id,
+                product_url: None,
+                value: None,
+                created_by: USER_ID,
+            },
+        )
+        .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_create_non_existent_user(pool: PgPool) {
+        let non_existent_user_id = uuid!("76aed14a-9b1a-45b9-b125-5ae118623dfb");
+
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::create(
+            &mut txn,
+            CreateAssetType {
+                name: "Test Asset Type".into(),
+                manufacturer: MANUFACTURER_ID,
+                product_url: None,
+                value: None,
+                created_by: non_existent_user_id,
+            },
+        )
+        .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_delete(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let successful = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found")
+            .delete(&mut txn)
+            .await
+            .expect("failed to delete asset type");
+
+        assert!(successful);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_delete_non_existent(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        // delete the asset type
+        asset_type
+            .clone()
+            .delete(&mut txn)
+            .await
+            .expect("failed to delete asset type");
+
+        // the asset type is already deleted, so deleting it again
+        // should return a false success value.
+        let result = asset_type
+            .delete(&mut txn)
+            .await
+            .expect("failed to delete asset type");
+        assert!(!result);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_update(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        let name: String = "New Name".into();
+        let product_url = Some(Text(
+            Url::parse("https://wikipedia.org").expect("failed to parse URL"),
+        ));
+
+        let new_asset_type = asset_type
+            .clone()
+            .update(
+                &mut txn,
+                UpdateAssetType {
+                    name: name.clone(),
+                    manufacturer: asset_type.manufacturer,
+                    product_url: product_url.clone(),
+                    value: asset_type.value,
+                },
+            )
+            .await
+            .expect("failed to update asset type");
+
+        assert_eq!(new_asset_type.id, ASSET_TYPE_ID);
+        assert_eq!(new_asset_type.name, name);
+        assert_eq!(new_asset_type.manufacturer, asset_type.manufacturer);
+        assert_eq!(new_asset_type.product_url, product_url);
+        assert_eq!(new_asset_type.value, asset_type.value);
+        assert_eq!(new_asset_type.created_at, asset_type.created_at);
+        assert_eq!(new_asset_type.created_by, asset_type.created_by);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_update_non_existent_manufacturer(pool: PgPool) {
+        let non_existent_manufacturer_id = uuid!("2ca48a56-f09f-495a-b2c2-0db2820a887d");
+
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        let asset_type = asset_type
+            .clone()
+            .update(
+                &mut txn,
+                UpdateAssetType {
+                    name: asset_type.name,
+                    manufacturer: non_existent_manufacturer_id,
+                    product_url: asset_type.product_url,
+                    value: asset_type.value,
+                },
+            )
+            .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_update_non_existent(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        // delete the asset type
+        asset_type
+            .clone()
+            .delete(&mut txn)
+            .await
+            .expect("failed to delete asset type");
+
+        // previously deleting the asset type means it no
+        // longer exists, and an update should fail.
+        let asset_type = asset_type
+            .clone()
+            .update(
+                &mut txn,
+                UpdateAssetType {
+                    name: asset_type.name,
+                    manufacturer: asset_type.manufacturer,
+                    product_url: asset_type.product_url,
+                    value: asset_type.value,
+                },
+            )
+            .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_patch(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        let name: String = "New Name".into();
+        let product_url = Some(Text(
+            Url::parse("https://wikipedia.org").expect("failed to parse url"),
+        ));
+
+        let new_asset_type = asset_type
+            .clone()
+            .patch(
+                &mut txn,
+                PatchAssetType {
+                    name: PatchField::Present(name.clone()),
+                    manufacturer: PatchField::Absent,
+                    product_url: PatchField::Present(product_url.clone()),
+                    value: PatchField::Absent,
+                },
+            )
+            .await
+            .expect("failed to patch asset type");
+
+        assert_eq!(new_asset_type.id, asset_type.id);
+        assert_eq!(new_asset_type.name, name);
+        assert_eq!(new_asset_type.manufacturer, asset_type.manufacturer);
+        assert_eq!(new_asset_type.product_url, product_url);
+        assert_eq!(new_asset_type.value, asset_type.value);
+        assert_eq!(new_asset_type.created_at, asset_type.created_at);
+        assert_eq!(new_asset_type.created_by, asset_type.created_by);
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_patch_non_existent_manufacturer(pool: PgPool) {
+        let non_existent_manufacturer_id = uuid!("6e261a2c-08d4-4eb7-b1a7-dad7ade2b457");
+
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found")
+            .patch(
+                &mut txn,
+                PatchAssetType {
+                    name: PatchField::Absent,
+                    manufacturer: PatchField::Present(non_existent_manufacturer_id),
+                    product_url: PatchField::Absent,
+                    value: PatchField::Absent,
+                },
+            )
+            .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+
+    #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
+    async fn test_patch_non_existent(pool: PgPool) {
+        let mut txn = pool.begin().await.expect("failed to begin transaction");
+
+        let asset_type = AssetType::get_by_id(&mut txn, ASSET_TYPE_ID)
+            .await
+            .expect("failed to get asset type")
+            .expect("asset type not found");
+
+        // delete the asset type
+        asset_type
+            .clone()
+            .delete(&mut txn)
+            .await
+            .expect("failed to delete asset type");
+
+        // previously deleting the asset type means it no
+        // longer exists, and a patch should fail.
+        let asset_type = asset_type
+            .clone()
+            .patch(
+                &mut txn,
+                PatchAssetType {
+                    name: PatchField::Absent,
+                    manufacturer: PatchField::Absent,
+                    product_url: PatchField::Absent,
+                    value: PatchField::Absent,
+                },
+            )
+            .await;
+
+        assert_matches!(asset_type, Err(_))
+    }
+}
