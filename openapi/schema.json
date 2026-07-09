@@ -978,7 +978,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserInfo"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 }
               }
@@ -1000,7 +1000,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserInfo"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -1153,7 +1153,7 @@
           "members": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserInfo"
+              "$ref": "#/components/schemas/UserDto"
             }
           }
         }
@@ -1366,7 +1366,7 @@
         "type": "number",
         "format": "float"
       },
-      "UserInfo": {
+      "UserDto": {
         "type": "object",
         "required": [
           "id",
