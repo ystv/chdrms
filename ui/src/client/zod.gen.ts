@@ -83,14 +83,15 @@ export const zPatchAssetType = z.object({
     value: zSchemaDecimal.nullish()
 });
 
-export const zUserInfo = z.object({
+export const zUserDto = z.object({
     email: z.string(),
     id: z.uuid(),
+    is_admin: z.boolean(),
     name: z.string()
 });
 
 export const zGroupMembers = z.object({
-    members: z.array(zUserInfo)
+    members: z.array(zUserDto)
 });
 
 /**
@@ -278,12 +279,12 @@ export const zUpdateManufacturerByIdResponse = zManufacturerInfo;
 /**
  * Success
  */
-export const zListUsersResponse = z.array(zUserInfo);
+export const zListUsersResponse = z.array(zUserDto);
 
 /**
  * Success
  */
-export const zGetCurrentUserResponse = zUserInfo;
+export const zGetCurrentUserResponse = zUserDto;
 
 /**
  * Success

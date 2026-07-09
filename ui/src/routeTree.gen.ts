@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as authenticatedIndexRouteImport } from './routes/(authenticated)/index'
+import { Route as authenticatedUsersIndexRouteImport } from './routes/(authenticated)/users/index'
 import { Route as authenticatedGroupsIndexRouteImport } from './routes/(authenticated)/groups/index'
 import { Route as authenticatedUsersAtmeIndexRouteImport } from './routes/(authenticated)/users/@me/index'
 
@@ -27,6 +28,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
 const authenticatedIndexRoute = authenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => authenticatedRouteRoute,
+} as any)
+const authenticatedUsersIndexRoute = authenticatedUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
   getParentRoute: () => authenticatedRouteRoute,
 } as any)
 const authenticatedGroupsIndexRoute =
@@ -46,12 +52,14 @@ export interface FileRoutesByFullPath {
   '/': typeof authenticatedIndexRoute
   '/login/': typeof LoginIndexRoute
   '/groups/': typeof authenticatedGroupsIndexRoute
+  '/users/': typeof authenticatedUsersIndexRoute
   '/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof authenticatedIndexRoute
   '/login': typeof LoginIndexRoute
   '/groups': typeof authenticatedGroupsIndexRoute
+  '/users': typeof authenticatedUsersIndexRoute
   '/users/@me': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRoutesById {
@@ -60,19 +68,21 @@ export interface FileRoutesById {
   '/(authenticated)/': typeof authenticatedIndexRoute
   '/login/': typeof LoginIndexRoute
   '/(authenticated)/groups/': typeof authenticatedGroupsIndexRoute
+  '/(authenticated)/users/': typeof authenticatedUsersIndexRoute
   '/(authenticated)/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login/' | '/groups/' | '/users/@me/'
+  fullPaths: '/' | '/login/' | '/groups/' | '/users/' | '/users/@me/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/groups' | '/users/@me'
+  to: '/' | '/login' | '/groups' | '/users' | '/users/@me'
   id:
     | '__root__'
     | '/(authenticated)'
     | '/(authenticated)/'
     | '/login/'
     | '/(authenticated)/groups/'
+    | '/(authenticated)/users/'
     | '/(authenticated)/users/@me/'
   fileRoutesById: FileRoutesById
 }
@@ -104,6 +114,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedIndexRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
+    '/(authenticated)/users/': {
+      id: '/(authenticated)/users/'
+      path: '/users'
+      fullPath: '/users/'
+      preLoaderRoute: typeof authenticatedUsersIndexRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
     '/(authenticated)/groups/': {
       id: '/(authenticated)/groups/'
       path: '/groups'
@@ -124,12 +141,14 @@ declare module '@tanstack/react-router' {
 interface authenticatedRouteRouteChildren {
   authenticatedIndexRoute: typeof authenticatedIndexRoute
   authenticatedGroupsIndexRoute: typeof authenticatedGroupsIndexRoute
+  authenticatedUsersIndexRoute: typeof authenticatedUsersIndexRoute
   authenticatedUsersAtmeIndexRoute: typeof authenticatedUsersAtmeIndexRoute
 }
 
 const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
   authenticatedIndexRoute: authenticatedIndexRoute,
   authenticatedGroupsIndexRoute: authenticatedGroupsIndexRoute,
+  authenticatedUsersIndexRoute: authenticatedUsersIndexRoute,
   authenticatedUsersAtmeIndexRoute: authenticatedUsersAtmeIndexRoute,
 }
 
