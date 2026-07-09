@@ -17,7 +17,7 @@ function RouteComponent() {
 
   const me = useQuery({ ...getCurrentUserOptions({}), retry: false });
 
-  if (me.data) {
+  if (!me.isFetching && !me.isRefetching && me.status === 'success') {
     console.log('User logged in, redirecting to home page');
     navigate({ to: '/' });
   }
