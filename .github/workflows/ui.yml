@@ -45,3 +45,22 @@ jobs:
           yarn install --immutable --inline-builds
           yarn build
         working-directory: ui
+
+  openapi-ts:
+    name: OpenAPI-ts Generation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: "yarn"
+          cache-dependency-path: "ui/yarn.lock"
+      - run: |
+          yarn install --immutable --inline-builds
+          yarn openapi-ts
+        working-directory: ui
+      - name: Check diff
+        run: |
+          git add ui/src/client
+          git diff --exit-code HEAD -- ui/src/client

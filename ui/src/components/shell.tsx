@@ -12,7 +12,7 @@ import type { ReactNode } from 'react';
 import { ColorSchemeToggle } from './color-scheme-toggle';
 import { getCurrentUserOptions } from '#/client/@tanstack/react-query.gen';
 import { useQuery } from '@tanstack/react-query';
-import { HomeIcon, UserIcon } from 'lucide-react';
+import { HomeIcon, UserIcon, CirclePileIcon } from 'lucide-react';
 import LogoutButton from './logout-button';
 
 export function Shell(props: { children: ReactNode }) {
@@ -68,6 +68,13 @@ export function Shell(props: { children: ReactNode }) {
           to="/"
           label="Home"
           leftSection={<HomeIcon />}
+        />
+        <NavLink
+          component={Link}
+          to="/groups"
+          label="Groups"
+          onClick={closeMobile}
+          leftSection={<CirclePileIcon />}
         />
         {me.data && (
           <NavLink
