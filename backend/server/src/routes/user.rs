@@ -20,6 +20,7 @@ pub struct UserDto {
     pub id: Uuid,
     pub email: String,
     pub name: String,
+    pub is_admin: bool,
 }
 
 impl From<&User> for UserDto {
@@ -28,6 +29,7 @@ impl From<&User> for UserDto {
             id: value.id,
             email: value.email.clone(),
             name: value.name.clone(),
+            is_admin: value.is_admin,
         }
     }
 }
