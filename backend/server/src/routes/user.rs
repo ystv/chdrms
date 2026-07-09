@@ -65,7 +65,7 @@ impl ObjectPermissions {
     tag = TAG,
     operation_id = "get_current_user",
     responses(
-        (status = OK, description = "Success", body = UserInfo),
+        (status = OK, description = "Success", body = UserDto),
     ),
 )]
 async fn current_user(auth: AuthContext) -> Json<UserDto> {
@@ -93,7 +93,7 @@ async fn current_user_permissions(auth: AuthContext) -> Json<Vec<ObjectPermissio
     tag = TAG,
     operation_id = "list_users",
     responses(
-        (status = OK, description = "Success", body = [UserInfo])
+        (status = OK, description = "Success", body = [UserDto])
     )
 )]
 async fn list_users(
