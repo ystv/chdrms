@@ -5,3 +5,9 @@ members = [
     "backend/database_macros/",
     "backend/server/",
 ]
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
