@@ -38,6 +38,7 @@
             rust-analyzer
             sqlx-cli
             cargo-expand
+            mold
           ] ++ dependencies;
         };
       }
