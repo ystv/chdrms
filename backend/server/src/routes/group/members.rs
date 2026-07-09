@@ -14,13 +14,13 @@ use uuid::Uuid;
 use crate::{
     auth::permissions::RequirePermission,
     error::{AppError, Result},
-    routes::user::UserInfo,
+    routes::user::UserDto,
     state::AppState,
 };
 
 #[derive(Serialize, ToSchema)]
 pub struct GroupMembers {
-    members: Vec<UserInfo>,
+    members: Vec<UserDto>,
 }
 
 #[derive(Deserialize, ToSchema)]

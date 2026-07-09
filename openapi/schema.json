@@ -1371,7 +1371,8 @@
         "required": [
           "id",
           "email",
-          "name"
+          "name",
+          "is_admin"
         ],
         "properties": {
           "email": {
@@ -1380,6 +1381,9 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "is_admin": {
+            "type": "boolean"
           },
           "name": {
             "type": "string"

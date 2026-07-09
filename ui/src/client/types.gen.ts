@@ -92,6 +92,7 @@ export type SchemaDecimal = number;
 export type UserInfo = {
     email: string;
     id: string;
+    is_admin: boolean;
     name: string;
 };
 
