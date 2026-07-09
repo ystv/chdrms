@@ -16,13 +16,13 @@ use crate::{
 pub(super) const TAG: &str = "user";
 
 #[derive(Serialize, ToSchema)]
-pub struct UserInfo {
+pub struct UserDto {
     pub id: Uuid,
     pub email: String,
     pub name: String,
 }
 
-impl From<&User> for UserInfo {
+impl From<&User> for UserDto {
     fn from(value: &User) -> Self {
         Self {
             id: value.id,
@@ -63,10 +63,10 @@ impl ObjectPermissions {
     tag = TAG,
     operation_id = "get_current_user",
     responses(
-        (status = OK, description = "Success", body = UserInfo),
+        (status = OK, description = "Success", body = UserDto),
     ),
 )]
-async fn current_user(auth: AuthContext) -> Json<UserInfo> {
+async fn current_user(auth: AuthContext) -> Json<UserDto> {
     Json(auth.user().into())
 }
 
@@ -91,13 +91,13 @@ async fn current_user_permissions(auth: AuthContext) -> Json<Vec<ObjectPermissio
     tag = TAG,
     operation_id = "list_users",
     responses(
-        (status = OK, description = "Success", body = [UserInfo])
+        (status = OK, description = "Success", body = [UserDto])
     )
 )]
 async fn list_users(
     State(state): State<AppState>,
     _auth: RequirePermission<user::permission::List>,
-) -> Result<Json<Vec<UserInfo>>> {
+) -> Result<Json<Vec<UserDto>>> {
     Ok(Json(
         User::list(&mut state.transaction().await?)
             .await?
