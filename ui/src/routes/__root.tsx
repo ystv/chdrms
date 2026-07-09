@@ -5,13 +5,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 import '@mantine/core/styles.css';
 import '../styles.css';
 import { MantineProvider } from '@mantine/core';
-import { Shell } from '#/components/shell';
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from '@tanstack/react-query';
-import { getCurrentUserOptions } from '#/client/@tanstack/react-query.gen';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -19,8 +13,6 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   const queryClient = new QueryClient();
-
-  // const me = useQuery({ ...getCurrentUserOptions({}) });
 
   return (
     <>

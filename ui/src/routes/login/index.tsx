@@ -4,7 +4,7 @@ import {
 } from '#/client/@tanstack/react-query.gen';
 import { Button, Card, Center, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/login/')({
   component: RouteComponent,
