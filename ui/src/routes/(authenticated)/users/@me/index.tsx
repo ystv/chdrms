@@ -38,6 +38,7 @@ function RouteComponent() {
           </Tooltip>
         </Group>
         <Text>{me.data?.email}</Text>
+        {me.data?.is_admin && 'This user is an admin'}
       </Stack>
     </Card>
   );

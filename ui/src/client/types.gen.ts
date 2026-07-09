@@ -33,7 +33,7 @@ export type GroupInfo = {
 };
 
 export type GroupMembers = {
-    members: Array<UserInfo>;
+    members: Array<UserDto>;
 };
 
 export type Manufacturer = {
@@ -89,9 +89,10 @@ export type ProviderInfo = {
 
 export type SchemaDecimal = number;
 
-export type UserInfo = {
+export type UserDto = {
     email: string;
     id: string;
+    is_admin: boolean;
     name: string;
 };
 
@@ -705,7 +706,7 @@ export type ListUsersResponses = {
     /**
      * Success
      */
-    200: Array<UserInfo>;
+    200: Array<UserDto>;
 };
 
 export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
@@ -721,7 +722,7 @@ export type GetCurrentUserResponses = {
     /**
      * Success
      */
-    200: UserInfo;
+    200: UserDto;
 };
 
 export type GetCurrentUserResponse = GetCurrentUserResponses[keyof GetCurrentUserResponses];
