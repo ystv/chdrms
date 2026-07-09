@@ -19,6 +19,7 @@ const config = defineConfig({
     proxy: {
       // this routes /api requests to the locally running api backend in dev
       '/api': 'http://localhost:' + (process.env.PORT ?? '3000'),
+      '/auth': 'http://localhost:' + (process.env.PORT ?? '3000'),
     },
   },
 });

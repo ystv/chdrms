@@ -1,13 +1,39 @@
-import { AppShell, Burger, Group, NavLink, Stack, Text } from '@mantine/core';
+import {
+  AppShell,
+  Burger,
+  Group,
+  LoadingOverlay,
+  NavLink,
+  Text,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Link } from '@tanstack/react-router';
-import { XIcon } from 'lucide-react';
+import { Link, useNavigate } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
+import { ColorSchemeToggle } from './color-scheme-toggle';
+import { getCurrentUserOptions } from '#/client/@tanstack/react-query.gen';
+import { useQuery } from '@tanstack/react-query';
+import { HomeIcon, UserIcon } from 'lucide-react';
+import LogoutButton from './logout-button';
 
 export function Shell(props: { children: ReactNode }) {
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] =
     useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+
+  const navigate = useNavigate();
+
+  const me = useQuery({ ...getCurrentUserOptions({}), retry: false });
+
+  if (!me.data && !me.error)
+    return (
+      <div style={{ width: '100%', height: '100vh' }}>
+        <LoadingOverlay visible />
+      </div>
+    );
+
+  if (me.error) {
+    navigate({ to: '/login' });
+  }
 
   return (
     <AppShell
@@ -33,16 +59,27 @@ export function Shell(props: { children: ReactNode }) {
             visibleFrom="sm"
             size="sm"
           />
+          <Text>{me.data?.name}</Text>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
-        <NavLink component={Link} to="/" label="Home" />
         <NavLink
           component={Link}
-          to="/test"
-          label="Test"
-          onClick={closeMobile}
+          to="/"
+          label="Home"
+          leftSection={<HomeIcon />}
         />
+        {me.data && (
+          <NavLink
+            component={Link}
+            to="/users/@me"
+            label="My Profile"
+            onClick={closeMobile}
+            leftSection={<UserIcon />}
+          />
+        )}
+        <ColorSchemeToggle mt={'auto'} />
+        <LogoutButton />
       </AppShell.Navbar>
       <AppShell.Main>{props.children}</AppShell.Main>
     </AppShell>
