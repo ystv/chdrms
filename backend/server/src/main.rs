@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use chdrms_server::{error::AppError, state::AppState};
+use chdrms_server::{error::AppError, state::AppState, storage};
 use sqlx::postgres::PgPoolOptions;
 use tower_http::{
     services::{ServeDir, ServeFile},
@@ -43,6 +43,7 @@ async fn main() -> Result<(), AppError> {
         chdrms_server::config::load_key(get_env!("SECRET_KEY_PATH", ".secretkey".to_string()))
             .await;
 
+    // database
     let pool = PgPoolOptions::new()
         .max_connections(8)
         .connect(&get_env!("DATABASE_URL"))
@@ -53,7 +54,11 @@ async fn main() -> Result<(), AppError> {
         return Ok(());
     };
 
-    let state = AppState::new(pool, config, key);
+    // storage
+    let storage = storage::Storage::new(&config.storage);
+    println!("{}", storage.get_test_document().url);
+
+    let state = AppState::new(pool, config, storage, key);
 
     let (app, _) = chdrms_server::routes::routes();
 

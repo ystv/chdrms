@@ -2,18 +2,19 @@ use axum::extract::FromRef;
 use axum_extra::extract::cookie::Key;
 use openidconnect::reqwest;
 
-use crate::{USER_AGENT, config::AppConfig};
+use crate::{USER_AGENT, config::AppConfig, storage::Storage};
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
     pool: sqlx::PgPool,
     pub config: AppConfig,
     pub client: reqwest::Client,
+    pub storage: Storage,
     pub key: Key,
 }
 
 impl AppState {
-    pub fn new(pool: sqlx::PgPool, config: AppConfig, key: Key) -> Self {
+    pub fn new(pool: sqlx::PgPool, config: AppConfig, storage: Storage, key: Key) -> Self {
         Self {
             pool,
             config,
@@ -21,6 +22,7 @@ impl AppState {
                 .user_agent(USER_AGENT)
                 .build()
                 .unwrap(),
+            storage,
             key,
         }
     }
