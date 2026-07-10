@@ -27,6 +27,9 @@ uuid = { version = "1.23.3", features = ["serde"] }
 validify = "2.0.0"
 url = "2.5.8"
 s3 = "0.1.36"
+tokio-stream = "0.1.18"
+bytes = "1.12.1"
+moka = { version = "0.12.15", features = ["future"] }
 
 [dev-dependencies]
 serde_json = "1.0.150"

@@ -1,5 +1,5 @@
 use serde::{Deserialize, Deserializer};
-use sqlx::PgPool;
+use sqlx::{PgPool, prelude::FromRow};
 
 pub mod asset_type;
 pub mod location;
@@ -81,6 +81,27 @@ where
     {
         Ok(PatchField::Present(T::deserialize(deserializer)?))
     }
+}
+
+// todo: dunno where to put this
+#[derive(Debug, Clone)]
+pub struct StorageKey(String);
+
+impl StorageKey {
+    pub fn key(&self) -> &str {
+        &self.0
+    }
+
+    pub fn into_key(self) -> String {
+        self.0
+    }
+}
+
+#[derive(FromRow)]
+pub struct ExampleUserStruct {
+    //...
+    pub profile_picture: Option<StorageKey>,
+    //...
 }
 
 #[cfg(test)]

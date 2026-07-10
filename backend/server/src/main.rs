@@ -56,7 +56,6 @@ async fn main() -> Result<(), AppError> {
 
     // storage
     let storage = storage::Storage::new(&config.storage);
-    println!("{}", storage.get_test_document().url);
 
     let state = AppState::new(pool, config, storage, key);
 
