@@ -175,4 +175,4 @@ impl User {
     }
 }
 
-define_permissions!("users" => List, Invite);
+define_permissions!("users" => List, Invite, Manage);

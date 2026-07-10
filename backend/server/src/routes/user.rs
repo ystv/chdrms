@@ -1,6 +1,9 @@
 use std::collections::{HashMap, HashSet};
 
-use axum::{Json, extract::State};
+use axum::{
+    Json,
+    extract::{Path, State},
+};
 use chdrms_database::user::{self, User};
 use serde::Serialize;
 use utoipa::ToSchema;
@@ -9,7 +12,7 @@ use uuid::Uuid;
 
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
-    error::Result,
+    error::{AppError, ErrorResponse, Result},
     state::AppState,
 };
 
@@ -72,6 +75,31 @@ async fn current_user(auth: AuthContext) -> Json<UserDto> {
     Json(auth.user().into())
 }
 
+/// Get a user by their ID.
+#[utoipa::path(
+    get,
+    path = "/{id}",
+    tag = TAG,
+    operation_id = "get_user_by_id",
+    responses(
+        (status = OK, description = "Success", body = UserDto),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "User by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn get_by_id(
+    State(state): State<AppState>,
+    _auth: RequirePermission<user::permission::Manage>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<UserDto>> {
+    Ok(Json(
+        (&user::User::get_by_id(&mut state.transaction().await?, id)
+            .await?
+            .ok_or_else(|| AppError::NotFound)?)
+            .into(),
+    ))
+}
+
 /// Get the current user's permissions.
 #[utoipa::path(
     get,
@@ -114,4 +142,5 @@ pub(super) fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(current_user))
         .routes(routes!(current_user_permissions))
         .routes(routes!(list_users))
+        .routes(routes!(get_by_id))
 }
