@@ -5,6 +5,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::{error::ErrorResponse, state::AppState};
 
+mod asset;
 mod asset_type;
 mod auth;
 mod group;
@@ -24,6 +25,7 @@ mod user;
         (name = manufacturer::TAG, description = "Manufacturers"),
         (name = asset_type::TAG, description = "Asset Types"),
         (name = location::TAG, description = "Locations"),
+        (name = asset::TAG, description = "Assets"),
     ),
 )]
 struct ApiDoc;
@@ -50,6 +52,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
         .nest("/manufacturer", manufacturer::routes())
         .nest("/asset/type", asset_type::routes())
         .nest("/location", location::routes())
+        .nest("/asset", asset::routes())
         .split_for_parts();
 
     let router = Router::new()
