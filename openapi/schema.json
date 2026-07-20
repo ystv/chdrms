@@ -312,6 +312,344 @@
         }
       }
     },
+    "/assets": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "List all assets.",
+        "operationId": "list_assets",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Create a new asset.",
+        "operationId": "create_asset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Get an asset by its ID.",
+        "operationId": "get_asset_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Update an asset by its ID.",
+        "operationId": "update_asset_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Delete an asset by its ID.",
+        "operationId": "delete_asset_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}/location": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Get an asset's location",
+        "operationId": "get_asset_location",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Set an asset's location.",
+        "operationId": "set_asset_location",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssetLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -329,6 +667,235 @@
                   "items": {
                     "$ref": "#/components/schemas/ProviderInfo"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bundles": {
+      "get": {
+        "tags": [
+          "asset_bundle"
+        ],
+        "summary": "List all asset bundles.",
+        "operationId": "list_asset_bundles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetBundleDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset bundle by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "asset_bundle"
+        ],
+        "summary": "Create an asset bundle.",
+        "operationId": "create_asset_bundle",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bundles/{id}": {
+      "get": {
+        "tags": [
+          "asset_bundle"
+        ],
+        "summary": "Get an asset bundle by its ID.",
+        "operationId": "get_asset_bundle_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset bundle ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetBundleDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset bundle by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "asset_bundle"
+        ],
+        "summary": "Delete an asset bundle.",
+        "operationId": "delete_asset_bundle",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset bundle ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset bundle by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bundles/{id}/assets": {
+      "get": {
+        "tags": [
+          "asset_bundle"
+        ],
+        "summary": "Get assets within an asset bundle.",
+        "operationId": "get_assets_within_bundle_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset bundle ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset bundle by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -1375,6 +1942,80 @@
   },
   "components": {
     "schemas": {
+      "AssetBundleDto": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssetDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "tag",
+          "locations"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "An optional alias for this asset. This is purely for convenience\nin searching for and identifying multiple instances of similar\nassets."
+          },
+          "bundle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "An optional bundle that this asset is within, as asset bundle\nidentifier."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for this asset. This property is immutable."
+          },
+          "locations": {
+            "$ref": "#/components/schemas/AssetLocations"
+          },
+          "tag": {
+            "type": "string",
+            "description": "The asset tag attached to this asset."
+          },
+          "type": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The type of this asset, as an asset type identifier. This property\nis immutable."
+          }
+        }
+      },
+      "AssetLocations": {
+        "type": "object",
+        "required": [
+          "current",
+          "home"
+        ],
+        "properties": {
+          "current": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The current location of an asset. This property is only mutable\nvia its dedicated field endpoints."
+          },
+          "home": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The default/home location of this asset. This is used to mark where\nan asset *should* be when not assigned to a project."
+          }
+        }
+      },
       "AssetType": {
         "type": "object",
         "required": [
@@ -1454,6 +2095,39 @@
         },
         "maxItems": 2,
         "minItems": 2
+      },
+      "CreateAssetRequest": {
+        "type": "object",
+        "required": [
+          "type",
+          "tag",
+          "locations"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bundle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "locations": {
+            "$ref": "#/components/schemas/AssetLocations"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "CreateGroup": {
         "type": "object",
@@ -1801,6 +2475,58 @@
         "type": "number",
         "format": "float"
       },
+      "UpdateAssetLocationRequest": {
+        "type": "object",
+        "required": [
+          "location"
+        ],
+        "properties": {
+          "location": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateAssetLocations": {
+        "type": "object",
+        "required": [
+          "home"
+        ],
+        "properties": {
+          "home": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateAssetRequest": {
+        "type": "object",
+        "required": [
+          "tag",
+          "locations"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bundle": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "locations": {
+            "$ref": "#/components/schemas/UpdateAssetLocations"
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
       "UserDto": {
         "type": "object",
         "required": [
@@ -1851,6 +2577,14 @@
     {
       "name": "location",
       "description": "Locations"
+    },
+    {
+      "name": "asset",
+      "description": "Assets"
+    },
+    {
+      "name": "asset_bundle",
+      "description": "Asset Bundles"
     }
   ]
 }

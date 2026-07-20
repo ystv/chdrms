@@ -19,12 +19,12 @@ use crate::{
 pub(super) const TAG: &str = "location";
 
 #[derive(Serialize, ToSchema)]
-struct LocationDto {
-    id: Uuid,
-    name: String,
-    description: Option<String>,
+pub(super) struct LocationDto {
+    pub id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
 
-    coordinates: Option<Coordinates>,
+    pub coordinates: Option<Coordinates>,
 }
 
 impl From<database::Location> for LocationDto {
@@ -95,7 +95,7 @@ impl From<PatchLocation> for database::PatchLocation {
 }
 
 #[derive(Serialize, Deserialize, Debug, ToSchema)]
-struct Coordinates(f64, f64);
+pub(super) struct Coordinates(f64, f64);
 
 impl From<Coordinates> for PgPoint {
     fn from(Coordinates(latitude, longitude): Coordinates) -> Self {
