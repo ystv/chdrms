@@ -312,6 +312,68 @@
         }
       }
     },
+    "/asset/{id}": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Get an asset by its ID.",
+        "operationId": "get_asset_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "resolve",
+            "in": "query",
+            "description": "Whether to resolve related entites",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -1375,6 +1437,75 @@
   },
   "components": {
     "schemas": {
+      "AssetDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "tag",
+          "home_location",
+          "location"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bundle": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ResolvableBundle"
+              }
+            ]
+          },
+          "home_location": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "location": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssetSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "tag"
+        ],
+        "properties": {
+          "alias": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tag": {
+            "type": "string"
+          }
+        }
+      },
       "AssetType": {
         "type": "object",
         "required": [
@@ -1797,6 +1928,33 @@
           }
         }
       },
+      "ResolvableBundle": {
+        "oneOf": [
+          {
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "assets"
+            ],
+            "properties": {
+              "assets": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AssetSummary"
+                }
+              },
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ]
+      },
       "SchemaDecimal": {
         "type": "number",
         "format": "float"
@@ -1851,6 +2009,10 @@
     {
       "name": "location",
       "description": "Locations"
+    },
+    {
+      "name": "asset",
+      "description": "Assets"
     }
   ]
 }
