@@ -1,0 +1,120 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT labels.id, labels.name, labels.description, labels.colour AS \"colour: _\", labels.blocking, labels.created_at, labels.created_by\n            FROM labels\n            LEFT JOIN asset_labels\n            ON labels.id = asset_labels.label AND asset_labels.asset = $1;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "description"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "colour: _",
+        "type_info": {
+          "Custom": {
+            "name": "rgb",
+            "kind": {
+              "Composite": [
+                [
+                  "r",
+                  "Int2"
+                ],
+                [
+                  "g",
+                  "Int2"
+                ],
+                [
+                  "b",
+                  "Int2"
+                ]
+              ]
+            }
+          }
+        },
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "colour"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "blocking",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "blocking"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "created_by",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "created_by"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "3e162d505d42483501e1922751c6d24f06df7f6ff0fe4cad5500a58e6434a758"
+}
