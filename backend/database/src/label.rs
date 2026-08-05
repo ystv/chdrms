@@ -63,6 +63,68 @@ impl Label {
         .await
     }
 
+    pub async fn update(
+        self,
+        txn: &mut sqlx::PgTransaction<'_>,
+        update: UpdateLabel,
+    ) -> sqlx::Result<Self> {
+        sqlx::query_as!(
+            Self,
+            r#"UPDATE labels
+            SET
+                name = $2,
+                description = $3,
+                colour = $4,
+                blocking = $5
+            WHERE id = $1
+            RETURNING
+                id,
+                name,
+                description,
+                colour AS "colour: _",
+                blocking,
+                created_at,
+                created_by;"#,
+            self.id,
+            update.name,
+            update.description,
+            update.colour as _,
+            update.blocking,
+        )
+        .fetch_one(&mut **txn)
+        .await
+    }
+
+    pub async fn delete(self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<bool> {
+        let result = sqlx::query_as!(
+            Self,
+            r#"DELETE FROM labels
+            WHERE id = $1;"#,
+            self.id,
+        )
+        .execute(&mut **txn)
+        .await?;
+
+        Ok(result.rows_affected() != 0)
+    }
+
+    pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
+        sqlx::query_as!(
+            Self,
+            r#"SELECT
+                id,
+                name,
+                description,
+                colour AS "colour: _",
+                blocking,
+                created_at,
+                created_by
+            FROM labels;"#,
+        )
+        .fetch_all(&mut **txn)
+        .await
+    }
+
     pub async fn list_asset_labels(
         txn: &mut sqlx::PgTransaction<'_>,
         asset: Uuid,

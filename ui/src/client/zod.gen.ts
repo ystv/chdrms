@@ -46,11 +46,26 @@ export const zCreateGroup = z.object({
     name: z.string()
 });
 
+export const zCreateLabelRequest = z.object({
+    blocking: z.boolean(),
+    colour: z.string().nullish(),
+    description: z.string().nullish(),
+    name: z.string()
+});
+
 export const zErrorResponse = z.object({
     error: z.string()
 });
 
 export const zGroupInfo = z.object({
+    id: z.uuid(),
+    name: z.string()
+});
+
+export const zLabelDto = z.object({
+    blocking: z.boolean(),
+    colour: z.string().nullish(),
+    description: z.string().nullish(),
     id: z.uuid(),
     name: z.string()
 });
@@ -156,6 +171,13 @@ export const zUpdateAssetRequest = z.object({
     locations: zUpdateAssetLocations,
     notes: z.string().nullish(),
     tag: z.string()
+});
+
+export const zUpdateLabelRequest = z.object({
+    blocking: z.boolean(),
+    colour: z.string().nullish(),
+    description: z.string().nullish(),
+    name: z.string()
 });
 
 export const zUserDto = z.object({
@@ -414,6 +436,47 @@ export const zHealthResponse = z.string();
  * Success
  */
 export const zHealth2Response = z.string();
+
+/**
+ * Success
+ */
+export const zListLabelsResponse = z.array(zLabelDto);
+
+export const zCreateLabelBody = zCreateLabelRequest;
+
+/**
+ * Success
+ */
+export const zCreateLabelResponse = zLabelDto;
+
+export const zDeleteLabelByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zDeleteLabelByIdResponse = z.void();
+
+export const zGetLabelByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetLabelByIdResponse = zLabelDto;
+
+export const zUpdateLabelByIdBody = zUpdateLabelRequest;
+
+export const zUpdateLabelByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zUpdateLabelByIdResponse = zLabelDto;
 
 /**
  * Success
