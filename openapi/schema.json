@@ -2331,6 +2331,8 @@
           "id",
           "type",
           "tag",
+          "labels",
+          "blocks",
           "locations"
         ],
         "properties": {
@@ -2340,6 +2342,13 @@
               "null"
             ],
             "description": "An optional alias for this asset. This is purely for convenience\nin searching for and identifying multiple instances of similar\nassets."
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Block"
+            },
+            "description": "An array of reasons why the asset could be blocked\nby anything, like a label or maintenance job. This field is\nimmutable and only affected by external fields."
           },
           "bundle": {
             "type": [
@@ -2353,6 +2362,14 @@
             "type": "string",
             "format": "uuid",
             "description": "The unique identifier for this asset. This property is immutable."
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "An array of labels attached to this asset. This field is only\nmutable via its dedicated field endpoints."
           },
           "locations": {
             "$ref": "#/components/schemas/AssetLocations"
@@ -2464,6 +2481,29 @@
             ]
           }
         }
+      },
+      "Block": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "label"
+                ]
+              }
+            }
+          }
+        ]
       },
       "ContactDetailsDto": {
         "type": "object",

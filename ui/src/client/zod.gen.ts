@@ -11,10 +11,17 @@ export const zAssetLocations = z.object({
     home: z.uuid()
 });
 
+export const zBlock = z.object({
+    label: z.uuid(),
+    reason: z.enum(['label'])
+});
+
 export const zAssetDto = z.object({
     alias: z.string().nullish(),
+    blocks: z.array(zBlock),
     bundle: z.uuid().nullish(),
     id: z.uuid(),
+    labels: z.array(z.uuid()),
     locations: zAssetLocations,
     notes: z.string().nullish(),
     tag: z.string(),

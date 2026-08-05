@@ -16,6 +16,12 @@ export type AssetDto = {
      */
     alias?: string | null;
     /**
+     * An array of reasons why the asset could be blocked
+     * by anything, like a label or maintenance job. This field is
+     * immutable and only affected by external fields.
+     */
+    blocks: Array<Block>;
+    /**
      * An optional bundle that this asset is within, as asset bundle
      * identifier.
      */
@@ -24,6 +30,11 @@ export type AssetDto = {
      * The unique identifier for this asset. This property is immutable.
      */
     id: string;
+    /**
+     * An array of labels attached to this asset. This field is only
+     * mutable via its dedicated field endpoints.
+     */
+    labels: Array<string>;
     locations: AssetLocations;
     /**
      * An optional field for miscellaneous notes about the asset.
@@ -66,6 +77,11 @@ export type AssetTypeDto = {
     name: string;
     product_url?: string | null;
     value?: null | SchemaDecimal;
+};
+
+export type Block = {
+    label: string;
+    reason: 'label';
 };
 
 export type ContactDetailsDto = {
