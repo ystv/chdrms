@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addPermissionToGroup, addUserToGroup, createAssetType, createGroup, createManufacturer, deleteAssetTypeById, deleteManufacturerById, getAssetTypeById, getCurrentUser, getCurrentUserPermissions, getGroupById, getManufacturerById, health, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listManufacturers, listUsers, type Options, patchAssetTypeById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, updateAssetTypeById, updateManufacturerById } from '../sdk.gen';
-import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, HealthData, HealthResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
+import { addPermissionToGroup, addUserToGroup, createAsset, createAssetBundle, createAssetType, createGroup, createLocation, createManufacturer, deleteAssetBundle, deleteAssetById, deleteAssetTypeById, deleteLocationById, deleteManufacturerById, getAssetBundleById, getAssetById, getAssetLocation, getAssetsWithinBundleById, getAssetTypeById, getCurrentUser, getCurrentUserPermissions, getGroupById, getLocationById, getManufacturerById, getUserById, health, listAssetBundles, listAssets, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listLocations, listManufacturers, listUsers, type Options, patchAssetTypeById, patchLocationById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, setAssetLocation, updateAssetById, updateAssetTypeById, updateLocationById, updateManufacturerById } from '../sdk.gen';
+import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetBundleData, CreateAssetBundleError, CreateAssetBundleResponse, CreateAssetData, CreateAssetError, CreateAssetResponse, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateLocationData, CreateLocationError, CreateLocationResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetBundleData, DeleteAssetBundleError, DeleteAssetBundleResponse, DeleteAssetByIdData, DeleteAssetByIdError, DeleteAssetByIdResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteLocationByIdData, DeleteLocationByIdError, DeleteLocationByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetBundleByIdData, GetAssetBundleByIdError, GetAssetBundleByIdResponse, GetAssetByIdData, GetAssetByIdError, GetAssetByIdResponse, GetAssetLocationData, GetAssetLocationError, GetAssetLocationResponse, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetLocationByIdData, GetLocationByIdError, GetLocationByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, HealthData, HealthResponse, ListAssetBundlesData, ListAssetBundlesError, ListAssetBundlesResponse, ListAssetsData, ListAssetsError, ListAssetsResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListLocationsData, ListLocationsError, ListLocationsResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchLocationByIdData, PatchLocationByIdError, PatchLocationByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, SetAssetLocationData, SetAssetLocationError, SetAssetLocationResponse, UpdateAssetByIdData, UpdateAssetByIdError, UpdateAssetByIdResponse, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateLocationByIdData, UpdateLocationByIdError, UpdateLocationByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -143,6 +143,128 @@ export const updateAssetTypeByIdMutation = (options?: Partial<Options<UpdateAsse
     return mutationOptions;
 };
 
+export const listAssetsQueryKey = (options?: Options<ListAssetsData>) => createQueryKey('listAssets', options);
+
+/**
+ * List all assets.
+ */
+export const listAssetsOptions = (options?: Options<ListAssetsData>) => queryOptions<ListAssetsResponse, ListAssetsError, ListAssetsResponse, ReturnType<typeof listAssetsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listAssets({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listAssetsQueryKey(options)
+});
+
+/**
+ * Create a new asset.
+ */
+export const createAssetMutation = (options?: Partial<Options<CreateAssetData>>): UseMutationOptions<CreateAssetResponse, CreateAssetError, Options<CreateAssetData>> => {
+    const mutationOptions: UseMutationOptions<CreateAssetResponse, CreateAssetError, Options<CreateAssetData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createAsset({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete an asset by its ID.
+ */
+export const deleteAssetByIdMutation = (options?: Partial<Options<DeleteAssetByIdData>>): UseMutationOptions<DeleteAssetByIdResponse, DeleteAssetByIdError, Options<DeleteAssetByIdData>> => {
+    const mutationOptions: UseMutationOptions<DeleteAssetByIdResponse, DeleteAssetByIdError, Options<DeleteAssetByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteAssetById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getAssetByIdQueryKey = (options: Options<GetAssetByIdData>) => createQueryKey('getAssetById', options);
+
+/**
+ * Get an asset by its ID.
+ */
+export const getAssetByIdOptions = (options: Options<GetAssetByIdData>) => queryOptions<GetAssetByIdResponse, GetAssetByIdError, GetAssetByIdResponse, ReturnType<typeof getAssetByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getAssetById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getAssetByIdQueryKey(options)
+});
+
+/**
+ * Update an asset by its ID.
+ */
+export const updateAssetByIdMutation = (options?: Partial<Options<UpdateAssetByIdData>>): UseMutationOptions<UpdateAssetByIdResponse, UpdateAssetByIdError, Options<UpdateAssetByIdData>> => {
+    const mutationOptions: UseMutationOptions<UpdateAssetByIdResponse, UpdateAssetByIdError, Options<UpdateAssetByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateAssetById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getAssetLocationQueryKey = (options: Options<GetAssetLocationData>) => createQueryKey('getAssetLocation', options);
+
+/**
+ * Get an asset's location
+ */
+export const getAssetLocationOptions = (options: Options<GetAssetLocationData>) => queryOptions<GetAssetLocationResponse, GetAssetLocationError, GetAssetLocationResponse, ReturnType<typeof getAssetLocationQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getAssetLocation({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getAssetLocationQueryKey(options)
+});
+
+/**
+ * Set an asset's location.
+ */
+export const setAssetLocationMutation = (options?: Partial<Options<SetAssetLocationData>>): UseMutationOptions<SetAssetLocationResponse, SetAssetLocationError, Options<SetAssetLocationData>> => {
+    const mutationOptions: UseMutationOptions<SetAssetLocationResponse, SetAssetLocationError, Options<SetAssetLocationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await setAssetLocation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const listAuthProvidersQueryKey = (options?: Options<ListAuthProvidersData>) => createQueryKey('listAuthProviders', options);
 
 /**
@@ -159,6 +281,94 @@ export const listAuthProvidersOptions = (options?: Options<ListAuthProvidersData
         return data;
     },
     queryKey: listAuthProvidersQueryKey(options)
+});
+
+export const listAssetBundlesQueryKey = (options?: Options<ListAssetBundlesData>) => createQueryKey('listAssetBundles', options);
+
+/**
+ * List all asset bundles.
+ */
+export const listAssetBundlesOptions = (options?: Options<ListAssetBundlesData>) => queryOptions<ListAssetBundlesResponse, ListAssetBundlesError, ListAssetBundlesResponse, ReturnType<typeof listAssetBundlesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listAssetBundles({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listAssetBundlesQueryKey(options)
+});
+
+/**
+ * Create an asset bundle.
+ */
+export const createAssetBundleMutation = (options?: Partial<Options<CreateAssetBundleData>>): UseMutationOptions<CreateAssetBundleResponse, CreateAssetBundleError, Options<CreateAssetBundleData>> => {
+    const mutationOptions: UseMutationOptions<CreateAssetBundleResponse, CreateAssetBundleError, Options<CreateAssetBundleData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createAssetBundle({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete an asset bundle.
+ */
+export const deleteAssetBundleMutation = (options?: Partial<Options<DeleteAssetBundleData>>): UseMutationOptions<DeleteAssetBundleResponse, DeleteAssetBundleError, Options<DeleteAssetBundleData>> => {
+    const mutationOptions: UseMutationOptions<DeleteAssetBundleResponse, DeleteAssetBundleError, Options<DeleteAssetBundleData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteAssetBundle({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getAssetBundleByIdQueryKey = (options: Options<GetAssetBundleByIdData>) => createQueryKey('getAssetBundleById', options);
+
+/**
+ * Get an asset bundle by its ID.
+ */
+export const getAssetBundleByIdOptions = (options: Options<GetAssetBundleByIdData>) => queryOptions<GetAssetBundleByIdResponse, GetAssetBundleByIdError, GetAssetBundleByIdResponse, ReturnType<typeof getAssetBundleByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getAssetBundleById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getAssetBundleByIdQueryKey(options)
+});
+
+export const getAssetsWithinBundleByIdQueryKey = (options: Options<GetAssetsWithinBundleByIdData>) => createQueryKey('getAssetsWithinBundleById', options);
+
+/**
+ * Get assets within an asset bundle.
+ */
+export const getAssetsWithinBundleByIdOptions = (options: Options<GetAssetsWithinBundleByIdData>) => queryOptions<GetAssetsWithinBundleByIdResponse, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, ReturnType<typeof getAssetsWithinBundleByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getAssetsWithinBundleById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getAssetsWithinBundleByIdQueryKey(options)
 });
 
 export const listGroupsQueryKey = (options?: Options<ListGroupsData>) => createQueryKey('listGroups', options);
@@ -336,6 +546,110 @@ export const healthOptions = (options?: Options<HealthData>) => queryOptions<Hea
     queryKey: healthQueryKey(options)
 });
 
+export const listLocationsQueryKey = (options?: Options<ListLocationsData>) => createQueryKey('listLocations', options);
+
+/**
+ * List all locations.
+ */
+export const listLocationsOptions = (options?: Options<ListLocationsData>) => queryOptions<ListLocationsResponse, ListLocationsError, ListLocationsResponse, ReturnType<typeof listLocationsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listLocations({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listLocationsQueryKey(options)
+});
+
+/**
+ * Create a location.
+ */
+export const createLocationMutation = (options?: Partial<Options<CreateLocationData>>): UseMutationOptions<CreateLocationResponse, CreateLocationError, Options<CreateLocationData>> => {
+    const mutationOptions: UseMutationOptions<CreateLocationResponse, CreateLocationError, Options<CreateLocationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createLocation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete a location by its ID.
+ */
+export const deleteLocationByIdMutation = (options?: Partial<Options<DeleteLocationByIdData>>): UseMutationOptions<DeleteLocationByIdResponse, DeleteLocationByIdError, Options<DeleteLocationByIdData>> => {
+    const mutationOptions: UseMutationOptions<DeleteLocationByIdResponse, DeleteLocationByIdError, Options<DeleteLocationByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteLocationById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getLocationByIdQueryKey = (options: Options<GetLocationByIdData>) => createQueryKey('getLocationById', options);
+
+/**
+ * Get a location by its ID.
+ */
+export const getLocationByIdOptions = (options: Options<GetLocationByIdData>) => queryOptions<GetLocationByIdResponse, GetLocationByIdError, GetLocationByIdResponse, ReturnType<typeof getLocationByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLocationById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLocationByIdQueryKey(options)
+});
+
+/**
+ * Patch individual fields of a location by its ID.
+ */
+export const patchLocationByIdMutation = (options?: Partial<Options<PatchLocationByIdData>>): UseMutationOptions<PatchLocationByIdResponse, PatchLocationByIdError, Options<PatchLocationByIdData>> => {
+    const mutationOptions: UseMutationOptions<PatchLocationByIdResponse, PatchLocationByIdError, Options<PatchLocationByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await patchLocationById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update all fields of a location by its ID.
+ */
+export const updateLocationByIdMutation = (options?: Partial<Options<UpdateLocationByIdData>>): UseMutationOptions<UpdateLocationByIdResponse, UpdateLocationByIdError, Options<UpdateLocationByIdData>> => {
+    const mutationOptions: UseMutationOptions<UpdateLocationByIdResponse, UpdateLocationByIdError, Options<UpdateLocationByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateLocationById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const listManufacturersQueryKey = (options?: Options<ListManufacturersData>) => createQueryKey('listManufacturers', options);
 
 /**
@@ -492,4 +806,22 @@ export const getCurrentUserPermissionsOptions = (options?: Options<GetCurrentUse
         return data;
     },
     queryKey: getCurrentUserPermissionsQueryKey(options)
+});
+
+export const getUserByIdQueryKey = (options: Options<GetUserByIdData>) => createQueryKey('getUserById', options);
+
+/**
+ * Get a user by their ID.
+ */
+export const getUserByIdOptions = (options: Options<GetUserByIdData>) => queryOptions<GetUserByIdResponse, GetUserByIdError, GetUserByIdResponse, ReturnType<typeof getUserByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getUserById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getUserByIdQueryKey(options)
 });
