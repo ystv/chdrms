@@ -16,6 +16,7 @@ use chdrms_database::{PatchField, asset_type as database, manufacturer::Manufact
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
+    routes::asset::model::{AssetDto, AssetLocations},
     state::AppState,
 };
 
@@ -174,6 +175,50 @@ async fn list(
     ))
 }
 
+/// List assets of the specified type.
+#[utoipa::path(
+    get,
+    path = "/{id}/assets",
+    tag = TAG,
+    operation_id = "list_assets_of_asset_type",
+    responses(
+        (status = OK, description = "Success", body = Vec<AssetDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description= "Asset type by that ID not found", body = ErrorResponse),
+    )
+)]
+async fn list_assets_of_asset_type(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::View>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<AssetDto>>> {
+    let mut txn = state.transaction().await?;
+
+    // check if the asset type exists
+    let id = database::AssetType::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .id;
+
+    Ok(Json(
+        chdrms_database::asset::Asset::list_of_type(id, &mut state.transaction().await?)
+            .await?
+            .into_iter()
+            .map(|asset| AssetDto {
+                id: asset.id,
+                r#type: asset.r#type,
+                alias: asset.alias,
+                tag: asset.tag,
+                bundle: asset.bundle,
+                locations: AssetLocations {
+                    current: asset.location,
+                    home: asset.home_location,
+                },
+            })
+            .collect(),
+    ))
+}
+
 /// Create an asset type.
 #[utoipa::path(
     post,
@@ -297,4 +342,5 @@ pub(super) fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(delete))
         .routes(routes!(update))
         .routes(routes!(patch))
+        .routes(routes!(list_assets_of_asset_type))
 }

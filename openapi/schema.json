@@ -312,6 +312,61 @@
         }
       }
     },
+    "/asset-types/{id}/assets": {
+      "get": {
+        "tags": [
+          "asset_type"
+        ],
+        "summary": "List assets of the specified type.",
+        "operationId": "list_assets_of_asset_type",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssetDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset type by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/assets": {
       "get": {
         "tags": [
