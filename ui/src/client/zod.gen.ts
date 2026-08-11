@@ -2,6 +2,34 @@
 
 import * as z from 'zod';
 
+export const zAssetBundleDto = z.object({
+    id: z.uuid()
+});
+
+export const zAssetLocations = z.object({
+    current: z.uuid(),
+    home: z.uuid()
+});
+
+export const zAssetDto = z.object({
+    alias: z.string().nullish(),
+    bundle: z.uuid().nullish(),
+    id: z.uuid(),
+    locations: zAssetLocations,
+    tag: z.string(),
+    type: z.uuid()
+});
+
+export const zCoordinates = z.tuple([z.number(), z.number()]);
+
+export const zCreateAssetRequest = z.object({
+    alias: z.string().nullish(),
+    bundle: z.uuid().nullish(),
+    locations: zAssetLocations,
+    tag: z.string(),
+    type: z.uuid()
+});
+
 export const zCreateGroup = z.object({
     name: z.string()
 });
@@ -11,6 +39,19 @@ export const zErrorResponse = z.object({
 });
 
 export const zGroupInfo = z.object({
+    id: z.uuid(),
+    name: z.string()
+});
+
+export const zLocation = z.object({
+    coordinates: zCoordinates.nullish(),
+    description: z.string().nullish(),
+    name: z.string()
+});
+
+export const zLocationDto = z.object({
+    coordinates: zCoordinates.nullish(),
+    description: z.string().nullish(),
     id: z.uuid(),
     name: z.string()
 });
@@ -39,6 +80,12 @@ export const zModifyMember = z.object({
 export const zObjectPermissions = z.object({
     actions: z.array(z.string()),
     name: z.string()
+});
+
+export const zPatchLocation = z.object({
+    coordinates: zCoordinates.nullish(),
+    description: z.string().nullish(),
+    name: z.string().nullish()
 });
 
 export const zPatchManufacturer = z.object({
@@ -81,6 +128,21 @@ export const zPatchAssetType = z.object({
     name: z.string().nullish(),
     product_url: z.string().nullish(),
     value: zSchemaDecimal.nullish()
+});
+
+export const zUpdateAssetLocationRequest = z.object({
+    location: z.uuid()
+});
+
+export const zUpdateAssetLocations = z.object({
+    home: z.uuid()
+});
+
+export const zUpdateAssetRequest = z.object({
+    alias: z.string().nullish(),
+    bundle: z.uuid().nullish(),
+    locations: zUpdateAssetLocations,
+    tag: z.string()
 });
 
 export const zUserDto = z.object({
@@ -149,7 +211,105 @@ export const zUpdateAssetTypeByIdResponse = zAssetTypeDto;
 /**
  * Success
  */
+export const zListAssetsResponse = z.array(zAssetDto);
+
+export const zCreateAssetBody = zCreateAssetRequest;
+
+/**
+ * Success
+ */
+export const zCreateAssetResponse = zAssetDto;
+
+export const zDeleteAssetByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zDeleteAssetByIdResponse = z.void();
+
+export const zGetAssetByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetAssetByIdResponse = zAssetDto;
+
+export const zUpdateAssetByIdBody = zUpdateAssetRequest;
+
+export const zUpdateAssetByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zUpdateAssetByIdResponse = z.void();
+
+export const zGetAssetLocationPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetAssetLocationResponse = zLocationDto;
+
+export const zSetAssetLocationBody = zUpdateAssetLocationRequest;
+
+export const zSetAssetLocationPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zSetAssetLocationResponse = zAssetDto;
+
+/**
+ * Success
+ */
 export const zListAuthProvidersResponse = z.array(zProviderInfo);
+
+/**
+ * Success
+ */
+export const zListAssetBundlesResponse = z.array(zAssetBundleDto);
+
+/**
+ * Success
+ */
+export const zCreateAssetBundleResponse = z.array(zAssetDto);
+
+export const zDeleteAssetBundlePath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zDeleteAssetBundleResponse = z.void();
+
+export const zGetAssetBundleByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetAssetBundleByIdResponse = zAssetBundleDto;
+
+export const zGetAssetsWithinBundleByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetAssetsWithinBundleByIdResponse = z.array(zAssetDto);
 
 /**
  * Success
@@ -227,6 +387,58 @@ export const zHealth2Response = z.string();
 /**
  * Success
  */
+export const zListLocationsResponse = z.array(zLocationDto);
+
+export const zCreateLocationBody = zLocation;
+
+/**
+ * Success
+ */
+export const zCreateLocationResponse = zLocationDto;
+
+export const zDeleteLocationByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zDeleteLocationByIdResponse = z.void();
+
+export const zGetLocationByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetLocationByIdResponse = zLocationDto;
+
+export const zPatchLocationByIdBody = zPatchLocation;
+
+export const zPatchLocationByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zPatchLocationByIdResponse = zLocationDto;
+
+export const zUpdateLocationByIdBody = zLocation;
+
+export const zUpdateLocationByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zUpdateLocationByIdResponse = zLocationDto;
+
+/**
+ * Success
+ */
 export const zListManufacturersResponse = z.array(zManufacturerInfo);
 
 export const zCreateManufacturerBody = zManufacturer;
@@ -290,3 +502,12 @@ export const zGetCurrentUserResponse = zUserDto;
  * Success
  */
 export const zGetCurrentUserPermissionsResponse = z.array(zObjectPermissions);
+
+export const zGetUserByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetUserByIdResponse = zUserDto;

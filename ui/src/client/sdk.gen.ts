@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddPermissionToGroupData, AddPermissionToGroupErrors, AddPermissionToGroupResponses, AddUserToGroupData, AddUserToGroupErrors, AddUserToGroupResponses, CreateAssetTypeData, CreateAssetTypeErrors, CreateAssetTypeResponses, CreateGroupData, CreateGroupResponses, CreateManufacturerData, CreateManufacturerErrors, CreateManufacturerResponses, DeleteAssetTypeByIdData, DeleteAssetTypeByIdErrors, DeleteAssetTypeByIdResponses, DeleteManufacturerByIdData, DeleteManufacturerByIdErrors, DeleteManufacturerByIdResponses, GetAssetTypeByIdData, GetAssetTypeByIdErrors, GetAssetTypeByIdResponses, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponses, GetCurrentUserResponses, GetGroupByIdData, GetGroupByIdErrors, GetGroupByIdResponses, GetManufacturerByIdData, GetManufacturerByIdErrors, GetManufacturerByIdResponses, Health2Data, Health2Responses, HealthData, HealthResponses, ListAssetTypesData, ListAssetTypesErrors, ListAssetTypesResponses, ListAuthProvidersData, ListAuthProvidersResponses, ListGroupMembersData, ListGroupMembersErrors, ListGroupMembersResponses, ListGroupPermissionsData, ListGroupPermissionsErrors, ListGroupPermissionsResponses, ListGroupsData, ListGroupsResponses, ListManufacturersData, ListManufacturersErrors, ListManufacturersResponses, ListUsersData, ListUsersResponses, PatchAssetTypeByIdData, PatchAssetTypeByIdErrors, PatchAssetTypeByIdResponses, PatchManufacturerByIdData, PatchManufacturerByIdErrors, PatchManufacturerByIdResponses, RemovePermissionFromGroupData, RemovePermissionFromGroupErrors, RemovePermissionFromGroupResponses, RemoveUserFromGroupData, RemoveUserFromGroupErrors, RemoveUserFromGroupResponses, UpdateAssetTypeByIdData, UpdateAssetTypeByIdErrors, UpdateAssetTypeByIdResponses, UpdateManufacturerByIdData, UpdateManufacturerByIdErrors, UpdateManufacturerByIdResponses } from './types.gen';
+import type { AddPermissionToGroupData, AddPermissionToGroupErrors, AddPermissionToGroupResponses, AddUserToGroupData, AddUserToGroupErrors, AddUserToGroupResponses, CreateAssetBundleData, CreateAssetBundleErrors, CreateAssetBundleResponses, CreateAssetData, CreateAssetErrors, CreateAssetResponses, CreateAssetTypeData, CreateAssetTypeErrors, CreateAssetTypeResponses, CreateGroupData, CreateGroupResponses, CreateLocationData, CreateLocationErrors, CreateLocationResponses, CreateManufacturerData, CreateManufacturerErrors, CreateManufacturerResponses, DeleteAssetBundleData, DeleteAssetBundleErrors, DeleteAssetBundleResponses, DeleteAssetByIdData, DeleteAssetByIdErrors, DeleteAssetByIdResponses, DeleteAssetTypeByIdData, DeleteAssetTypeByIdErrors, DeleteAssetTypeByIdResponses, DeleteLocationByIdData, DeleteLocationByIdErrors, DeleteLocationByIdResponses, DeleteManufacturerByIdData, DeleteManufacturerByIdErrors, DeleteManufacturerByIdResponses, GetAssetBundleByIdData, GetAssetBundleByIdErrors, GetAssetBundleByIdResponses, GetAssetByIdData, GetAssetByIdErrors, GetAssetByIdResponses, GetAssetLocationData, GetAssetLocationErrors, GetAssetLocationResponses, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdErrors, GetAssetsWithinBundleByIdResponses, GetAssetTypeByIdData, GetAssetTypeByIdErrors, GetAssetTypeByIdResponses, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponses, GetCurrentUserResponses, GetGroupByIdData, GetGroupByIdErrors, GetGroupByIdResponses, GetLocationByIdData, GetLocationByIdErrors, GetLocationByIdResponses, GetManufacturerByIdData, GetManufacturerByIdErrors, GetManufacturerByIdResponses, GetUserByIdData, GetUserByIdErrors, GetUserByIdResponses, Health2Data, Health2Responses, HealthData, HealthResponses, ListAssetBundlesData, ListAssetBundlesErrors, ListAssetBundlesResponses, ListAssetsData, ListAssetsErrors, ListAssetsResponses, ListAssetTypesData, ListAssetTypesErrors, ListAssetTypesResponses, ListAuthProvidersData, ListAuthProvidersResponses, ListGroupMembersData, ListGroupMembersErrors, ListGroupMembersResponses, ListGroupPermissionsData, ListGroupPermissionsErrors, ListGroupPermissionsResponses, ListGroupsData, ListGroupsResponses, ListLocationsData, ListLocationsErrors, ListLocationsResponses, ListManufacturersData, ListManufacturersErrors, ListManufacturersResponses, ListUsersData, ListUsersResponses, PatchAssetTypeByIdData, PatchAssetTypeByIdErrors, PatchAssetTypeByIdResponses, PatchLocationByIdData, PatchLocationByIdErrors, PatchLocationByIdResponses, PatchManufacturerByIdData, PatchManufacturerByIdErrors, PatchManufacturerByIdResponses, RemovePermissionFromGroupData, RemovePermissionFromGroupErrors, RemovePermissionFromGroupResponses, RemoveUserFromGroupData, RemoveUserFromGroupErrors, RemoveUserFromGroupResponses, SetAssetLocationData, SetAssetLocationErrors, SetAssetLocationResponses, UpdateAssetByIdData, UpdateAssetByIdErrors, UpdateAssetByIdResponses, UpdateAssetTypeByIdData, UpdateAssetTypeByIdErrors, UpdateAssetTypeByIdResponses, UpdateLocationByIdData, UpdateLocationByIdErrors, UpdateLocationByIdResponses, UpdateManufacturerByIdData, UpdateManufacturerByIdErrors, UpdateManufacturerByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -21,13 +21,13 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 /**
  * List all asset types.
  */
-export const listAssetTypes = <ThrowOnError extends boolean = false>(options?: Options<ListAssetTypesData, ThrowOnError>): RequestResult<ListAssetTypesResponses, ListAssetTypesErrors, ThrowOnError> => (options?.client ?? client).get<ListAssetTypesResponses, ListAssetTypesErrors, ThrowOnError>({ url: '/asset/type', ...options });
+export const listAssetTypes = <ThrowOnError extends boolean = false>(options?: Options<ListAssetTypesData, ThrowOnError>): RequestResult<ListAssetTypesResponses, ListAssetTypesErrors, ThrowOnError> => (options?.client ?? client).get<ListAssetTypesResponses, ListAssetTypesErrors, ThrowOnError>({ url: '/asset-types', ...options });
 
 /**
  * Create an asset type.
  */
 export const createAssetType = <ThrowOnError extends boolean = false>(options: Options<CreateAssetTypeData, ThrowOnError>): RequestResult<CreateAssetTypeResponses, CreateAssetTypeErrors, ThrowOnError> => (options.client ?? client).post<CreateAssetTypeResponses, CreateAssetTypeErrors, ThrowOnError>({
-    url: '/asset/type',
+    url: '/asset-types',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -38,18 +38,18 @@ export const createAssetType = <ThrowOnError extends boolean = false>(options: O
 /**
  * Delete an asset type by its ID.
  */
-export const deleteAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetTypeByIdData, ThrowOnError>): RequestResult<DeleteAssetTypeByIdResponses, DeleteAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteAssetTypeByIdResponses, DeleteAssetTypeByIdErrors, ThrowOnError>({ url: '/asset/type/{id}', ...options });
+export const deleteAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetTypeByIdData, ThrowOnError>): RequestResult<DeleteAssetTypeByIdResponses, DeleteAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteAssetTypeByIdResponses, DeleteAssetTypeByIdErrors, ThrowOnError>({ url: '/asset-types/{id}', ...options });
 
 /**
  * Get an asset type by its ID.
  */
-export const getAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<GetAssetTypeByIdData, ThrowOnError>): RequestResult<GetAssetTypeByIdResponses, GetAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).get<GetAssetTypeByIdResponses, GetAssetTypeByIdErrors, ThrowOnError>({ url: '/asset/type/{id}', ...options });
+export const getAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<GetAssetTypeByIdData, ThrowOnError>): RequestResult<GetAssetTypeByIdResponses, GetAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).get<GetAssetTypeByIdResponses, GetAssetTypeByIdErrors, ThrowOnError>({ url: '/asset-types/{id}', ...options });
 
 /**
  * Patch individual fields of an asset type by its ID.
  */
 export const patchAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<PatchAssetTypeByIdData, ThrowOnError>): RequestResult<PatchAssetTypeByIdResponses, PatchAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchAssetTypeByIdResponses, PatchAssetTypeByIdErrors, ThrowOnError>({
-    url: '/asset/type/{id}',
+    url: '/asset-types/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -61,7 +61,63 @@ export const patchAssetTypeById = <ThrowOnError extends boolean = false>(options
  * Update all fields of an asset type by its ID.
  */
 export const updateAssetTypeById = <ThrowOnError extends boolean = false>(options: Options<UpdateAssetTypeByIdData, ThrowOnError>): RequestResult<UpdateAssetTypeByIdResponses, UpdateAssetTypeByIdErrors, ThrowOnError> => (options.client ?? client).put<UpdateAssetTypeByIdResponses, UpdateAssetTypeByIdErrors, ThrowOnError>({
-    url: '/asset/type/{id}',
+    url: '/asset-types/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List all assets.
+ */
+export const listAssets = <ThrowOnError extends boolean = false>(options?: Options<ListAssetsData, ThrowOnError>): RequestResult<ListAssetsResponses, ListAssetsErrors, ThrowOnError> => (options?.client ?? client).get<ListAssetsResponses, ListAssetsErrors, ThrowOnError>({ url: '/assets', ...options });
+
+/**
+ * Create a new asset.
+ */
+export const createAsset = <ThrowOnError extends boolean = false>(options: Options<CreateAssetData, ThrowOnError>): RequestResult<CreateAssetResponses, CreateAssetErrors, ThrowOnError> => (options.client ?? client).post<CreateAssetResponses, CreateAssetErrors, ThrowOnError>({
+    url: '/assets',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete an asset by its ID.
+ */
+export const deleteAssetById = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetByIdData, ThrowOnError>): RequestResult<DeleteAssetByIdResponses, DeleteAssetByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteAssetByIdResponses, DeleteAssetByIdErrors, ThrowOnError>({ url: '/assets/{id}', ...options });
+
+/**
+ * Get an asset by its ID.
+ */
+export const getAssetById = <ThrowOnError extends boolean = false>(options: Options<GetAssetByIdData, ThrowOnError>): RequestResult<GetAssetByIdResponses, GetAssetByIdErrors, ThrowOnError> => (options.client ?? client).get<GetAssetByIdResponses, GetAssetByIdErrors, ThrowOnError>({ url: '/assets/{id}', ...options });
+
+/**
+ * Update an asset by its ID.
+ */
+export const updateAssetById = <ThrowOnError extends boolean = false>(options: Options<UpdateAssetByIdData, ThrowOnError>): RequestResult<UpdateAssetByIdResponses, UpdateAssetByIdErrors, ThrowOnError> => (options.client ?? client).put<UpdateAssetByIdResponses, UpdateAssetByIdErrors, ThrowOnError>({
+    url: '/assets/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get an asset's location
+ */
+export const getAssetLocation = <ThrowOnError extends boolean = false>(options: Options<GetAssetLocationData, ThrowOnError>): RequestResult<GetAssetLocationResponses, GetAssetLocationErrors, ThrowOnError> => (options.client ?? client).get<GetAssetLocationResponses, GetAssetLocationErrors, ThrowOnError>({ url: '/assets/{id}/location', ...options });
+
+/**
+ * Set an asset's location.
+ */
+export const setAssetLocation = <ThrowOnError extends boolean = false>(options: Options<SetAssetLocationData, ThrowOnError>): RequestResult<SetAssetLocationResponses, SetAssetLocationErrors, ThrowOnError> => (options.client ?? client).post<SetAssetLocationResponses, SetAssetLocationErrors, ThrowOnError>({
+    url: '/assets/{id}/location',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -73,6 +129,31 @@ export const updateAssetTypeById = <ThrowOnError extends boolean = false>(option
  * List authentication providers.
  */
 export const listAuthProviders = <ThrowOnError extends boolean = false>(options?: Options<ListAuthProvidersData, ThrowOnError>): RequestResult<ListAuthProvidersResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListAuthProvidersResponses, unknown, ThrowOnError>({ url: '/auth/providers', ...options });
+
+/**
+ * List all asset bundles.
+ */
+export const listAssetBundles = <ThrowOnError extends boolean = false>(options?: Options<ListAssetBundlesData, ThrowOnError>): RequestResult<ListAssetBundlesResponses, ListAssetBundlesErrors, ThrowOnError> => (options?.client ?? client).get<ListAssetBundlesResponses, ListAssetBundlesErrors, ThrowOnError>({ url: '/bundles', ...options });
+
+/**
+ * Create an asset bundle.
+ */
+export const createAssetBundle = <ThrowOnError extends boolean = false>(options?: Options<CreateAssetBundleData, ThrowOnError>): RequestResult<CreateAssetBundleResponses, CreateAssetBundleErrors, ThrowOnError> => (options?.client ?? client).post<CreateAssetBundleResponses, CreateAssetBundleErrors, ThrowOnError>({ url: '/bundles', ...options });
+
+/**
+ * Delete an asset bundle.
+ */
+export const deleteAssetBundle = <ThrowOnError extends boolean = false>(options: Options<DeleteAssetBundleData, ThrowOnError>): RequestResult<DeleteAssetBundleResponses, DeleteAssetBundleErrors, ThrowOnError> => (options.client ?? client).delete<DeleteAssetBundleResponses, DeleteAssetBundleErrors, ThrowOnError>({ url: '/bundles/{id}', ...options });
+
+/**
+ * Get an asset bundle by its ID.
+ */
+export const getAssetBundleById = <ThrowOnError extends boolean = false>(options: Options<GetAssetBundleByIdData, ThrowOnError>): RequestResult<GetAssetBundleByIdResponses, GetAssetBundleByIdErrors, ThrowOnError> => (options.client ?? client).get<GetAssetBundleByIdResponses, GetAssetBundleByIdErrors, ThrowOnError>({ url: '/bundles/{id}', ...options });
+
+/**
+ * Get assets within an asset bundle.
+ */
+export const getAssetsWithinBundleById = <ThrowOnError extends boolean = false>(options: Options<GetAssetsWithinBundleByIdData, ThrowOnError>): RequestResult<GetAssetsWithinBundleByIdResponses, GetAssetsWithinBundleByIdErrors, ThrowOnError> => (options.client ?? client).get<GetAssetsWithinBundleByIdResponses, GetAssetsWithinBundleByIdErrors, ThrowOnError>({ url: '/bundles/{id}/assets', ...options });
 
 /**
  * List groups.
@@ -165,6 +246,57 @@ export const health = <ThrowOnError extends boolean = false>(options?: Options<H
 export const health2 = <ThrowOnError extends boolean = false>(options?: Options<Health2Data, ThrowOnError>): RequestResult<Health2Responses, unknown, ThrowOnError> => (options?.client ?? client).head<Health2Responses, unknown, ThrowOnError>({ url: '/health', ...options });
 
 /**
+ * List all locations.
+ */
+export const listLocations = <ThrowOnError extends boolean = false>(options?: Options<ListLocationsData, ThrowOnError>): RequestResult<ListLocationsResponses, ListLocationsErrors, ThrowOnError> => (options?.client ?? client).get<ListLocationsResponses, ListLocationsErrors, ThrowOnError>({ url: '/location', ...options });
+
+/**
+ * Create a location.
+ */
+export const createLocation = <ThrowOnError extends boolean = false>(options: Options<CreateLocationData, ThrowOnError>): RequestResult<CreateLocationResponses, CreateLocationErrors, ThrowOnError> => (options.client ?? client).post<CreateLocationResponses, CreateLocationErrors, ThrowOnError>({
+    url: '/location',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete a location by its ID.
+ */
+export const deleteLocationById = <ThrowOnError extends boolean = false>(options: Options<DeleteLocationByIdData, ThrowOnError>): RequestResult<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError>({ url: '/location/{id}', ...options });
+
+/**
+ * Get a location by its ID.
+ */
+export const getLocationById = <ThrowOnError extends boolean = false>(options: Options<GetLocationByIdData, ThrowOnError>): RequestResult<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError> => (options.client ?? client).get<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError>({ url: '/location/{id}', ...options });
+
+/**
+ * Patch individual fields of a location by its ID.
+ */
+export const patchLocationById = <ThrowOnError extends boolean = false>(options: Options<PatchLocationByIdData, ThrowOnError>): RequestResult<PatchLocationByIdResponses, PatchLocationByIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchLocationByIdResponses, PatchLocationByIdErrors, ThrowOnError>({
+    url: '/location/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update all fields of a location by its ID.
+ */
+export const updateLocationById = <ThrowOnError extends boolean = false>(options: Options<UpdateLocationByIdData, ThrowOnError>): RequestResult<UpdateLocationByIdResponses, UpdateLocationByIdErrors, ThrowOnError> => (options.client ?? client).put<UpdateLocationByIdResponses, UpdateLocationByIdErrors, ThrowOnError>({
+    url: '/location/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * List all manufacturers.
  */
 export const listManufacturers = <ThrowOnError extends boolean = false>(options?: Options<ListManufacturersData, ThrowOnError>): RequestResult<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError> => (options?.client ?? client).get<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError>({ url: '/manufacturer', ...options });
@@ -229,3 +361,8 @@ export const getCurrentUser = <ThrowOnError extends boolean = false>(options?: O
  * Get the current user's permissions.
  */
 export const getCurrentUserPermissions = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentUserPermissionsData, ThrowOnError>): RequestResult<GetCurrentUserPermissionsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetCurrentUserPermissionsResponses, unknown, ThrowOnError>({ url: '/user/@me/permissions', ...options });
+
+/**
+ * Get a user by their ID.
+ */
+export const getUserById = <ThrowOnError extends boolean = false>(options: Options<GetUserByIdData, ThrowOnError>): RequestResult<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError> => (options.client ?? client).get<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError>({ url: '/user/{id}', ...options });

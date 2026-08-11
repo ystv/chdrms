@@ -14,7 +14,7 @@
     }
   ],
   "paths": {
-    "/asset/type": {
+    "/asset-types": {
       "get": {
         "tags": [
           "asset_type"
@@ -97,7 +97,7 @@
         }
       }
     },
-    "/asset/type/{id}": {
+    "/asset-types/{id}": {
       "get": {
         "tags": [
           "asset_type"

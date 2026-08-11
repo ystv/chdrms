@@ -4,6 +4,51 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}/api/v1` | (string & {});
 };
 
+export type AssetBundleDto = {
+    id: string;
+};
+
+export type AssetDto = {
+    /**
+     * An optional alias for this asset. This is purely for convenience
+     * in searching for and identifying multiple instances of similar
+     * assets.
+     */
+    alias?: string | null;
+    /**
+     * An optional bundle that this asset is within, as asset bundle
+     * identifier.
+     */
+    bundle?: string | null;
+    /**
+     * The unique identifier for this asset. This property is immutable.
+     */
+    id: string;
+    locations: AssetLocations;
+    /**
+     * The asset tag attached to this asset.
+     */
+    tag: string;
+    /**
+     * The type of this asset, as an asset type identifier. This property
+     * is immutable.
+     */
+    type: string;
+};
+
+export type AssetLocations = {
+    /**
+     * The current location of an asset. This property is only mutable
+     * via its dedicated field endpoints.
+     */
+    current: string;
+    /**
+     * The default/home location of this asset. This is used to mark where
+     * an asset *should* be when not assigned to a project.
+     */
+    home: string;
+};
+
 export type AssetType = {
     manufacturer: string;
     name: string;
@@ -17,6 +62,19 @@ export type AssetTypeDto = {
     name: string;
     product_url?: string | null;
     value?: null | SchemaDecimal;
+};
+
+export type Coordinates = [
+    number,
+    number
+];
+
+export type CreateAssetRequest = {
+    alias?: string | null;
+    bundle?: string | null;
+    locations: AssetLocations;
+    tag: string;
+    type: string;
 };
 
 export type CreateGroup = {
@@ -34,6 +92,19 @@ export type GroupInfo = {
 
 export type GroupMembers = {
     members: Array<UserDto>;
+};
+
+export type Location = {
+    coordinates?: null | Coordinates;
+    description?: string | null;
+    name: string;
+};
+
+export type LocationDto = {
+    coordinates?: null | Coordinates;
+    description?: string | null;
+    id: string;
+    name: string;
 };
 
 export type Manufacturer = {
@@ -69,6 +140,12 @@ export type PatchAssetType = {
     value?: null | SchemaDecimal;
 };
 
+export type PatchLocation = {
+    coordinates?: null | Coordinates;
+    description?: string | null;
+    name?: string | null;
+};
+
 export type PatchManufacturer = {
     description?: string | null;
     email?: string | null;
@@ -89,6 +166,21 @@ export type ProviderInfo = {
 
 export type SchemaDecimal = number;
 
+export type UpdateAssetLocationRequest = {
+    location: string;
+};
+
+export type UpdateAssetLocations = {
+    home: string;
+};
+
+export type UpdateAssetRequest = {
+    alias?: string | null;
+    bundle?: string | null;
+    locations: UpdateAssetLocations;
+    tag: string;
+};
+
 export type UserDto = {
     email: string;
     id: string;
@@ -100,7 +192,7 @@ export type ListAssetTypesData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/asset/type';
+    url: '/asset-types';
 };
 
 export type ListAssetTypesErrors = {
@@ -125,7 +217,7 @@ export type CreateAssetTypeData = {
     body: AssetType;
     path?: never;
     query?: never;
-    url: '/asset/type';
+    url: '/asset-types';
 };
 
 export type CreateAssetTypeErrors = {
@@ -156,7 +248,7 @@ export type DeleteAssetTypeByIdData = {
         id: string;
     };
     query?: never;
-    url: '/asset/type/{id}';
+    url: '/asset-types/{id}';
 };
 
 export type DeleteAssetTypeByIdErrors = {
@@ -187,7 +279,7 @@ export type GetAssetTypeByIdData = {
         id: string;
     };
     query?: never;
-    url: '/asset/type/{id}';
+    url: '/asset-types/{id}';
 };
 
 export type GetAssetTypeByIdErrors = {
@@ -218,7 +310,7 @@ export type PatchAssetTypeByIdData = {
         id: string;
     };
     query?: never;
-    url: '/asset/type/{id}';
+    url: '/asset-types/{id}';
 };
 
 export type PatchAssetTypeByIdErrors = {
@@ -249,7 +341,7 @@ export type UpdateAssetTypeByIdData = {
         id: string;
     };
     query?: never;
-    url: '/asset/type/{id}';
+    url: '/asset-types/{id}';
 };
 
 export type UpdateAssetTypeByIdErrors = {
@@ -274,6 +366,226 @@ export type UpdateAssetTypeByIdResponses = {
 
 export type UpdateAssetTypeByIdResponse = UpdateAssetTypeByIdResponses[keyof UpdateAssetTypeByIdResponses];
 
+export type ListAssetsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/assets';
+};
+
+export type ListAssetsErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type ListAssetsError = ListAssetsErrors[keyof ListAssetsErrors];
+
+export type ListAssetsResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetDto>;
+};
+
+export type ListAssetsResponse = ListAssetsResponses[keyof ListAssetsResponses];
+
+export type CreateAssetData = {
+    body: CreateAssetRequest;
+    path?: never;
+    query?: never;
+    url: '/assets';
+};
+
+export type CreateAssetErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type CreateAssetError = CreateAssetErrors[keyof CreateAssetErrors];
+
+export type CreateAssetResponses = {
+    /**
+     * Success
+     */
+    200: AssetDto;
+};
+
+export type CreateAssetResponse = CreateAssetResponses[keyof CreateAssetResponses];
+
+export type DeleteAssetByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}';
+};
+
+export type DeleteAssetByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type DeleteAssetByIdError = DeleteAssetByIdErrors[keyof DeleteAssetByIdErrors];
+
+export type DeleteAssetByIdResponses = {
+    /**
+     * Success
+     */
+    204: void;
+};
+
+export type DeleteAssetByIdResponse = DeleteAssetByIdResponses[keyof DeleteAssetByIdResponses];
+
+export type GetAssetByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}';
+};
+
+export type GetAssetByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetAssetByIdError = GetAssetByIdErrors[keyof GetAssetByIdErrors];
+
+export type GetAssetByIdResponses = {
+    /**
+     * Success
+     */
+    200: AssetDto;
+};
+
+export type GetAssetByIdResponse = GetAssetByIdResponses[keyof GetAssetByIdResponses];
+
+export type UpdateAssetByIdData = {
+    body: UpdateAssetRequest;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}';
+};
+
+export type UpdateAssetByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type UpdateAssetByIdError = UpdateAssetByIdErrors[keyof UpdateAssetByIdErrors];
+
+export type UpdateAssetByIdResponses = {
+    /**
+     * Success
+     */
+    204: void;
+};
+
+export type UpdateAssetByIdResponse = UpdateAssetByIdResponses[keyof UpdateAssetByIdResponses];
+
+export type GetAssetLocationData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}/location';
+};
+
+export type GetAssetLocationErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetAssetLocationError = GetAssetLocationErrors[keyof GetAssetLocationErrors];
+
+export type GetAssetLocationResponses = {
+    /**
+     * Success
+     */
+    200: LocationDto;
+};
+
+export type GetAssetLocationResponse = GetAssetLocationResponses[keyof GetAssetLocationResponses];
+
+export type SetAssetLocationData = {
+    body: UpdateAssetLocationRequest;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}/location';
+};
+
+export type SetAssetLocationErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type SetAssetLocationError = SetAssetLocationErrors[keyof SetAssetLocationErrors];
+
+export type SetAssetLocationResponses = {
+    /**
+     * Success
+     */
+    200: AssetDto;
+};
+
+export type SetAssetLocationResponse = SetAssetLocationResponses[keyof SetAssetLocationResponses];
+
 export type ListAuthProvidersData = {
     body?: never;
     path?: never;
@@ -289,6 +601,162 @@ export type ListAuthProvidersResponses = {
 };
 
 export type ListAuthProvidersResponse = ListAuthProvidersResponses[keyof ListAuthProvidersResponses];
+
+export type ListAssetBundlesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/bundles';
+};
+
+export type ListAssetBundlesErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset bundle by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type ListAssetBundlesError = ListAssetBundlesErrors[keyof ListAssetBundlesErrors];
+
+export type ListAssetBundlesResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetBundleDto>;
+};
+
+export type ListAssetBundlesResponse = ListAssetBundlesResponses[keyof ListAssetBundlesResponses];
+
+export type CreateAssetBundleData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/bundles';
+};
+
+export type CreateAssetBundleErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type CreateAssetBundleError = CreateAssetBundleErrors[keyof CreateAssetBundleErrors];
+
+export type CreateAssetBundleResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetDto>;
+};
+
+export type CreateAssetBundleResponse = CreateAssetBundleResponses[keyof CreateAssetBundleResponses];
+
+export type DeleteAssetBundleData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset bundle ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/bundles/{id}';
+};
+
+export type DeleteAssetBundleErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset bundle by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type DeleteAssetBundleError = DeleteAssetBundleErrors[keyof DeleteAssetBundleErrors];
+
+export type DeleteAssetBundleResponses = {
+    /**
+     * Success
+     */
+    204: void;
+};
+
+export type DeleteAssetBundleResponse = DeleteAssetBundleResponses[keyof DeleteAssetBundleResponses];
+
+export type GetAssetBundleByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset bundle ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/bundles/{id}';
+};
+
+export type GetAssetBundleByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset bundle by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetAssetBundleByIdError = GetAssetBundleByIdErrors[keyof GetAssetBundleByIdErrors];
+
+export type GetAssetBundleByIdResponses = {
+    /**
+     * Success
+     */
+    200: AssetBundleDto;
+};
+
+export type GetAssetBundleByIdResponse = GetAssetBundleByIdResponses[keyof GetAssetBundleByIdResponses];
+
+export type GetAssetsWithinBundleByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset bundle ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/bundles/{id}/assets';
+};
+
+export type GetAssetsWithinBundleByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset bundle by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetAssetsWithinBundleByIdError = GetAssetsWithinBundleByIdErrors[keyof GetAssetsWithinBundleByIdErrors];
+
+export type GetAssetsWithinBundleByIdResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetDto>;
+};
+
+export type GetAssetsWithinBundleByIdResponse = GetAssetsWithinBundleByIdResponses[keyof GetAssetsWithinBundleByIdResponses];
 
 export type ListGroupsData = {
     body?: never;
@@ -521,6 +989,180 @@ export type Health2Responses = {
 
 export type Health2Response = Health2Responses[keyof Health2Responses];
 
+export type ListLocationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/location';
+};
+
+export type ListLocationsErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type ListLocationsError = ListLocationsErrors[keyof ListLocationsErrors];
+
+export type ListLocationsResponses = {
+    /**
+     * Success
+     */
+    200: Array<LocationDto>;
+};
+
+export type ListLocationsResponse = ListLocationsResponses[keyof ListLocationsResponses];
+
+export type CreateLocationData = {
+    body: Location;
+    path?: never;
+    query?: never;
+    url: '/location';
+};
+
+export type CreateLocationErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type CreateLocationError = CreateLocationErrors[keyof CreateLocationErrors];
+
+export type CreateLocationResponses = {
+    /**
+     * Success
+     */
+    200: LocationDto;
+};
+
+export type CreateLocationResponse = CreateLocationResponses[keyof CreateLocationResponses];
+
+export type DeleteLocationByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/location/{id}';
+};
+
+export type DeleteLocationByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Location by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type DeleteLocationByIdError = DeleteLocationByIdErrors[keyof DeleteLocationByIdErrors];
+
+export type DeleteLocationByIdResponses = {
+    /**
+     * Success
+     */
+    204: void;
+};
+
+export type DeleteLocationByIdResponse = DeleteLocationByIdResponses[keyof DeleteLocationByIdResponses];
+
+export type GetLocationByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/location/{id}';
+};
+
+export type GetLocationByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Location by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetLocationByIdError = GetLocationByIdErrors[keyof GetLocationByIdErrors];
+
+export type GetLocationByIdResponses = {
+    /**
+     * Success
+     */
+    200: LocationDto;
+};
+
+export type GetLocationByIdResponse = GetLocationByIdResponses[keyof GetLocationByIdResponses];
+
+export type PatchLocationByIdData = {
+    body: PatchLocation;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/location/{id}';
+};
+
+export type PatchLocationByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Location by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type PatchLocationByIdError = PatchLocationByIdErrors[keyof PatchLocationByIdErrors];
+
+export type PatchLocationByIdResponses = {
+    /**
+     * Success
+     */
+    200: LocationDto;
+};
+
+export type PatchLocationByIdResponse = PatchLocationByIdResponses[keyof PatchLocationByIdResponses];
+
+export type UpdateLocationByIdData = {
+    body: Location;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/location/{id}';
+};
+
+export type UpdateLocationByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Location by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type UpdateLocationByIdError = UpdateLocationByIdErrors[keyof UpdateLocationByIdErrors];
+
+export type UpdateLocationByIdResponses = {
+    /**
+     * Success
+     */
+    200: LocationDto;
+};
+
+export type UpdateLocationByIdResponse = UpdateLocationByIdResponses[keyof UpdateLocationByIdResponses];
+
 export type ListManufacturersData = {
     body?: never;
     path?: never;
@@ -742,3 +1384,34 @@ export type GetCurrentUserPermissionsResponses = {
 };
 
 export type GetCurrentUserPermissionsResponse = GetCurrentUserPermissionsResponses[keyof GetCurrentUserPermissionsResponses];
+
+export type GetUserByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/user/{id}';
+};
+
+export type GetUserByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * User by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetUserByIdError = GetUserByIdErrors[keyof GetUserByIdErrors];
+
+export type GetUserByIdResponses = {
+    /**
+     * Success
+     */
+    200: UserDto;
+};
+
+export type GetUserByIdResponse = GetUserByIdResponses[keyof GetUserByIdResponses];

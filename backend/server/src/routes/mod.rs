@@ -52,7 +52,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
         .nest("/group", group::routes())
         .nest("/user", user::routes())
         .nest("/manufacturer", manufacturer::routes())
-        .nest("/asset/type", asset_type::routes())
+        .nest("/asset-types", asset_type::routes())
         .nest("/location", location::routes())
         .nest("/assets", asset::routes())
         .nest("/bundles", bundle::routes())
