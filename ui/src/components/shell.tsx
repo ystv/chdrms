@@ -71,6 +71,30 @@ export function Shell(props: { children: ReactNode }) {
         />
         <NavLink
           component={Link}
+          to="/assets"
+          label="Assets"
+          onClick={closeMobile}
+        />
+        <NavLink
+          component={Link}
+          to="/asset-types"
+          label="Asset Types"
+          onClick={closeMobile}
+        />
+        <NavLink
+          component={Link}
+          to="/manufacturers"
+          label="Manufacturers"
+          onClick={closeMobile}
+        />
+        <NavLink
+          component={Link}
+          to="/locations"
+          label="Locations"
+          onClick={closeMobile}
+        />
+        <NavLink
+          component={Link}
           to="/users"
           label="Users"
           onClick={closeMobile}
