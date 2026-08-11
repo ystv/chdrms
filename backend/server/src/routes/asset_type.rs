@@ -208,6 +208,7 @@ async fn list_assets_of_asset_type(
                 id: asset.id,
                 r#type: asset.r#type,
                 alias: asset.alias,
+                notes: asset.notes,
                 tag: asset.tag,
                 bundle: asset.bundle,
                 locations: AssetLocations {

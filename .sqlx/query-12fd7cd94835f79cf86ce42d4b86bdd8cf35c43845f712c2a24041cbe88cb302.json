@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, type, alias, tag, bundle, home_location, location, created_at, created_by\n            FROM assets\n            WHERE bundle = $1;",
+  "query": "SELECT\n                id,\n                type,\n                alias,\n                notes,\n                tag,\n                bundle,\n                home_location,\n                location,\n                created_at,\n                created_by\n            FROM assets\n            WHERE type = $1;",
   "describe": {
     "columns": [
       {
@@ -38,6 +38,17 @@
       },
       {
         "ordinal": 3,
+        "name": "notes",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "assets",
+            "name": "notes"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
         "name": "tag",
         "type_info": "Text",
         "origin": {
@@ -48,7 +59,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "bundle",
         "type_info": "Uuid",
         "origin": {
@@ -59,7 +70,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "home_location",
         "type_info": "Uuid",
         "origin": {
@@ -70,7 +81,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "location",
         "type_info": "Uuid",
         "origin": {
@@ -81,7 +92,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -92,7 +103,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -112,6 +123,7 @@
       false,
       false,
       true,
+      true,
       false,
       true,
       false,
@@ -120,5 +132,5 @@
       false
     ]
   },
-  "hash": "3137508b3774b4f18c4764f61a502bdb05bd8c8052cf12e0c2dc268107fd4c30"
+  "hash": "12fd7cd94835f79cf86ce42d4b86bdd8cf35c43845f712c2a24041cbe88cb302"
 }

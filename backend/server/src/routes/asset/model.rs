@@ -13,6 +13,8 @@ pub struct AssetDto {
     /// in searching for and identifying multiple instances of similar
     /// assets.
     pub alias: Option<String>,
+    /// An optional field for miscellaneous notes about the asset.
+    pub notes: Option<String>,
     /// The asset tag attached to this asset.
     pub tag: String,
 
@@ -32,6 +34,7 @@ pub struct UpdateAssetLocationRequest {
 pub struct CreateAssetRequest {
     pub r#type: Uuid,
     pub alias: Option<String>,
+    pub notes: Option<String>,
     pub tag: String,
 
     pub bundle: Option<Uuid>,
@@ -42,6 +45,7 @@ pub struct CreateAssetRequest {
 #[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct UpdateAssetRequest {
     pub alias: Option<String>,
+    pub notes: Option<String>,
     pub tag: String,
 
     pub bundle: Option<Uuid>,

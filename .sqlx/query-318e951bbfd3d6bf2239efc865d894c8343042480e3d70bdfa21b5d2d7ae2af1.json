@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, type, alias, tag, bundle, home_location, location, created_at, created_by\n            FROM assets\n            WHERE id = $1;",
+  "query": "INSERT INTO assets(type, alias, notes, tag, bundle, home_location, location, created_by)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n            RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;",
   "describe": {
     "columns": [
       {
@@ -38,6 +38,17 @@
       },
       {
         "ordinal": 3,
+        "name": "notes",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "assets",
+            "name": "notes"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
         "name": "tag",
         "type_info": "Text",
         "origin": {
@@ -48,7 +59,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "bundle",
         "type_info": "Uuid",
         "origin": {
@@ -59,7 +70,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "home_location",
         "type_info": "Uuid",
         "origin": {
@@ -70,7 +81,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "location",
         "type_info": "Uuid",
         "origin": {
@@ -81,7 +92,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -92,7 +103,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -105,12 +116,20 @@
     ],
     "parameters": {
       "Left": [
+        "Uuid",
+        "Text",
+        "Text",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "Uuid",
         "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
+      true,
       true,
       false,
       true,
@@ -120,5 +139,5 @@
       false
     ]
   },
-  "hash": "ff8d3866a31e06acaccd17edf7327f4e261ff2e0c24eade0a2ea52dc0b34db64"
+  "hash": "318e951bbfd3d6bf2239efc865d894c8343042480e3d70bdfa21b5d2d7ae2af1"
 }

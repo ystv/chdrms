@@ -62,7 +62,7 @@ impl Bundle {
     pub async fn assets(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Asset>> {
         sqlx::query_as!(
             Asset,
-            r#"SELECT id, type, alias, tag, bundle, home_location, location, created_at, created_by
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
             FROM assets
             WHERE bundle = $1;"#,
             &self.id,
