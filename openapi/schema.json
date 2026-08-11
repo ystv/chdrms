@@ -2041,6 +2041,13 @@
           "locations": {
             "$ref": "#/components/schemas/AssetLocations"
           },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "An optional field for miscellaneous notes about the asset."
+          },
           "tag": {
             "type": "string",
             "description": "The asset tag attached to this asset."
@@ -2174,6 +2181,12 @@
           },
           "locations": {
             "$ref": "#/components/schemas/AssetLocations"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "tag": {
             "type": "string"
@@ -2576,6 +2589,12 @@
           },
           "locations": {
             "$ref": "#/components/schemas/UpdateAssetLocations"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "tag": {
             "type": "string"

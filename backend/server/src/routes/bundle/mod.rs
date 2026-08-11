@@ -85,6 +85,7 @@ async fn get_assets_by_id(
                 id: asset.id,
                 r#type: asset.r#type,
                 alias: asset.alias,
+                notes: asset.notes,
                 tag: asset.tag,
                 bundle: asset.bundle,
                 locations: AssetLocations {

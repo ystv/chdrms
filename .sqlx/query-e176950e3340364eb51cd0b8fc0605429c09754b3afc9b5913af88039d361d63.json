@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "UPDATE assets\n            SET location = $2\n            WHERE id = $1\n            RETURNING id, type, alias, tag, bundle, home_location, location, created_at, created_by;",
+  "query": "SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by\n            FROM assets\n            WHERE bundle = $1;",
   "describe": {
     "columns": [
       {
@@ -38,6 +38,17 @@
       },
       {
         "ordinal": 3,
+        "name": "notes",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "assets",
+            "name": "notes"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
         "name": "tag",
         "type_info": "Text",
         "origin": {
@@ -48,7 +59,7 @@
         }
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "bundle",
         "type_info": "Uuid",
         "origin": {
@@ -59,7 +70,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "home_location",
         "type_info": "Uuid",
         "origin": {
@@ -70,7 +81,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 7,
         "name": "location",
         "type_info": "Uuid",
         "origin": {
@@ -81,7 +92,7 @@
         }
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "created_at",
         "type_info": "Timestamptz",
         "origin": {
@@ -92,7 +103,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 9,
         "name": "created_by",
         "type_info": "Uuid",
         "origin": {
@@ -105,13 +116,13 @@
     ],
     "parameters": {
       "Left": [
-        "Uuid",
         "Uuid"
       ]
     },
     "nullable": [
       false,
       false,
+      true,
       true,
       false,
       true,
@@ -121,5 +132,5 @@
       false
     ]
   },
-  "hash": "eadb1f83502ab0c5c794fa6dc4edf0940103f9d8bb9aef4a2328f3b756e39fc1"
+  "hash": "e176950e3340364eb51cd0b8fc0605429c09754b3afc9b5913af88039d361d63"
 }

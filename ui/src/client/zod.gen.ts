@@ -16,6 +16,7 @@ export const zAssetDto = z.object({
     bundle: z.uuid().nullish(),
     id: z.uuid(),
     locations: zAssetLocations,
+    notes: z.string().nullish(),
     tag: z.string(),
     type: z.uuid()
 });
@@ -26,6 +27,7 @@ export const zCreateAssetRequest = z.object({
     alias: z.string().nullish(),
     bundle: z.uuid().nullish(),
     locations: zAssetLocations,
+    notes: z.string().nullish(),
     tag: z.string(),
     type: z.uuid()
 });
@@ -142,6 +144,7 @@ export const zUpdateAssetRequest = z.object({
     alias: z.string().nullish(),
     bundle: z.uuid().nullish(),
     locations: zUpdateAssetLocations,
+    notes: z.string().nullish(),
     tag: z.string()
 });
 

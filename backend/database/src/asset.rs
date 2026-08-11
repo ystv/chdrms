@@ -11,6 +11,7 @@ struct Asset {
     #[schema(immutable)]
     r#type: Uuid,
     alias: Option<String>,
+    notes: Option<String>,
     tag: String,
 
     bundle: Option<Uuid>,
@@ -31,11 +32,12 @@ impl Asset {
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
-            r#"INSERT INTO assets(type, alias, tag, bundle, home_location, location, created_by)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING id, type, alias, tag, bundle, home_location, location, created_at, created_by;"#,
+            r#"INSERT INTO assets(type, alias, notes, tag, bundle, home_location, location, created_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
             asset.r#type,
             asset.alias,
+            asset.notes,
             asset.tag,
             asset.bundle,
             asset.home_location,
@@ -52,7 +54,7 @@ impl Asset {
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, type, alias, tag, bundle, home_location, location, created_at, created_by
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
             FROM assets
             WHERE id = $1;"#,
             id,
@@ -64,7 +66,7 @@ impl Asset {
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, type, alias, tag, bundle, home_location, location, created_at, created_by
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
             FROM assets;"#,
         )
         .fetch_all(&mut **txn)
@@ -81,6 +83,7 @@ impl Asset {
                 id,
                 type,
                 alias,
+                notes,
                 tag,
                 bundle,
                 home_location,
@@ -118,15 +121,17 @@ impl Asset {
             r#"UPDATE assets
             SET
                 alias = $2,
-                tag = $3,
-                bundle = $4,
-                home_location = $5,
-                location = $6
+                notes = $3,
+                tag = $4,
+                bundle = $5,
+                home_location = $6,
+                location = $7
             WHERE id = $1
             RETURNING
                 id,
                 type,
                 alias,
+                notes,
                 tag,
                 bundle,
                 home_location,
@@ -135,6 +140,7 @@ impl Asset {
                 created_by;"#,
             self.id,
             update.alias,
+            update.notes,
             update.tag,
             update.bundle,
             update.home_location,
@@ -154,7 +160,7 @@ impl Asset {
             r#"UPDATE assets
             SET location = $2
             WHERE id = $1
-            RETURNING id, type, alias, tag, bundle, home_location, location, created_at, created_by;"#,
+            RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
             &self.id,
             location,
         )

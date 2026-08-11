@@ -26,6 +26,10 @@ export type AssetDto = {
     id: string;
     locations: AssetLocations;
     /**
+     * An optional field for miscellaneous notes about the asset.
+     */
+    notes?: string | null;
+    /**
      * The asset tag attached to this asset.
      */
     tag: string;
@@ -73,6 +77,7 @@ export type CreateAssetRequest = {
     alias?: string | null;
     bundle?: string | null;
     locations: AssetLocations;
+    notes?: string | null;
     tag: string;
     type: string;
 };
@@ -178,6 +183,7 @@ export type UpdateAssetRequest = {
     alias?: string | null;
     bundle?: string | null;
     locations: UpdateAssetLocations;
+    notes?: string | null;
     tag: string;
 };
 

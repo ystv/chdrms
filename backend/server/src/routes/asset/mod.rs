@@ -65,6 +65,7 @@ async fn get_by_id(
         id: asset.id,
         r#type: asset.r#type,
         alias: asset.alias,
+        notes: asset.notes,
         tag: asset.tag,
         bundle: asset.bundle,
         locations: AssetLocations {
@@ -98,6 +99,7 @@ async fn create(
         CreateAsset {
             r#type: asset.r#type,
             alias: asset.alias,
+            notes: asset.notes,
             tag: asset.tag,
             bundle: asset.bundle,
             home_location: asset.locations.home,
@@ -113,6 +115,7 @@ async fn create(
         id: asset.id,
         r#type: asset.r#type,
         alias: asset.alias,
+        notes: asset.notes,
         tag: asset.tag,
         bundle: asset.bundle,
         locations: AssetLocations {
@@ -155,6 +158,7 @@ async fn update(
             &mut txn,
             UpdateAsset {
                 alias: update.alias,
+                notes: update.notes,
                 tag: update.tag,
                 bundle: update.bundle,
                 home_location: update.locations.home,
@@ -167,6 +171,7 @@ async fn update(
         id: asset.id,
         r#type: asset.r#type,
         alias: asset.alias,
+        notes: asset.notes,
         tag: asset.tag,
         bundle: asset.bundle,
         locations: AssetLocations {
@@ -199,6 +204,7 @@ async fn list(
                 id: asset.id,
                 r#type: asset.r#type,
                 alias: asset.alias,
+                notes: asset.notes,
                 tag: asset.tag,
                 bundle: asset.bundle,
                 locations: AssetLocations {
@@ -309,6 +315,7 @@ async fn put_location(
         id: asset.id,
         r#type: asset.r#type,
         alias: asset.alias,
+        notes: asset.notes,
         tag: asset.tag,
         bundle: asset.bundle,
         locations: AssetLocations {
