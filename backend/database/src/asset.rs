@@ -71,6 +71,30 @@ impl Asset {
         .await
     }
 
+    pub async fn list_of_type(
+        r#type: Uuid,
+        txn: &mut sqlx::PgTransaction<'_>,
+    ) -> sqlx::Result<Vec<Asset>> {
+        sqlx::query_as!(
+            Asset,
+            r#"SELECT
+                id,
+                type,
+                alias,
+                tag,
+                bundle,
+                home_location,
+                location,
+                created_at,
+                created_by
+            FROM assets
+            WHERE type = $1;"#,
+            r#type,
+        )
+        .fetch_all(&mut **txn)
+        .await
+    }
+
     pub async fn delete(self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<bool> {
         let result = sqlx::query_as!(
             Self,

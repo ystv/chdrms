@@ -208,6 +208,15 @@ export const zUpdateAssetTypeByIdPath = z.object({
  */
 export const zUpdateAssetTypeByIdResponse = zAssetTypeDto;
 
+export const zListAssetsOfAssetTypePath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zListAssetsOfAssetTypeResponse = z.array(zAssetDto);
+
 /**
  * Success
  */

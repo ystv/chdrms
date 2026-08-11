@@ -366,6 +366,37 @@ export type UpdateAssetTypeByIdResponses = {
 
 export type UpdateAssetTypeByIdResponse = UpdateAssetTypeByIdResponses[keyof UpdateAssetTypeByIdResponses];
 
+export type ListAssetsOfAssetTypeData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/asset-types/{id}/assets';
+};
+
+export type ListAssetsOfAssetTypeErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset type by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type ListAssetsOfAssetTypeError = ListAssetsOfAssetTypeErrors[keyof ListAssetsOfAssetTypeErrors];
+
+export type ListAssetsOfAssetTypeResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetDto>;
+};
+
+export type ListAssetsOfAssetTypeResponse = ListAssetsOfAssetTypeResponses[keyof ListAssetsOfAssetTypeResponses];
+
 export type ListAssetsData = {
     body?: never;
     path?: never;
