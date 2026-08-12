@@ -901,6 +901,61 @@
         }
       }
     },
+    "/assets/{id}/timeline": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "operationId": "get_asset_timeline_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimelineEventDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/providers": {
       "get": {
         "tags": [
@@ -2789,6 +2844,56 @@
       },
       "SchemaDecimal": {
         "type": "string"
+      },
+      "TimelineEventDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TimelineEventTypeDto"
+          },
+          {
+            "type": "object",
+            "required": [
+              "title",
+              "content",
+              "time"
+            ],
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "time": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "TimelineEventTypeDto": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "comment",
+              "type"
+            ],
+            "properties": {
+              "comment": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "comment"
+                ]
+              }
+            }
+          }
+        ]
       },
       "UpdateAssetLocationRequest": {
         "type": "object",

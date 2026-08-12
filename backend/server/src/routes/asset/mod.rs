@@ -28,8 +28,8 @@ use crate::{
     error::{AppError, ErrorResponse, Result},
     routes::{
         asset::model::{
-            AssetDto, AssetLocations, CreateAssetRequest, UpdateAssetLocationRequest,
-            UpdateAssetRequest,
+            AssetDto, AssetLocations, CreateAssetRequest, TimelineEventDto, TimelineEventTypeDto,
+            UpdateAssetLocationRequest, UpdateAssetRequest,
         },
         location::LocationDto,
         model::{CommentDto, CreateCommentRequest, UpdateCommentRequest},
@@ -487,6 +487,58 @@ async fn update_comment(
     }))
 }
 
+#[utoipa::path(
+    get,
+    path = "/{id}/timeline",
+    tag = TAG,
+    operation_id = "get_asset_timeline_by_id",
+    params(
+        ("id" = Uuid, Path, description = "Requested asset ID"),
+    ),
+    responses(
+        (status = OK, description = "Success", body = Vec<TimelineEventDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Asset by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn get_timeline(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::View>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<TimelineEventDto>>> {
+    // todo: this logic should probably be moved out of the router,
+    //       given it will be slightly more advance than a single
+    //       database lookup in the future.
+
+    let mut txn = state.transaction().await?;
+    let mut events = Vec::new();
+
+    let asset = database::Asset::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?;
+
+    // fetch comments
+    events.extend(
+        asset
+            .list_comments(&mut txn)
+            .await?
+            .into_iter()
+            .map(|comment| TimelineEventDto {
+                title: comment.title,
+                content: comment.content,
+                time: comment.created_at,
+                r#type: TimelineEventTypeDto::Comment {
+                    comment: comment.id,
+                },
+            }),
+    );
+
+    // sort by date
+    events.sort_by_key(|event| event.time);
+
+    Ok(Json(events))
+}
+
 pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
@@ -499,4 +551,5 @@ pub(super) fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(list_comments))
         .routes(routes!(update_comment))
         .routes(routes!(create_comment))
+        .routes(routes!(get_timeline))
 }

@@ -146,6 +146,17 @@ export const zPatchAssetType = z.object({
     value: zSchemaDecimal.nullish()
 });
 
+export const zTimelineEventTypeDto = z.object({
+    comment: z.uuid(),
+    type: z.enum(['comment'])
+});
+
+export const zTimelineEventDto = zTimelineEventTypeDto.and(z.object({
+    content: z.string(),
+    time: z.iso.datetime(),
+    title: z.string()
+}));
+
 export const zUpdateAssetLocationRequest = z.object({
     location: z.uuid()
 });
@@ -332,6 +343,15 @@ export const zSetAssetLocationPath = z.object({
  * Success
  */
 export const zSetAssetLocationResponse = zAssetDto;
+
+export const zGetAssetTimelineByIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zGetAssetTimelineByIdResponse = z.array(zTimelineEventDto);
 
 /**
  * Success
