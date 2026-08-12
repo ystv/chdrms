@@ -21,6 +21,15 @@ export const zAssetDto = z.object({
     type: z.uuid()
 });
 
+export const zCommentDto = z.object({
+    archived_at: z.iso.datetime().nullish(),
+    content: z.string(),
+    created_at: z.iso.datetime(),
+    created_by: z.uuid(),
+    id: z.uuid(),
+    title: z.string()
+});
+
 export const zContactDetailsLinkDto = z.object({
     label: z.string().nullish(),
     link: z.url()
@@ -40,6 +49,11 @@ export const zCreateAssetRequest = z.object({
     notes: z.string().nullish(),
     tag: z.string(),
     type: z.uuid()
+});
+
+export const zCreateCommentRequest = z.object({
+    content: z.string(),
+    title: z.string()
 });
 
 export const zCreateGroup = z.object({
@@ -158,6 +172,12 @@ export const zUpdateAssetRequest = z.object({
     tag: z.string()
 });
 
+export const zUpdateCommentRequest = z.object({
+    archived: z.boolean(),
+    content: z.string(),
+    title: z.string()
+});
+
 export const zUserDto = z.object({
     email: z.string(),
     id: z.uuid(),
@@ -242,6 +262,18 @@ export const zCreateAssetBody = zCreateAssetRequest;
  */
 export const zCreateAssetResponse = zAssetDto;
 
+export const zUpdateAssetCommentByAssetAndCommentIdBody = zUpdateCommentRequest;
+
+export const zUpdateAssetCommentByAssetAndCommentIdPath = z.object({
+    asset_id: z.uuid(),
+    comment_id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zUpdateAssetCommentByAssetAndCommentIdResponse = z.array(zCommentDto);
+
 export const zDeleteAssetByIdPath = z.object({
     id: z.uuid()
 });
@@ -270,6 +302,26 @@ export const zUpdateAssetByIdPath = z.object({
  * Success
  */
 export const zUpdateAssetByIdResponse = z.void();
+
+export const zListAssetCommentsByAssetIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zListAssetCommentsByAssetIdResponse = z.array(zCommentDto);
+
+export const zCreateAssetCommentByAssetIdBody = zCreateCommentRequest;
+
+export const zCreateAssetCommentByAssetIdPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zCreateAssetCommentByAssetIdResponse = z.array(zCommentDto);
 
 export const zGetAssetLocationPath = z.object({
     id: z.uuid()

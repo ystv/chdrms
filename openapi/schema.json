@@ -440,6 +440,82 @@
         }
       }
     },
+    "/assets/{asset_id}/comments/{comment_id}": {
+      "put": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Update a comment attached to an asset based on its ID.",
+        "operationId": "update_asset_comment_by_asset_and_comment_id",
+        "parameters": [
+          {
+            "name": "asset_id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "description": "Requested comment ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommentDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset or comment by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/assets/{id}": {
       "get": {
         "tags": [
@@ -563,6 +639,126 @@
         "responses": {
           "204": {
             "description": "Success"
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assets/{id}/comments": {
+      "get": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "List comments attached to this asset.",
+        "operationId": "list_asset_comments_by_asset_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommentDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Asset by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "asset"
+        ],
+        "summary": "Add a comment to the specified asset.",
+        "operationId": "create_asset_comment_by_asset_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested asset ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommentDto"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Missing permission",
@@ -2239,6 +2435,43 @@
           }
         }
       },
+      "CommentDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "content",
+          "created_at",
+          "created_by"
+        ],
+        "properties": {
+          "archived_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "content": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
       "ContactDetailsDto": {
         "type": "object",
         "required": [
@@ -2322,6 +2555,21 @@
           "type": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "CreateCommentRequest": {
+        "type": "object",
+        "required": [
+          "title",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
           }
         }
       },
@@ -2724,6 +2972,25 @@
             ]
           },
           "tag": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateCommentRequest": {
+        "type": "object",
+        "required": [
+          "archived",
+          "title",
+          "content"
+        ],
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "content": {
+            "type": "string"
+          },
+          "title": {
             "type": "string"
           }
         }
