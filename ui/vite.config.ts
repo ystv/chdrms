@@ -6,6 +6,8 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
+const serverURL = 'http://localhost:' + (process.env.PORT ?? '3000');
+
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
   base: process.env.UI_BASE_URL ?? '/',
@@ -18,8 +20,10 @@ const config = defineConfig({
   server: {
     proxy: {
       // this routes /api requests to the locally running api backend in dev
-      '/api': 'http://localhost:' + (process.env.PORT ?? '3000'),
-      '/auth': 'http://localhost:' + (process.env.PORT ?? '3000'),
+      '/api': serverURL,
+      '/apidoc': serverURL,
+      '/auth': serverURL,
+      '/swagger-ui': serverURL,
     },
   },
 });
