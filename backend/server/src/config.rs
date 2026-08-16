@@ -7,6 +7,7 @@ use serde::Deserialize;
 #[derive(Clone, Deserialize)]
 pub struct AppConfig {
     pub base_url: Url,
+    pub storage: StorageConfig,
     #[serde(rename = "oidc_provider")]
     pub oidc_providers: HashMap<String, OIDCProviderConfig>,
 }
@@ -19,6 +20,24 @@ pub struct OIDCProviderConfig {
     pub client_secret: ClientSecret,
     pub allow_registration: bool,
     pub auto_account_linking: bool,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+#[serde(tag = "backend", rename_all = "snake_case")]
+pub enum StorageConfig {
+    S3(S3Config),
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct S3Config {
+    pub bucket: String,
+    pub region: String,
+    pub endpoint: String,
+
+    pub access_key_id: Option<String>,
+    pub secret_access_key: Option<String>,
+    #[serde(default)]
+    pub path_style: bool,
 }
 
 pub async fn load_configuration(path: impl AsRef<Path>) -> AppConfig {

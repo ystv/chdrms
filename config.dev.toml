@@ -1,5 +1,14 @@
 base_url = "http://localhost:3000"
 
+[storage]
+backend = "s3"
+bucket = "test"
+region = "garage"
+endpoint = "http://localhost:3900"
+access_key_id = "e49342a36ecb7ec77fe61842b46e19d66e855e43b83d6655b79e05c759fbf3e6"
+secret_access_key = "9e14033d60ec377751a8b9632aa812f46e3fac29a4fb2160c3394080748a3085"
+path_style = true
+
 [oidc_provider.keycloak]
 name = "Keycloak (localhost)"
 issuer_url = "http://localhost:8080/realms/dev"
