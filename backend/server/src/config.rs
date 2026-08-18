@@ -17,6 +17,8 @@ pub struct OIDCProviderConfig {
     pub issuer_url: IssuerUrl,
     pub client_id: ClientId,
     pub client_secret: ClientSecret,
+    #[serde(default)]
+    pub scopes: Vec<String>,
     pub allow_registration: bool,
     pub auto_account_linking: bool,
 }
