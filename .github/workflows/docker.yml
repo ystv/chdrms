@@ -1,0 +1,36 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t chdrms .
+      - run: |
+          docker image tag chdrms:latest ghcr.io/ystv/chdrms:pr-${{github.event.number}}-${{github.run_number}}
+          docker image tag chdrms:latest ghcr.io/ystv/chdrms:pr-${{github.event.number}}
+        if: github.event_name == 'pull_request'
+      - run: |
+          docker image tag chdrms:latest ghcr.io/ystv/chdrms:${{github.run_number}}
+        if: github.ref_name == 'main'
+      - run: |
+          docker image tag chdrms:latest ghcr.io/ystv/chdrms:latest
+          docker image tag chdrms:latest ghcr.io/ystv/chdrms:${{github.ref_name}}
+        if: github.ref_type == 'tag'
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker push ghcr.io/ystv/chdrms -a

@@ -33,17 +33,15 @@ COPY .sqlx ./.sqlx
 RUN cargo build --release --bin chdrms_server
 
 # ---
-FROM node:alpine AS frontend-base
+FROM node:24-alpine AS frontend-base
 
 WORKDIR /app
-
-RUN npm install -g corepack@latest && \
-    corepack enable
 
 # ---
 FROM frontend-base AS frontend-builder
 
-COPY ui/package.json ui/yarn.lock ./
+COPY ui/package.json ui/yarn.lock ui/.yarnrc.yml ./
+COPY ui/.yarn ./.yarn
 RUN yarn install --immutable
 
 COPY ui ./
