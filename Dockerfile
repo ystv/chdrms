@@ -33,12 +33,9 @@ COPY .sqlx ./.sqlx
 RUN cargo build --release --bin chdrms_server
 
 # ---
-FROM node:24-alpine AS frontend-base
+FROM node:24-alpine AS frontend-builder
 
 WORKDIR /app
-
-# ---
-FROM frontend-base AS frontend-builder
 
 COPY ui/package.json ui/yarn.lock ui/.yarnrc.yml ./
 COPY ui/.yarn ./.yarn
