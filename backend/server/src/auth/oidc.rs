@@ -7,7 +7,7 @@ use chdrms_database::user::{User, UserCreation};
 use openidconnect::{
     AuthorizationCode, ClaimsVerificationError, CsrfToken, DiscoveryError, EmptyAdditionalClaims,
     EndpointMaybeSet, EndpointNotSet, EndpointSet, HttpClientError, Nonce, PkceCodeChallenge,
-    PkceCodeVerifier, RedirectUrl, RequestTokenError, StandardErrorResponse, TokenResponse,
+    PkceCodeVerifier, RedirectUrl, RequestTokenError, Scope, StandardErrorResponse, TokenResponse,
     core::{
         CoreAuthDisplay, CoreAuthPrompt, CoreAuthenticationFlow, CoreClient, CoreErrorResponseType,
         CoreGenderClaim, CoreJsonWebKey, CoreJweContentEncryptionAlgorithm, CoreProviderMetadata,
@@ -147,6 +147,12 @@ impl OIDCProvider {
                 CoreAuthenticationFlow::AuthorizationCode,
                 CsrfToken::new_random,
                 Nonce::new_random,
+            )
+            .add_scopes(
+                self.config
+                    .scopes
+                    .iter()
+                    .map(|scope| Scope::new(scope.to_owned())),
             )
             .set_pkce_challenge(pkce_challenge)
             .url();
