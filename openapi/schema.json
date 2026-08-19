@@ -2540,8 +2540,7 @@
         }
       },
       "SchemaDecimal": {
-        "type": "number",
-        "format": "float"
+        "type": "string"
       },
       "UpdateAssetLocationRequest": {
         "type": "object",

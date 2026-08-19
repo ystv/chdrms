@@ -169,7 +169,7 @@ export type ProviderInfo = {
     name: string;
 };
 
-export type SchemaDecimal = number;
+export type SchemaDecimal = string;
 
 export type UpdateAssetLocationRequest = {
     location: string;

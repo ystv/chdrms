@@ -62,7 +62,7 @@ impl From<Decimal> for SchemaDecimal {
 
 impl PartialSchema for SchemaDecimal {
     fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
-        f32::schema()
+        str::schema()
     }
 }
 

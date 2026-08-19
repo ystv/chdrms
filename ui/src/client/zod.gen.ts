@@ -108,7 +108,7 @@ export const zProviderInfo = z.object({
     name: z.string()
 });
 
-export const zSchemaDecimal = z.number();
+export const zSchemaDecimal = z.string();
 
 export const zAssetType = z.object({
     manufacturer: z.uuid(),
