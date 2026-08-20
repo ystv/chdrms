@@ -173,6 +173,33 @@ impl User {
             .fetch_all(&mut **txn)
             .await
     }
+
+    pub async fn count(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<i64> {
+        sqlx::query_scalar!(
+            r#"SELECT COUNT(*) AS "count!"
+            FROM users;"#
+        )
+        .fetch_one(&mut **txn)
+        .await
+    }
+
+    pub async fn set_admin(
+        self,
+        admin: bool,
+        txn: &mut sqlx::PgTransaction<'_>,
+    ) -> sqlx::Result<User> {
+        sqlx::query_as!(
+            Self,
+            r#"UPDATE users
+            SET is_admin=$2
+            WHERE id=$1
+            RETURNING id, email, name, is_admin;"#,
+            self.id,
+            admin,
+        )
+        .fetch_one(&mut **txn)
+        .await
+    }
 }
 
 define_permissions!("users" => List, Invite, Manage);

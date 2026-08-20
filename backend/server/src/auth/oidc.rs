@@ -241,7 +241,14 @@ impl OIDCProvider {
             .map(|e| e.to_string())
             .ok_or_else(|| AuthError::MissingClaim("email"))?;
 
-        let user = User::get_by_external_id(txn, &self.config.name, &provider_id).await?;
+        let existing_users = User::count(txn).await? != 0;
+
+        // don't bother doing a lookup if there aren't any users
+        let user = if existing_users {
+            User::get_by_external_id(txn, &self.config.name, &provider_id).await?
+        } else {
+            None
+        };
 
         // first, see if we can attempt an account link via email (if enabled for this provider)
         let user = match user {
@@ -274,9 +281,18 @@ impl OIDCProvider {
             user => user,
         };
 
-        let Some(user) = user else {
+        let Some(mut user) = user else {
             return Err(AuthError::UserNotFound);
         };
+
+        // if there were no prior users, we should give the first one
+        // admin permissions. this allows for first-time setup.
+        //
+        // in the future, it is probably best this is handled outside
+        // of the OIDC context
+        if !existing_users {
+            user = user.set_admin(true, txn).await?;
+        }
 
         let session = user.create_session(txn).await?;
 
