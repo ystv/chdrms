@@ -274,9 +274,19 @@ impl OIDCProvider {
             user => user,
         };
 
-        let Some(user) = user else {
+        let Some(mut user) = user else {
             return Err(AuthError::UserNotFound);
         };
+
+        // if the user is the only user, we should give them admin
+        // permissions. this allows for first-time setup and early
+        // recovery
+        //
+        // in the future, it is probably best this is handled outside
+        // of the OIDC context
+        if User::count(txn).await? == 1 {
+            user = user.set_admin(true, txn).await?;
+        }
 
         let session = user.create_session(txn).await?;
 
