@@ -50,6 +50,8 @@ pub enum AppError {
     AuthSetup(#[from] AuthSetupError),
     #[error("{0}")]
     InternalServerError(String),
+    #[error("conflict: {0}")]
+    Conflict(String),
 }
 
 impl AppError {
@@ -63,6 +65,10 @@ impl AppError {
 
     pub fn forbidden(message: impl Into<String>) -> Self {
         Self::Forbidden(message.into())
+    }
+
+    pub fn conflict(message: impl Into<String>) -> Self {
+        Self::Conflict(message.into())
     }
 }
 
@@ -80,6 +86,7 @@ impl IntoResponse for AppError {
             }
             Self::Forbidden(message) => ErrorResponse::error(StatusCode::FORBIDDEN, message),
             Self::InternalServerError(message) => ErrorResponse::internal_server_error(message),
+            Self::Conflict(message) => ErrorResponse::error(StatusCode::CONFLICT, message),
         }
     }
 }

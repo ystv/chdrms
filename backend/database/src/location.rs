@@ -1,9 +1,11 @@
 use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
 use sqlx::postgres::types::PgPoint;
+use thiserror::Error;
+use tracing::error;
 use uuid::Uuid;
 
-use crate::permission::define_permissions;
+use crate::{Postgres, permission::define_permissions};
 
 #[schema]
 struct Location {
@@ -18,6 +20,100 @@ struct Location {
     created_at: DateTime<Utc>,
     #[schema(immutable)]
     created_by: Uuid,
+}
+
+pub trait LocationRepository {
+    fn get_location_by_asset_id(
+        &self,
+        id: Uuid,
+    ) -> impl Future<Output = Result<Location, GetLocationByAssetIdError>> + Send;
+
+    fn create_location(
+        &self,
+        location: &CreateLocation,
+    ) -> impl Future<Output = Result<Location, CreateLocationError>> + Send;
+}
+
+#[derive(Debug, Error)]
+pub enum GetLocationByAssetIdError {
+    #[error("backend error")]
+    Backend,
+    #[error("not found")]
+    NotFound,
+}
+
+#[derive(Debug, Error)]
+pub enum CreateLocationError {
+    #[error("backend error")]
+    Backend,
+    #[error("relationship error")]
+    Relationship,
+}
+
+impl LocationRepository for Postgres {
+    async fn get_location_by_asset_id(
+        &self,
+        id: Uuid,
+    ) -> Result<Location, GetLocationByAssetIdError> {
+        sqlx::query_as!(
+            Location,
+            r#"SELECT locations.id, locations.name, locations.description, locations.coordinates, locations.created_at, locations.created_by
+            FROM locations
+            LEFT JOIN assets
+            ON locations.id = assets.location
+            WHERE assets.id = $1;"#,
+            id,
+        )
+        .fetch_one(&mut *self.transaction().await?)
+        .await.map_err(Into::into)
+    }
+
+    async fn create_location(
+        &self,
+        location: &CreateLocation,
+    ) -> Result<Location, CreateLocationError> {
+        let mut txn = self.transaction().await?;
+
+        let location = sqlx::query_as!(
+            Location,
+            "INSERT INTO locations(name, description, coordinates, created_by)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, name, description, coordinates, created_at, created_by;",
+            location.name,
+            location.description,
+            location.coordinates,
+            location.created_by,
+        )
+        .fetch_one(&mut *txn)
+        .await?;
+
+        txn.commit().await?;
+
+        Ok(location)
+    }
+}
+
+impl From<sqlx::Error> for GetLocationByAssetIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::RowNotFound => GetLocationByAssetIdError::NotFound,
+            _ => GetLocationByAssetIdError::Backend,
+        }
+    }
+}
+
+impl From<sqlx::Error> for CreateLocationError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::Database(err) => match err.kind() {
+                sqlx::error::ErrorKind::ForeignKeyViolation => CreateLocationError::Relationship,
+                _ => CreateLocationError::Backend,
+            },
+            _ => CreateLocationError::Backend,
+        }
+    }
 }
 
 impl Location {

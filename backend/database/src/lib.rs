@@ -1,5 +1,5 @@
 use serde::{Deserialize, Deserializer};
-use sqlx::PgPool;
+use sqlx::{PgPool, postgres::PgPoolOptions};
 
 pub mod asset;
 pub mod asset_type;
@@ -10,8 +10,31 @@ pub mod permission;
 pub mod user;
 pub mod user_group;
 
-pub async fn migrate(pool: &PgPool) -> Result<(), sqlx::migrate::MigrateError> {
-    sqlx::migrate!().run(pool).await
+#[derive(Clone)]
+pub struct Postgres {
+    pool: PgPool,
+}
+
+impl Postgres {
+    pub async fn new(url: &str) -> Self {
+        // todo: reconsider this error handling
+        let pool = PgPoolOptions::new()
+            .max_connections(8)
+            .connect(url)
+            .await
+            .expect("failed to connect to database");
+
+        sqlx::migrate!()
+            .run(&pool)
+            .await
+            .expect("failed to run database migrations");
+
+        Self { pool }
+    }
+
+    pub(crate) async fn transaction(&self) -> sqlx::Result<sqlx::PgTransaction<'_>> {
+        self.pool.begin().await
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
