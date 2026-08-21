@@ -14,8 +14,12 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::asset::{self as database, CreateAsset, UpdateAsset};
+use chdrms_database::{
+    asset::{self as database, CreateAsset, UpdateAsset},
+    comment::{CreateComment, UpdateComment},
+};
 
+use sqlx::types::chrono::Utc;
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
@@ -28,6 +32,7 @@ use crate::{
             UpdateAssetRequest,
         },
         location::LocationDto,
+        model::{CommentDto, CreateCommentRequest, UpdateCommentRequest},
     },
     state::AppState,
 };
@@ -236,6 +241,13 @@ async fn delete(
     _auth: RequirePermission<database::permission::Manage>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
+    // todo: this route does not do a recursive deletion of
+    //       relationships to the asset. this is mainly to
+    //       align with DELETE's idempotence. however, it is
+    //       currently not possible to delete comments, in
+    //       attempts to preserve history. how should this be
+    //       handled?
+
     let mut txn = state.transaction().await?;
 
     database::Asset::get_by_id(&mut txn, id)
@@ -325,6 +337,156 @@ async fn put_location(
     }))
 }
 
+/// List comments attached to this asset.
+#[utoipa::path(
+    get,
+    path = "/{id}/comments",
+    tag = TAG,
+    operation_id = "list_asset_comments_by_asset_id",
+    params(
+        ("id" = Uuid, Path, description = "Requested asset ID"),
+    ),
+    responses(
+        (status = OK, description = "Success", body = Vec<CommentDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Asset by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn list_comments(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::View>, // todo: special permission for comments?
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<CommentDto>>> {
+    let mut txn = state.transaction().await?;
+
+    Ok(Json(
+        database::Asset::get_by_id(&mut txn, id)
+            .await?
+            .ok_or_else(|| AppError::NotFound)?
+            .list_comments(&mut txn)
+            .await?
+            .into_iter()
+            .map(|comment| CommentDto {
+                id: comment.id,
+                archived_at: comment.archived_at,
+                title: comment.title,
+                content: comment.content,
+                created_at: comment.created_at,
+                created_by: comment.created_by,
+            })
+            .collect(),
+    ))
+}
+
+/// Add a comment to the specified asset.
+#[utoipa::path(
+    post,
+    path = "/{id}/comments",
+    tag = TAG,
+    operation_id = "create_asset_comment_by_asset_id",
+    params(
+        ("id" = Uuid, Path, description = "Requested asset ID"),
+    ),
+    responses(
+        (status = OK, description = "Success", body = Vec<CommentDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Asset by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn create_comment(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::View>, // todo: special permission for comments?
+    auth: AuthContext,
+    Path(id): Path<Uuid>,
+    Json(comment): Json<CreateCommentRequest>,
+) -> Result<Json<CommentDto>> {
+    let mut txn = state.transaction().await?;
+
+    let comment = database::Asset::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .add_comment(
+            &mut txn,
+            CreateComment {
+                title: comment.title,
+                content: comment.content,
+                created_by: auth.user().id,
+            },
+        )
+        .await?;
+
+    txn.commit().await?;
+
+    Ok(Json(CommentDto {
+        id: comment.id,
+        archived_at: comment.archived_at,
+        title: comment.title,
+        content: comment.content,
+        created_at: comment.created_at,
+        created_by: comment.created_by,
+    }))
+}
+
+/// Update a comment attached to an asset based on its ID.
+#[utoipa::path(
+    put,
+    path = "/{asset_id}/comments/{comment_id}",
+    tag = TAG,
+    operation_id = "update_asset_comment_by_asset_and_comment_id",
+    params(
+        ("asset_id" = Uuid, Path, description = "Requested asset ID"),
+        ("comment_id" = Uuid, Path, description = "Requested comment ID"),
+    ),
+    responses(
+        (status = OK, description = "Success", body = Vec<CommentDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Asset or comment by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn update_comment(
+    State(state): State<AppState>,
+    _auth: RequirePermission<database::permission::Manage>, // todo: special permission for comments?
+    Path((asset, comment)): Path<(Uuid, Uuid)>,
+    Json(request): Json<UpdateCommentRequest>,
+) -> Result<Json<CommentDto>> {
+    let mut txn = state.transaction().await?;
+
+    let comment = database::Asset::get_by_id(&mut txn, asset)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .get_comment_by_id(&mut txn, comment)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?;
+
+    let archived_at = match (comment.archived_at.is_some(), request.archived) {
+        (true, true) => comment.archived_at,
+        (false, true) => Some(Utc::now()),
+        (_, false) => None,
+    };
+
+    let comment = comment
+        .update(
+            &mut txn,
+            UpdateComment {
+                archived_at,
+                title: request.title,
+                content: request.content,
+            },
+        )
+        .await?;
+
+    txn.commit().await?;
+
+    Ok(Json(CommentDto {
+        id: comment.id,
+        archived_at: comment.archived_at,
+        title: comment.title,
+        content: comment.content,
+        created_at: comment.created_at,
+        created_by: comment.created_by,
+    }))
+}
+
 pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
@@ -334,4 +496,7 @@ pub(super) fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(update))
         .routes(routes!(get_location))
         .routes(routes!(put_location))
+        .routes(routes!(list_comments))
+        .routes(routes!(update_comment))
+        .routes(routes!(create_comment))
 }

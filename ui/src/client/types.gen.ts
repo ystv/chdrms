@@ -68,6 +68,15 @@ export type AssetTypeDto = {
     value?: null | SchemaDecimal;
 };
 
+export type CommentDto = {
+    archived_at?: string | null;
+    content: string;
+    created_at: string;
+    created_by: string;
+    id: string;
+    title: string;
+};
+
 export type Coordinates = [
     number,
     number
@@ -80,6 +89,11 @@ export type CreateAssetRequest = {
     notes?: string | null;
     tag: string;
     type: string;
+};
+
+export type CreateCommentRequest = {
+    content: string;
+    title: string;
 };
 
 export type CreateGroup = {
@@ -185,6 +199,12 @@ export type UpdateAssetRequest = {
     locations: UpdateAssetLocations;
     notes?: string | null;
     tag: string;
+};
+
+export type UpdateCommentRequest = {
+    archived: boolean;
+    content: string;
+    title: string;
 };
 
 export type UserDto = {
@@ -453,6 +473,44 @@ export type CreateAssetResponses = {
 
 export type CreateAssetResponse = CreateAssetResponses[keyof CreateAssetResponses];
 
+export type UpdateAssetCommentByAssetAndCommentIdData = {
+    body: UpdateCommentRequest;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        asset_id: string;
+        /**
+         * Requested comment ID
+         */
+        comment_id: string;
+    };
+    query?: never;
+    url: '/assets/{asset_id}/comments/{comment_id}';
+};
+
+export type UpdateAssetCommentByAssetAndCommentIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset or comment by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type UpdateAssetCommentByAssetAndCommentIdError = UpdateAssetCommentByAssetAndCommentIdErrors[keyof UpdateAssetCommentByAssetAndCommentIdErrors];
+
+export type UpdateAssetCommentByAssetAndCommentIdResponses = {
+    /**
+     * Success
+     */
+    200: Array<CommentDto>;
+};
+
+export type UpdateAssetCommentByAssetAndCommentIdResponse = UpdateAssetCommentByAssetAndCommentIdResponses[keyof UpdateAssetCommentByAssetAndCommentIdResponses];
+
 export type DeleteAssetByIdData = {
     body?: never;
     path: {
@@ -554,6 +612,74 @@ export type UpdateAssetByIdResponses = {
 };
 
 export type UpdateAssetByIdResponse = UpdateAssetByIdResponses[keyof UpdateAssetByIdResponses];
+
+export type ListAssetCommentsByAssetIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}/comments';
+};
+
+export type ListAssetCommentsByAssetIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type ListAssetCommentsByAssetIdError = ListAssetCommentsByAssetIdErrors[keyof ListAssetCommentsByAssetIdErrors];
+
+export type ListAssetCommentsByAssetIdResponses = {
+    /**
+     * Success
+     */
+    200: Array<CommentDto>;
+};
+
+export type ListAssetCommentsByAssetIdResponse = ListAssetCommentsByAssetIdResponses[keyof ListAssetCommentsByAssetIdResponses];
+
+export type CreateAssetCommentByAssetIdData = {
+    body: CreateCommentRequest;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}/comments';
+};
+
+export type CreateAssetCommentByAssetIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type CreateAssetCommentByAssetIdError = CreateAssetCommentByAssetIdErrors[keyof CreateAssetCommentByAssetIdErrors];
+
+export type CreateAssetCommentByAssetIdResponses = {
+    /**
+     * Success
+     */
+    200: Array<CommentDto>;
+};
+
+export type CreateAssetCommentByAssetIdResponse = CreateAssetCommentByAssetIdResponses[keyof CreateAssetCommentByAssetIdResponses];
 
 export type GetAssetLocationData = {
     body?: never;
