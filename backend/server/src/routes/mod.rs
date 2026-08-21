@@ -10,6 +10,7 @@ mod asset_type;
 mod auth;
 mod bundle;
 mod group;
+mod label;
 mod location;
 mod manufacturer;
 mod user;
@@ -27,7 +28,8 @@ mod user;
         (name = asset_type::TAG, description = "Asset Types"),
         (name = location::TAG, description = "Locations"),
         (name = asset::TAG, description = "Assets"),
-        (name = bundle::TAG, description = "Asset Bundles")
+        (name = bundle::TAG, description = "Asset Bundles"),
+        (name = label::TAG, description = "Labels"),
     ),
 )]
 struct ApiDoc;
@@ -56,6 +58,7 @@ pub fn routes() -> (Router<AppState>, utoipa::openapi::OpenApi) {
         .nest("/location", location::routes())
         .nest("/assets", asset::routes())
         .nest("/bundles", bundle::routes())
+        .nest("/labels", label::routes())
         .split_for_parts();
 
     let router = Router::new()
