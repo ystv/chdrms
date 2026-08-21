@@ -5,8 +5,18 @@ import {
 import { Button, Card, Center, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import z from 'zod';
 
 export const Route = createFileRoute('/login/')({
+  validateSearch: (search) =>
+    z.object({ redirect: z.string().optional() }).parse(search),
+  beforeLoad: async ({ search }) => {
+    if (search.redirect) {
+      await cookieStore.set('rms_postlogin_redirect', search.redirect);
+    } else {
+      await cookieStore.delete('rms_postlogin_redirect');
+    }
+  },
   component: RouteComponent,
 });
 
