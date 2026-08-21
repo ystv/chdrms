@@ -7,7 +7,7 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { ColorSchemeToggle } from './color-scheme-toggle';
 import { getCurrentUserOptions } from '#/client/@tanstack/react-query.gen';
@@ -20,8 +20,6 @@ export function Shell(props: { children: ReactNode }) {
     useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
-  const navigate = useNavigate();
-
   const me = useQuery({ ...getCurrentUserOptions({}), retry: false });
 
   if (!me.data && !me.error)
@@ -30,10 +28,6 @@ export function Shell(props: { children: ReactNode }) {
         <LoadingOverlay visible />
       </div>
     );
-
-  if (me.error) {
-    navigate({ to: '/login' });
-  }
 
   return (
     <AppShell
@@ -116,7 +110,15 @@ export function Shell(props: { children: ReactNode }) {
             leftSection={<UserIcon />}
           />
         )}
-        <ColorSchemeToggle mt={'auto'} />
+        <NavLink
+          component={Link}
+          to="/swagger-ui"
+          target="blank"
+          label="API docs"
+          onClick={closeMobile}
+          mt={'auto'}
+        />
+        <ColorSchemeToggle />
         <LogoutButton />
       </AppShell.Navbar>
       <AppShell.Main>{props.children}</AppShell.Main>
