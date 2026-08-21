@@ -1,13 +1,12 @@
 use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 
-use crate::{asset_type::AssetType, permission::define_permissions};
+use crate::{asset_type::AssetType, define_id, permission::define_permissions, user::UserId};
 
 #[schema]
 struct Manufacturer {
     #[schema(generated, immutable)]
-    id: Uuid,
+    id: ManufacturerId,
     name: String,
     description: Option<String>,
 
@@ -18,7 +17,7 @@ struct Manufacturer {
     #[schema(generated, immutable)]
     created_at: DateTime<Utc>,
     #[schema(immutable)]
-    created_by: Uuid,
+    created_by: UserId,
 }
 
 impl Manufacturer {
@@ -28,15 +27,15 @@ impl Manufacturer {
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
-            "INSERT INTO manufacturers(name, description, website, email, phone, created_by)
+            r#"INSERT INTO manufacturers(name, description, website, email, phone, created_by)
             VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING id, name, description, website, email, phone, created_at, created_by;",
+            RETURNING id AS "id: _", name, description, website, email, phone, created_at, created_by AS "created_by: _";"#,
             create.name,
             create.description,
             create.website,
             create.email,
             create.phone,
-            create.created_by,
+            create.created_by as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -44,14 +43,14 @@ impl Manufacturer {
 
     pub async fn get_by_id(
         txn: &mut sqlx::PgTransaction<'_>,
-        id: Uuid,
+        id: ManufacturerId,
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             Self,
-            "SELECT id, name, description, website, email, phone, created_at, created_by
+            r#"SELECT id AS "id: _", name, description, website, email, phone, created_at, created_by AS "created_by: _"
             FROM manufacturers
-            WHERE id = $1;",
-            id
+            WHERE id = $1;"#,
+            id as _,
         )
         .fetch_optional(&mut **txn)
         .await
@@ -62,7 +61,7 @@ impl Manufacturer {
             Self,
             "DELETE FROM manufacturers
             WHERE id = $1;",
-            self.id,
+            self.id as _,
         )
         .execute(&mut **txn)
         .await?;
@@ -73,8 +72,8 @@ impl Manufacturer {
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
-            "SELECT id, name, description, website, email, phone, created_at, created_by
-            FROM manufacturers;",
+            r#"SELECT id AS "id: _", name, description, website, email, phone, created_at, created_by AS "created_by: _"
+            FROM manufacturers;"#,
         )
         .fetch_all(&mut **txn)
         .await
@@ -86,10 +85,10 @@ impl Manufacturer {
     ) -> sqlx::Result<Vec<AssetType>> {
         sqlx::query_as!(
             AssetType,
-            r#"SELECT id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by
+            r#"SELECT id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _"
             FROM asset_types
             WHERE manufacturer = $1;"#,
-            self.id
+            self.id as _,
         )
         .fetch_all(&mut **txn)
         .await
@@ -102,11 +101,11 @@ impl Manufacturer {
     ) -> sqlx::Result<Self> {
         sqlx::query_as!(
             Self,
-            "UPDATE manufacturers
+            r#"UPDATE manufacturers
             SET name = $2, description = $3, website = $4, email = $5, phone = $6
             WHERE id = $1
-            RETURNING id, name, description, website, email, phone, created_at, created_by;",
-            self.id,
+            RETURNING id AS "id: _", name, description, website, email, phone, created_at, created_by AS "created_by: _";"#,
+            self.id as _,
             update.name,
             update.description,
             update.website,
@@ -130,7 +129,7 @@ impl Manufacturer {
 
         sqlx::query_as!(
             Self,
-            "UPDATE manufacturers
+            r#"UPDATE manufacturers
             SET
                 name = CASE WHEN $1 THEN $2 ELSE name END,
                 description = CASE WHEN $3 THEN $4 ELSE description END,
@@ -138,7 +137,7 @@ impl Manufacturer {
                 email = CASE WHEN $7 THEN $8 ELSE email END,
                 phone = CASE WHEN $9 THEN $10 ELSE phone END
             WHERE id = $11
-            RETURNING id, name, description, website, email, phone, created_at, created_by;",
+            RETURNING id AS "id: _", name, description, website, email, phone, created_at, created_by AS "created_by: _";"#,
             name_provided,
             name,
             description_provided,
@@ -149,7 +148,7 @@ impl Manufacturer {
             email,
             phone_provided,
             phone,
-            self.id,
+            self.id as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -157,3 +156,4 @@ impl Manufacturer {
 }
 
 define_permissions!("manufacturers" => View, Manage);
+define_id!(ManufacturerId);

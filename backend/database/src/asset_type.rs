@@ -3,16 +3,17 @@ use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use sqlx::types::Text;
 use url::Url;
-use uuid::Uuid;
 
-use crate::permission::define_permissions;
+use crate::{
+    define_id, manufacturer::ManufacturerId, permission::define_permissions, user::UserId,
+};
 
 #[schema]
 struct AssetType {
     #[schema(generated, immutable)]
-    id: Uuid,
+    id: AssetTypeId,
     name: String,
-    manufacturer: Uuid,
+    manufacturer: ManufacturerId,
 
     product_url: Option<Text<Url>>,
     value: Option<Decimal>,
@@ -20,7 +21,7 @@ struct AssetType {
     #[schema(generated, immutable)]
     created_at: DateTime<Utc>,
     #[schema(immutable)]
-    created_by: Uuid,
+    created_by: UserId,
 }
 
 impl AssetType {
@@ -32,12 +33,12 @@ impl AssetType {
             Self,
             r#"INSERT INTO asset_types(name, manufacturer, product_url, value, created_by)
             VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by;"#,
+            RETURNING id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _";"#,
             create.name,
-            create.manufacturer,
+            create.manufacturer as _,
             create.product_url as _,
             create.value,
-            create.created_by,
+            create.created_by as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -45,14 +46,14 @@ impl AssetType {
 
     pub async fn get_by_id(
         txn: &mut sqlx::PgTransaction<'_>,
-        id: Uuid,
+        id: AssetTypeId,
     ) -> sqlx::Result<Option<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by
+            r#"SELECT id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _"
             FROM asset_types
             WHERE id = $1;"#,
-            id
+            id as _,
         )
         .fetch_optional(&mut **txn)
         .await
@@ -63,7 +64,7 @@ impl AssetType {
             Self,
             "DELETE FROM asset_types
             WHERE id = $1;",
-            self.id
+            self.id as _,
         )
         .execute(&mut **txn)
         .await?;
@@ -74,7 +75,7 @@ impl AssetType {
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
-            r#"SELECT id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by
+            r#"SELECT id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _"
             FROM asset_types;"#,
         )
         .fetch_all(&mut **txn)
@@ -91,10 +92,10 @@ impl AssetType {
             r#"UPDATE asset_types
             SET name = $2, manufacturer = $3, product_url = $4, value = $5
             WHERE id = $1
-            RETURNING id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by;"#,
-            self.id,
+            RETURNING id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _";"#,
+            self.id as _,
             update.name,
-            update.manufacturer,
+            update.manufacturer as _,
             update.product_url as _,
             update.value,
         )
@@ -121,16 +122,16 @@ impl AssetType {
                 product_url = CASE WHEN $5 THEN $6 ELSE product_url END,
                 value = CASE WHEN $7 THEN $8 ELSE value END
             WHERE id = $9
-            RETURNING id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by;"#,
+            RETURNING id AS "id: _", name, manufacturer AS "manufacturer: _", product_url AS "product_url: _", value, created_at, created_by AS "created_by: _";"#,
             name_provided,
             name,
             manufacturer_provided,
-            manufacturer,
+            manufacturer as _,
             product_url_provided,
             product_url as _,
             value_provided,
             value,
-            self.id,
+            self.id as _,
         )
         .fetch_one(&mut **txn)
         .await
@@ -138,24 +139,23 @@ impl AssetType {
 }
 
 define_permissions!("asset_types" => View, Manage);
+define_id!(AssetTypeId);
 
 #[cfg(test)]
 mod tests {
+    use sqlx::PgPool;
     use std::assert_matches;
+    use uuid::uuid;
 
-    use rust_decimal::Decimal;
-    use sqlx::{PgPool, types::Text};
-    use url::Url;
-    use uuid::{Uuid, uuid};
+    use crate::PatchField;
 
-    use crate::{
-        PatchField,
-        asset_type::{AssetType, CreateAssetType, PatchAssetType, UpdateAssetType},
-    };
+    use super::*;
 
-    const ASSET_TYPE_ID: Uuid = uuid!("f1c8508a-7c1d-436d-a867-0849dddf5f87");
-    const MANUFACTURER_ID: Uuid = uuid!("3d6fd755-8d90-4a86-881f-4870049bf5f9");
-    const USER_ID: Uuid = uuid!("736bcb69-ae67-4ec1-8868-cca4662aa3b1");
+    const ASSET_TYPE_ID: AssetTypeId =
+        AssetTypeId::new(uuid!("f1c8508a-7c1d-436d-a867-0849dddf5f87"));
+    const MANUFACTURER_ID: ManufacturerId =
+        ManufacturerId::new(uuid!("3d6fd755-8d90-4a86-881f-4870049bf5f9"));
+    const USER_ID: UserId = UserId::new(uuid!("736bcb69-ae67-4ec1-8868-cca4662aa3b1"));
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_get_by_id(pool: PgPool) {
@@ -180,7 +180,7 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_get_by_id_non_existent(pool: PgPool) {
-        let non_existent_id = uuid!("76435093-ce9b-4464-8335-6e20e8a17180");
+        let non_existent_id = AssetTypeId::new(uuid!("76435093-ce9b-4464-8335-6e20e8a17180"));
 
         let mut txn = pool.begin().await.expect("failed to begin transaction");
 
@@ -220,7 +220,8 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_create_non_existent_manufacturer(pool: PgPool) {
-        let non_existent_manufacturer_id = uuid!("8abe6c36-6533-44be-ab63-1eb54d303eea");
+        let non_existent_manufacturer_id =
+            ManufacturerId::new(uuid!("8abe6c36-6533-44be-ab63-1eb54d303eea"));
 
         let mut txn = pool.begin().await.expect("failed to begin transaction");
 
@@ -241,7 +242,7 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_create_non_existent_user(pool: PgPool) {
-        let non_existent_user_id = uuid!("76aed14a-9b1a-45b9-b125-5ae118623dfb");
+        let non_existent_user_id = UserId::new(uuid!("76aed14a-9b1a-45b9-b125-5ae118623dfb"));
 
         let mut txn = pool.begin().await.expect("failed to begin transaction");
 
@@ -339,7 +340,8 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_update_non_existent_manufacturer(pool: PgPool) {
-        let non_existent_manufacturer_id = uuid!("2ca48a56-f09f-495a-b2c2-0db2820a887d");
+        let non_existent_manufacturer_id =
+            ManufacturerId::new(uuid!("2ca48a56-f09f-495a-b2c2-0db2820a887d"));
 
         let mut txn = pool.begin().await.expect("failed to begin transaction");
 
@@ -437,7 +439,8 @@ mod tests {
 
     #[sqlx::test(fixtures(path = "fixtures", scripts("asset_types")))]
     async fn test_patch_non_existent_manufacturer(pool: PgPool) {
-        let non_existent_manufacturer_id = uuid!("6e261a2c-08d4-4eb7-b1a7-dad7ade2b457");
+        let non_existent_manufacturer_id =
+            ManufacturerId::new(uuid!("6e261a2c-08d4-4eb7-b1a7-dad7ade2b457"));
 
         let mut txn = pool.begin().await.expect("failed to begin transaction");
 

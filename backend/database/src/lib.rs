@@ -85,6 +85,48 @@ where
     }
 }
 
+#[macro_export]
+macro_rules! define_id {
+    ($name:ident) => {
+        #[derive(
+            Debug,
+            Clone,
+            Copy,
+            PartialEq,
+            Eq,
+            Hash,
+            ::sqlx::Type,
+            ::serde::Serialize,
+            ::serde::Deserialize,
+        )]
+        #[sqlx(transparent)]
+        #[serde(transparent)]
+        pub struct $name(uuid::Uuid);
+
+        impl $name {
+            pub const fn new(id: uuid::Uuid) -> Self {
+                Self(id)
+            }
+
+            pub const fn as_inner(&self) -> &uuid::Uuid {
+                &self.0
+            }
+
+            pub const fn into_inner(self) -> uuid::Uuid {
+                self.0
+            }
+        }
+
+        impl From<$name> for uuid::Uuid {
+            fn from(id: $name) -> Self {
+                id.0
+            }
+        }
+
+        // we don't implement From<Uuid> as to force explicit creation of a typed ID
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

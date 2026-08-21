@@ -5,7 +5,7 @@ use axum::{
 };
 use chdrms_database::{
     asset::permission,
-    bundle::{self as database, CreateBundle},
+    bundle::{self as database, BundleId, CreateBundle},
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -45,10 +45,12 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<AssetBundleDto>> {
     Ok(Json(
-        database::Bundle::get_by_id(&mut state.transaction().await?, id)
+        database::Bundle::get_by_id(&mut state.transaction().await?, BundleId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)
-            .map(|bundle| AssetBundleDto { id: bundle.id })?,
+            .map(|bundle| AssetBundleDto {
+                id: bundle.id.into(),
+            })?,
     ))
 }
 
@@ -75,22 +77,22 @@ async fn get_assets_by_id(
     let mut txn = state.transaction().await?;
 
     Ok(Json(
-        database::Bundle::get_by_id(&mut txn, id)
+        database::Bundle::get_by_id(&mut txn, BundleId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)?
             .assets(&mut txn)
             .await?
             .into_iter()
             .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
+                id: asset.id.into(),
+                r#type: asset.r#type.into(),
                 alias: asset.alias,
                 notes: asset.notes,
                 tag: asset.tag,
-                bundle: asset.bundle,
+                bundle: asset.bundle.map(Into::into),
                 locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
+                    current: asset.location.into(),
+                    home: asset.home_location.into(),
                 },
             })
             .collect(),
@@ -122,7 +124,9 @@ async fn create(
         },
     )
     .await
-    .map(|bundle| AssetBundleDto { id: bundle.id })?;
+    .map(|bundle| AssetBundleDto {
+        id: bundle.id.into(),
+    })?;
 
     txn.commit().await?;
 
@@ -151,7 +155,7 @@ async fn delete(
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
 
-    database::Bundle::get_by_id(&mut txn, id)
+    database::Bundle::get_by_id(&mut txn, BundleId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .delete(&mut txn)
@@ -182,7 +186,9 @@ async fn list(
         database::Bundle::list(&mut state.transaction().await?)
             .await?
             .into_iter()
-            .map(|bundle| AssetBundleDto { id: bundle.id })
+            .map(|bundle| AssetBundleDto {
+                id: bundle.id.into(),
+            })
             .collect(),
     ))
 }
