@@ -1,8 +1,8 @@
 import { listUsersOptions } from '#/client/@tanstack/react-query.gen';
-import { Button, Group, Stack, Table, Title } from '@mantine/core';
+import { ActionIcon, Group, Stack, Table, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { CheckIcon, XIcon } from 'lucide-react';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { ArrowRightIcon, CheckIcon, XIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/(authenticated)/users/')({
   component: RouteComponent,
@@ -30,11 +30,16 @@ function RouteComponent() {
               <Table.Td>{user.name}</Table.Td>
               <Table.Td>{user.email}</Table.Td>
               <Table.Td>
-                {user.is_admin ? (
-                  <CheckIcon color="green" />
-                ) : (
-                  <XIcon color="red" />
-                )}
+                <Group>
+                  {user.is_admin ? (
+                    <CheckIcon color="green" />
+                  ) : (
+                    <XIcon color="red" />
+                  )}
+                  <ActionIcon ml={'auto'} component={Link} to={`./${user.id}`}>
+                    <ArrowRightIcon />
+                  </ActionIcon>
+                </Group>
               </Table.Td>
             </Table.Tr>
           ))}
