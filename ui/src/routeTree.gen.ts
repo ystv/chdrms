@@ -19,6 +19,7 @@ import { Route as authenticatedGroupsIndexRouteImport } from './routes/(authenti
 import { Route as authenticatedAssetsIndexRouteImport } from './routes/(authenticated)/assets/index'
 import { Route as authenticatedAssetTypesIndexRouteImport } from './routes/(authenticated)/asset-types/index'
 import { Route as authenticatedUsersAtmeIndexRouteImport } from './routes/(authenticated)/users/@me/index'
+import { Route as authenticatedUsersUserIDIndexRouteImport } from './routes/(authenticated)/users/$userID/index'
 
 const authenticatedRouteRoute = authenticatedRouteRouteImport.update({
   id: '/(authenticated)',
@@ -75,6 +76,12 @@ const authenticatedUsersAtmeIndexRoute =
     path: '/users/@me/',
     getParentRoute: () => authenticatedRouteRoute,
   } as any)
+const authenticatedUsersUserIDIndexRoute =
+  authenticatedUsersUserIDIndexRouteImport.update({
+    id: '/users/$userID/',
+    path: '/users/$userID/',
+    getParentRoute: () => authenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof authenticatedIndexRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/locations/': typeof authenticatedLocationsIndexRoute
   '/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/users/': typeof authenticatedUsersIndexRoute
+  '/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRoutesByTo {
@@ -96,6 +104,7 @@ export interface FileRoutesByTo {
   '/locations': typeof authenticatedLocationsIndexRoute
   '/manufacturers': typeof authenticatedManufacturersIndexRoute
   '/users': typeof authenticatedUsersIndexRoute
+  '/users/$userID': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRoutesById {
@@ -109,6 +118,7 @@ export interface FileRoutesById {
   '/(authenticated)/locations/': typeof authenticatedLocationsIndexRoute
   '/(authenticated)/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/(authenticated)/users/': typeof authenticatedUsersIndexRoute
+  '/(authenticated)/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/(authenticated)/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
 export interface FileRouteTypes {
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/locations/'
     | '/manufacturers/'
     | '/users/'
+    | '/users/$userID/'
     | '/users/@me/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/locations'
     | '/manufacturers'
     | '/users'
+    | '/users/$userID'
     | '/users/@me'
   id:
     | '__root__'
@@ -145,6 +157,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/locations/'
     | '/(authenticated)/manufacturers/'
     | '/(authenticated)/users/'
+    | '/(authenticated)/users/$userID/'
     | '/(authenticated)/users/@me/'
   fileRoutesById: FileRoutesById
 }
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedUsersAtmeIndexRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
+    '/(authenticated)/users/$userID/': {
+      id: '/(authenticated)/users/$userID/'
+      path: '/users/$userID'
+      fullPath: '/users/$userID/'
+      preLoaderRoute: typeof authenticatedUsersUserIDIndexRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
   }
 }
 
@@ -236,6 +256,7 @@ interface authenticatedRouteRouteChildren {
   authenticatedLocationsIndexRoute: typeof authenticatedLocationsIndexRoute
   authenticatedManufacturersIndexRoute: typeof authenticatedManufacturersIndexRoute
   authenticatedUsersIndexRoute: typeof authenticatedUsersIndexRoute
+  authenticatedUsersUserIDIndexRoute: typeof authenticatedUsersUserIDIndexRoute
   authenticatedUsersAtmeIndexRoute: typeof authenticatedUsersAtmeIndexRoute
 }
 
@@ -247,6 +268,7 @@ const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
   authenticatedLocationsIndexRoute: authenticatedLocationsIndexRoute,
   authenticatedManufacturersIndexRoute: authenticatedManufacturersIndexRoute,
   authenticatedUsersIndexRoute: authenticatedUsersIndexRoute,
+  authenticatedUsersUserIDIndexRoute: authenticatedUsersUserIDIndexRoute,
   authenticatedUsersAtmeIndexRoute: authenticatedUsersAtmeIndexRoute,
 }
 
