@@ -6,5 +6,6 @@ name = "Display name"
 issuer_url = "https://account.example.org/realms/master"
 client_id = ""
 client_secret = ""
+scopes = ["email", "profile"]
 allow_registration = true
 auto_account_linking = true
