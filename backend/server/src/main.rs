@@ -34,14 +34,16 @@ async fn main() -> Result<(), AppError> {
         .init();
 
     let config = chdrms_server::config::load_configuration(get_env!(
-        "CONFIGURATION_PATH",
+        "CHDRMS__CONFIGURATION_PATH",
         "config.toml".to_string()
     ))
     .await;
 
-    let key =
-        chdrms_server::config::load_key(get_env!("SECRET_KEY_PATH", ".secretkey".to_string()))
-            .await;
+    let key = chdrms_server::config::load_key(get_env!(
+        "CHDRMS__SECRET_KEY_PATH",
+        ".secretkey".to_string()
+    ))
+    .await;
 
     let pool = PgPoolOptions::new()
         .max_connections(8)
@@ -62,7 +64,7 @@ async fn main() -> Result<(), AppError> {
     // if we're running in production, we want to serve the static files from `dist`,
     // otherwise, we let Vite proxy the requests to us.
     if get_env!("ENVIRONMENT", "DEVELOPMENT".to_string()).as_str() == "PRODUCTION" {
-        let directory: PathBuf = get_env!("UI_DIRECTORY", "dist".to_string()).into();
+        let directory: PathBuf = get_env!("CHDRMS__UI_DIRECTORY", "dist".to_string()).into();
         app = app.fallback_service(
             ServeDir::new(&directory)
                 .not_found_service(ServeFile::new(directory.join("index.html"))),
@@ -71,8 +73,8 @@ async fn main() -> Result<(), AppError> {
 
     app = app.layer(TraceLayer::new_for_http());
 
-    let host: String = get_env!("HOST", "::".to_string());
-    let port: u16 = get_env!("PORT", 3000);
+    let host: String = get_env!("CHDRMS__HOST", "::".to_string());
+    let port: u16 = get_env!("CHDRMS__PORT", 3000);
 
     let listener = tokio::net::TcpListener::bind((host, port)).await.unwrap();
 

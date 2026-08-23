@@ -1,6 +1,10 @@
 use std::{collections::HashMap, path::Path};
 
 use axum_extra::extract::cookie::Key;
+use figment::{
+    Figment,
+    providers::{Env, Format, Toml},
+};
 use openidconnect::{ClientId, ClientSecret, IssuerUrl, url::Url};
 use serde::Deserialize;
 
@@ -26,10 +30,11 @@ pub struct OIDCProviderConfig {
 pub async fn load_configuration(path: impl AsRef<Path>) -> AppConfig {
     tracing::debug!(path = ?path.as_ref(), "loading configuration");
     // TODO: do we want/need better error handling here?
-    let s = tokio::fs::read_to_string(path)
-        .await
-        .expect("failed to read config file");
-    toml::from_str(&s).expect("failed to parse config")
+    Figment::new()
+        .merge(Toml::file(path))
+        .merge(Env::prefixed("CHDRMS__").split("__"))
+        .extract()
+        .expect("failed to parse configuration")
 }
 
 // TODO: support loading from environment variable?

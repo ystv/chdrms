@@ -1,11 +1,11 @@
-base_url = "http://localhost:3000"
+base_url = "http://localhost:3000" # CHDRMS__BASE_URL = 'http://localhost:3000'
 # base_url = "http://localhost:5173" # Uncomment when developing UI so the requests get proxied properly
 
 [oidc_provider.keycloak]
-name = "Display name"
+name = "Display name" # CHDRMS__OIDC_PROVIDER__KEYCLOAK__NAME = 'Display name'
 issuer_url = "https://account.example.org/realms/master"
 client_id = ""
 client_secret = ""
-scopes = ["email", "profile"]
+scopes = ["email", "profile"] # CHDRMS__OIDC_PROVIDER__KEYCLOAK__SCOPES = '[email,profile]'
 allow_registration = true
 auto_account_linking = true
