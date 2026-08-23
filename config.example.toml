@@ -1,6 +1,14 @@
 base_url = "http://localhost:3000"
 # base_url = "http://localhost:5173" # Uncomment when developing UI so the requests get proxied properly
 
+[storage]
+backend = "s3"
+bucket = "my-bucket"
+region = "eu-west-1"
+endpoint = "https://..."
+access_key_id = "..."
+secret_access_key = "..."
+
 [oidc_provider.keycloak]
 name = "Display name"
 issuer_url = "https://account.example.org/realms/master"

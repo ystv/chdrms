@@ -35,6 +35,20 @@ services:
     volumes:
       - ./conf/dev-realm.json:/opt/keycloak/data/import/dev-realm.json:ro
     command: start-dev --import-realm
+  garage:
+    image: dxflrs/garage:v2.3.0
+    ports:
+      - 3900:3900
+      - 3901:3901
+      - 3902:3902
+      - 3903:3903
+    environment:
+      GARAGE_DEFAULT_ACCESS_KEY: e49342a36ecb7ec77fe61842b46e19d66e855e43b83d6655b79e05c759fbf3e6
+      GARAGE_DEFAULT_SECRET_KEY: 9e14033d60ec377751a8b9632aa812f46e3fac29a4fb2160c3394080748a3085
+      GARAGE_DEFAULT_BUCKET: test
+    volumes:
+      - ./conf/dev-garage.toml:/etc/garage.toml:ro
+    command: /garage server --single-node --default-bucket
 
 volumes:
   postgres-data:
