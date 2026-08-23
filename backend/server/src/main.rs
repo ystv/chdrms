@@ -2,10 +2,12 @@ use std::path::PathBuf;
 
 use chdrms_server::{error::AppError, state::AppState};
 use sqlx::postgres::PgPoolOptions;
+use tokio::signal;
 use tower_http::{
     services::{ServeDir, ServeFile},
     trace::TraceLayer,
 };
+use tracing::info;
 use tracing_subscriber::prelude::*;
 
 macro_rules! get_env {
@@ -55,7 +57,7 @@ async fn main() -> Result<(), AppError> {
         return Ok(());
     };
 
-    let state = AppState::new(pool, config, key);
+    let state = AppState::new(pool.clone(), config, key);
 
     let (app, _) = chdrms_server::routes::routes();
 
@@ -79,7 +81,40 @@ async fn main() -> Result<(), AppError> {
     let listener = tokio::net::TcpListener::bind((host, port)).await.unwrap();
 
     tracing::info!("listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .unwrap();
+
+    // pool should be closed manually as there is no async Drop.
+    // this allows sqlx to clean up the connections.
+    pool.close().await;
 
     Ok(())
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install ctrl+c handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    info!("shutting down server")
 }
