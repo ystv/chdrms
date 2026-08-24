@@ -7,6 +7,7 @@ import type { ButtonProps } from '@mantine/core';
 const AssetTypeField = lazy(() => import('./fields/asset-type'));
 const LocationField = lazy(() => import('./fields/location'));
 const ManufacturerField = lazy(() => import('./fields/manufacturer'));
+const NumberAsStringField = lazy(() => import('./fields/number-as-string'));
 const NumberField = lazy(() => import('./fields/number'));
 const TextField = lazy(() => import('./fields/text'));
 
@@ -36,6 +37,7 @@ export const { useAppForm } = createFormHook({
     AssetTypeField,
     LocationField,
     ManufacturerField,
+    NumberAsStringField,
     NumberField,
     TextField,
   },

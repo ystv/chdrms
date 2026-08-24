@@ -47,14 +47,14 @@ function RouteComponent() {
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Name</Table.Th>
+            <Table.Th>Value</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {assetTypes.data?.map((assetType) => (
             <Table.Tr key={assetType.id}>
-              <Table.Td>
-                <Group>{assetType.name}</Group>
-              </Table.Td>
+              <Table.Td>{assetType.name}</Table.Td>
+              <Table.Td>{assetType.value}</Table.Td>
             </Table.Tr>
           ))}
         </Table.Tbody>
@@ -74,7 +74,7 @@ function CreateAssetTypeModal(props: {
     name: '',
     manufacturer: '',
     product_url: null,
-    value: 0.0,
+    value: null,
   };
 
   const form = useAppForm({
@@ -114,9 +114,10 @@ function CreateAssetTypeModal(props: {
         <form.AppField
           name="value"
           children={(field) => (
-            <field.NumberField
+            <field.NumberAsStringField
               label="Value"
               decimalScale={2}
+              min={0}
               fixedDecimalScale
               leftSection={'£'}
               required
