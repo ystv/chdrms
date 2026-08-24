@@ -60,6 +60,10 @@ impl AppError {
     pub fn internal_server_error(message: impl Into<String>) -> Self {
         Self::InternalServerError(message.into())
     }
+
+    pub fn forbidden(message: impl Into<String>) -> Self {
+        Self::Forbidden(message.into())
+    }
 }
 
 impl IntoResponse for AppError {

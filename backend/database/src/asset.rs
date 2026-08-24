@@ -181,6 +181,37 @@ impl Asset {
         .fetch_one(&mut **txn)
         .await
     }
+
+    pub async fn asset_exists(
+        txn: &mut sqlx::PgTransaction<'_>,
+        identifier: &AssetIdentifier,
+    ) -> sqlx::Result<bool> {
+        match identifier {
+            AssetIdentifier::Id(id) => sqlx::query_scalar!(
+                r#"SELECT EXISTS (
+                    SELECT 1
+                    FROM assets
+                    WHERE id = $1
+                ) AS "exists!: bool""#,
+                id,
+            ),
+            AssetIdentifier::Tag(tag) => sqlx::query_scalar!(
+                r#"SELECT EXISTS (
+                    SELECT 1
+                    FROM assets
+                    WHERE tag = $1
+                ) AS "exists!: bool""#,
+                tag,
+            ),
+        }
+        .fetch_one(&mut **txn)
+        .await
+    }
+}
+
+pub enum AssetIdentifier {
+    Id(Uuid),
+    Tag(String),
 }
 
 define_permissions!("assets" => View, Manage);

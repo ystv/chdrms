@@ -808,9 +808,23 @@ export type GetAssetsWithinBundleByIdResponse = GetAssetsWithinBundleByIdRespons
 export type GetContactDetailsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query: {
+        /**
+         * Referred asset ID or Tag.
+         */
+        asset: unknown;
+    };
     url: '/contact';
 };
+
+export type GetContactDetailsErrors = {
+    /**
+     * Forbidden
+     */
+    403: ErrorResponse;
+};
+
+export type GetContactDetailsError = GetContactDetailsErrors[keyof GetContactDetailsErrors];
 
 export type GetContactDetailsResponses = {
     /**

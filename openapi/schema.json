@@ -965,6 +965,14 @@
         ],
         "summary": "Get this instance's contact details.",
         "operationId": "get_contact_details",
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "query",
+            "description": "Referred asset ID or Tag.",
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -972,6 +980,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ContactDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }

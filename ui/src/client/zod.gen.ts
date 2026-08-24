@@ -333,6 +333,10 @@ export const zGetAssetsWithinBundleByIdPath = z.object({
  */
 export const zGetAssetsWithinBundleByIdResponse = z.array(zAssetDto);
 
+export const zGetContactDetailsQuery = z.object({
+    asset: z.unknown()
+});
+
 /**
  * Success
  */
