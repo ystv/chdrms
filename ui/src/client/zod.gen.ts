@@ -21,6 +21,16 @@ export const zAssetDto = z.object({
     type: z.uuid()
 });
 
+export const zContactDetailsLinkDto = z.object({
+    label: z.string().nullish(),
+    link: z.url()
+});
+
+export const zContactDetailsDto = z.object({
+    links: z.array(zContactDetailsLinkDto),
+    name: z.string().nullish()
+});
+
 export const zCoordinates = z.tuple([z.number(), z.number()]);
 
 export const zCreateAssetRequest = z.object({
@@ -322,6 +332,11 @@ export const zGetAssetsWithinBundleByIdPath = z.object({
  * Success
  */
 export const zGetAssetsWithinBundleByIdResponse = z.array(zAssetDto);
+
+/**
+ * Success
+ */
+export const zGetContactDetailsResponse = zContactDetailsDto;
 
 /**
  * Success

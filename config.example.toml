@@ -1,6 +1,12 @@
 base_url = "http://localhost:3000" # CHDRMS__BASE_URL = 'http://localhost:3000'
 # base_url = "http://localhost:5173" # Uncomment when developing UI so the requests get proxied properly
 
+[contact_details]
+name = "Example Organisation"
+[[contact_details.link]] # CHDRMS__CONTACT_DETAILS__LINK = '[{label="j.doe+chdrms@example.com",link="mailto:j.doe+chdrms@example.com"}]'
+label = "j.doe+chdrms@example.com"
+link = "mailto:j.doe+chdrms@example.com"
+
 [oidc_provider.keycloak]
 name = "Display name" # CHDRMS__OIDC_PROVIDER__KEYCLOAK__NAME = 'Display name'
 issuer_url = "https://account.example.org/realms/master"

@@ -68,6 +68,16 @@ export type AssetTypeDto = {
     value?: null | SchemaDecimal;
 };
 
+export type ContactDetailsDto = {
+    links: Array<ContactDetailsLinkDto>;
+    name?: string | null;
+};
+
+export type ContactDetailsLinkDto = {
+    label?: string | null;
+    link: string;
+};
+
 export type Coordinates = [
     number,
     number
@@ -794,6 +804,22 @@ export type GetAssetsWithinBundleByIdResponses = {
 };
 
 export type GetAssetsWithinBundleByIdResponse = GetAssetsWithinBundleByIdResponses[keyof GetAssetsWithinBundleByIdResponses];
+
+export type GetContactDetailsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/contact';
+};
+
+export type GetContactDetailsResponses = {
+    /**
+     * Success
+     */
+    200: ContactDetailsDto;
+};
+
+export type GetContactDetailsResponse = GetContactDetailsResponses[keyof GetContactDetailsResponses];
 
 export type ListGroupsData = {
     body?: never;

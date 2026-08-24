@@ -958,6 +958,27 @@
         }
       }
     },
+    "/contact": {
+      "get": {
+        "tags": [
+          "contact"
+        ],
+        "summary": "Get this instance's contact details.",
+        "operationId": "get_contact_details",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactDetailsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/group": {
       "get": {
         "tags": [
@@ -2149,6 +2170,44 @@
           }
         }
       },
+      "ContactDetailsDto": {
+        "type": "object",
+        "required": [
+          "links"
+        ],
+        "properties": {
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactDetailsLinkDto"
+            }
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ContactDetailsLinkDto": {
+        "type": "object",
+        "required": [
+          "link"
+        ],
+        "properties": {
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "link": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
       "Coordinates": {
         "type": "array",
         "items": {
@@ -2658,6 +2717,10 @@
     {
       "name": "asset_bundle",
       "description": "Asset Bundles"
+    },
+    {
+      "name": "contact",
+      "description": "Contact"
     }
   ]
 }

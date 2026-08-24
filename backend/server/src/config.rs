@@ -11,6 +11,8 @@ use serde::Deserialize;
 #[derive(Clone, Deserialize)]
 pub struct AppConfig {
     pub base_url: Url,
+    #[serde(default)]
+    pub contact_details: ContactDetails,
     #[serde(rename = "oidc_provider")]
     pub oidc_providers: HashMap<String, OIDCProviderConfig>,
 }
@@ -25,6 +27,20 @@ pub struct OIDCProviderConfig {
     pub scopes: Vec<String>,
     pub allow_registration: bool,
     pub auto_account_linking: bool,
+}
+
+#[derive(Debug, Clone, Deserialize, Default)]
+#[serde(default)]
+pub struct ContactDetails {
+    pub name: Option<String>,
+    #[serde(rename = "link")]
+    pub links: Vec<ContactLink>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct ContactLink {
+    pub label: Option<String>,
+    pub link: Url,
 }
 
 pub async fn load_configuration(path: impl AsRef<Path>) -> AppConfig {
