@@ -13,6 +13,7 @@ mod contact;
 mod group;
 mod location;
 mod manufacturer;
+mod model;
 mod user;
 
 #[derive(OpenApi)]

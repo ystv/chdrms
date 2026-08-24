@@ -28,6 +28,7 @@ use crate::{
             UpdateAssetRequest,
         },
         location::LocationDto,
+        model::AssetIdentifier,
     },
     state::AppState,
 };
@@ -36,30 +37,32 @@ pub(super) mod model;
 
 pub(super) const TAG: &str = "asset";
 
-/// Get an asset by its ID.
+/// Get an asset by its ID or Tag.
 #[utoipa::path(
     get,
     path = "/{id}",
     tag = TAG,
-    operation_id = "get_asset_by_id",
+    operation_id = "get_asset_by_id_or_tag",
     params(
-        ("id" = Uuid, Path, description = "Requested asset ID"),
+        ("id", Path, description = "Requested asset ID"),
     ),
     responses(
         (status = OK, description = "Success", body = AssetDto),
         (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
-        (status = NOT_FOUND, description = "Asset by that ID not found", body = ErrorResponse)
+        (status = NOT_FOUND, description = "Asset by that ID or Tag not found", body = ErrorResponse)
     ),
 )]
-async fn get_by_id(
+async fn get_by_id_or_tag(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::View>,
-    Path(id): Path<Uuid>,
+    Path(id): Path<AssetIdentifier>,
 ) -> Result<Json<AssetDto>> {
     let mut txn = state.transaction().await?;
-    let asset = database::Asset::get_by_id(&mut txn, id)
-        .await?
-        .ok_or_else(|| AppError::NotFound)?;
+    let asset = match id {
+        AssetIdentifier::Id(id) => database::Asset::get_by_id(&mut txn, id).await,
+        AssetIdentifier::Tag(tag) => database::Asset::get_by_tag(&mut txn, tag).await,
+    }?
+    .ok_or_else(|| AppError::NotFound)?;
 
     Ok(Json(AssetDto {
         id: asset.id,
@@ -327,7 +330,7 @@ async fn put_location(
 
 pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
-        .routes(routes!(get_by_id))
+        .routes(routes!(get_by_id_or_tag))
         .routes(routes!(create))
         .routes(routes!(list))
         .routes(routes!(delete))

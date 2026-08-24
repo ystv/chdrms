@@ -8,9 +8,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use crate::{
     config::ContactLink,
     error::{AppError, ErrorResponse, Result},
-    routes::contact::model::{
-        AssetIdentifier, ContactDetailsDto, ContactDetailsLinkDto, ContactParameters,
-    },
+    routes::contact::model::{ContactDetailsDto, ContactDetailsLinkDto, ContactParameters},
     state::AppState,
 };
 
@@ -36,17 +34,7 @@ async fn get_contact_details(
     State(state): State<AppState>,
     Query(parameters): Query<ContactParameters>,
 ) -> Result<Json<ContactDetailsDto>> {
-    use chdrms_database::asset as database;
-
-    if !Asset::asset_exists(
-        &mut state.transaction().await?,
-        &match parameters.asset {
-            AssetIdentifier::Id(id) => database::AssetIdentifier::Id(id),
-            AssetIdentifier::Tag(tag) => database::AssetIdentifier::Tag(tag),
-        },
-    )
-    .await?
-    {
+    if !Asset::asset_exists(&mut state.transaction().await?, &parameters.asset.into()).await? {
         return Err(AppError::forbidden("forbidden"));
     }
 

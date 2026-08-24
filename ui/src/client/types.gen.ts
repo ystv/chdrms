@@ -497,39 +497,39 @@ export type DeleteAssetByIdResponses = {
 
 export type DeleteAssetByIdResponse = DeleteAssetByIdResponses[keyof DeleteAssetByIdResponses];
 
-export type GetAssetByIdData = {
+export type GetAssetByIdOrTagData = {
     body?: never;
     path: {
         /**
          * Requested asset ID
          */
-        id: string;
+        id: unknown;
     };
     query?: never;
     url: '/assets/{id}';
 };
 
-export type GetAssetByIdErrors = {
+export type GetAssetByIdOrTagErrors = {
     /**
      * Missing permission
      */
     401: ErrorResponse;
     /**
-     * Asset by that ID not found
+     * Asset by that ID or Tag not found
      */
     404: ErrorResponse;
 };
 
-export type GetAssetByIdError = GetAssetByIdErrors[keyof GetAssetByIdErrors];
+export type GetAssetByIdOrTagError = GetAssetByIdOrTagErrors[keyof GetAssetByIdOrTagErrors];
 
-export type GetAssetByIdResponses = {
+export type GetAssetByIdOrTagResponses = {
     /**
      * Success
      */
     200: AssetDto;
 };
 
-export type GetAssetByIdResponse = GetAssetByIdResponses[keyof GetAssetByIdResponses];
+export type GetAssetByIdOrTagResponse = GetAssetByIdOrTagResponses[keyof GetAssetByIdOrTagResponses];
 
 export type UpdateAssetByIdData = {
     body: UpdateAssetRequest;

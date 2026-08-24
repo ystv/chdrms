@@ -251,14 +251,14 @@ export const zDeleteAssetByIdPath = z.object({
  */
 export const zDeleteAssetByIdResponse = z.void();
 
-export const zGetAssetByIdPath = z.object({
-    id: z.uuid()
+export const zGetAssetByIdOrTagPath = z.object({
+    id: z.unknown()
 });
 
 /**
  * Success
  */
-export const zGetAssetByIdResponse = zAssetDto;
+export const zGetAssetByIdOrTagResponse = zAssetDto;
 
 export const zUpdateAssetByIdBody = zUpdateAssetRequest;
 

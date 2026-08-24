@@ -445,18 +445,14 @@
         "tags": [
           "asset"
         ],
-        "summary": "Get an asset by its ID.",
-        "operationId": "get_asset_by_id",
+        "summary": "Get an asset by its ID or Tag.",
+        "operationId": "get_asset_by_id_or_tag",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "description": "Requested asset ID",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
+            "required": true
           }
         ],
         "responses": {
@@ -481,7 +477,7 @@
             }
           },
           "404": {
-            "description": "Asset by that ID not found",
+            "description": "Asset by that ID or Tag not found",
             "content": {
               "application/json": {
                 "schema": {

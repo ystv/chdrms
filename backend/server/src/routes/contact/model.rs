@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use url::Url;
 use utoipa::ToSchema;
-use uuid::Uuid;
+
+use crate::routes::model::AssetIdentifier;
 
 #[derive(Serialize, ToSchema)]
 pub(super) struct ContactDetailsDto {
@@ -18,11 +19,4 @@ pub(super) struct ContactDetailsLinkDto {
 #[derive(Deserialize)]
 pub(super) struct ContactParameters {
     pub asset: AssetIdentifier,
-}
-
-#[derive(Deserialize)]
-#[serde(untagged)]
-pub(super) enum AssetIdentifier {
-    Id(Uuid),
-    Tag(String),
 }

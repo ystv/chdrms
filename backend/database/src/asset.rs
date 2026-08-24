@@ -63,6 +63,21 @@ impl Asset {
         .await
     }
 
+    pub async fn get_by_tag(
+        txn: &mut sqlx::PgTransaction<'_>,
+        tag: String,
+    ) -> sqlx::Result<Option<Self>> {
+        sqlx::query_as!(
+            Self,
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            FROM assets
+            WHERE tag = $1;"#,
+            tag,
+        )
+        .fetch_optional(&mut **txn)
+        .await
+    }
+
     pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
         sqlx::query_as!(
             Self,
