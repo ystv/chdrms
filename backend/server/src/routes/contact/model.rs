@@ -18,5 +18,5 @@ pub(super) struct ContactDetailsLinkDto {
 
 #[derive(Deserialize)]
 pub(super) struct ContactParameters {
-    pub asset: AssetIdentifier,
+    pub asset: Option<AssetIdentifier>,
 }
