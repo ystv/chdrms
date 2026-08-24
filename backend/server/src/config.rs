@@ -33,6 +33,7 @@ pub struct OIDCProviderConfig {
 #[serde(default)]
 pub struct ContactDetails {
     pub name: Option<String>,
+    pub always_show: bool,
     #[serde(rename = "link")]
     pub links: Vec<ContactLink>,
 }

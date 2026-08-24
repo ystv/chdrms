@@ -34,11 +34,14 @@ async fn get_contact_details(
     State(state): State<AppState>,
     Query(parameters): Query<ContactParameters>,
 ) -> Result<Json<ContactDetailsDto>> {
-    if !Asset::asset_exists(&mut state.transaction().await?, &parameters.asset.into()).await? {
+    if !Asset::asset_exists(&mut state.transaction().await?, &parameters.asset.into()).await?
+        && !state.config.contact_details.always_show
+    {
         return Err(AppError::forbidden("forbidden"));
     }
 
     let details = state.config.contact_details;
+
     Ok(Json(ContactDetailsDto {
         name: details.name,
         links: details
