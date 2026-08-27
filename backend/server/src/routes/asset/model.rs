@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::types::chrono::{DateTime, Utc};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
@@ -66,4 +67,21 @@ pub struct AssetLocations {
 #[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct UpdateAssetLocations {
     pub home: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema)]
+pub struct TimelineEventDto {
+    pub title: String,
+    pub content: String,
+    pub time: DateTime<Utc>,
+
+    #[serde(flatten)]
+    pub r#type: TimelineEventTypeDto,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TimelineEventTypeDto {
+    Comment { comment: Uuid },
+    // Location { location_change: Uuid },
 }
