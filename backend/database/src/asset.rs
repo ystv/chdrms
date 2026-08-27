@@ -2,7 +2,11 @@ use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-use crate::{location::Location, permission::define_permissions};
+use crate::{
+    comment::{Comment, CreateComment},
+    location::Location,
+    permission::define_permissions,
+};
 
 #[schema]
 struct Asset {
@@ -220,6 +224,73 @@ impl Asset {
             ),
         }
         .fetch_one(&mut **txn)
+        .await
+    }
+
+    pub async fn list_comments(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+    ) -> sqlx::Result<Vec<Comment>> {
+        sqlx::query_as!(
+            Comment,
+            r#"SELECT
+                comments.id,
+                comments.archived_at,
+                comments.title,
+                comments.content,
+                comments.created_at,
+                comments.created_by
+            FROM comments
+            LEFT JOIN asset_comments
+            ON comments.id = asset_comments.comment
+            WHERE asset_comments.asset = $1;"#,
+            self.id,
+        )
+        .fetch_all(&mut **txn)
+        .await
+    }
+
+    pub async fn add_comment(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+        comment: CreateComment,
+    ) -> sqlx::Result<Comment> {
+        let comment = super::comment::Comment::create(txn, comment).await?;
+
+        sqlx::query!(
+            r#"INSERT INTO asset_comments(asset, comment)
+            VALUES ($1, $2);"#,
+            self.id,
+            comment.id,
+        )
+        .execute(&mut **txn)
+        .await?;
+
+        Ok(comment)
+    }
+
+    pub async fn get_comment_by_id(
+        &self,
+        txn: &mut sqlx::PgTransaction<'_>,
+        id: Uuid,
+    ) -> sqlx::Result<Option<Comment>> {
+        sqlx::query_as!(
+            Comment,
+            r#"SELECT
+                id,
+                archived_at,
+                title,
+                content,
+                created_by,
+                created_at
+            FROM comments
+            LEFT JOIN asset_comments
+            ON comments.id = asset_comments.comment
+            WHERE asset_comments.asset = $1 AND comments.id = $2;"#,
+            self.id,
+            id,
+        )
+        .fetch_optional(&mut **txn)
         .await
     }
 }
