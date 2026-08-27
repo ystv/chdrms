@@ -1332,6 +1332,232 @@
         }
       }
     },
+    "/labels": {
+      "get": {
+        "tags": [
+          "label"
+        ],
+        "operationId": "list_labels",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LabelDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "label"
+        ],
+        "operationId": "create_label",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLabelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/labels/{id}": {
+      "get": {
+        "tags": [
+          "label"
+        ],
+        "operationId": "get_label_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested label ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Label by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "label"
+        ],
+        "operationId": "update_label_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested label ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLabelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabelDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Label by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "label"
+        ],
+        "operationId": "delete_label_by_id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Requested label ID.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Label by that ID not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations": {
       "get": {
         "tags": [
@@ -2105,6 +2331,8 @@
           "id",
           "type",
           "tag",
+          "labels",
+          "blocks",
           "locations"
         ],
         "properties": {
@@ -2114,6 +2342,13 @@
               "null"
             ],
             "description": "An optional alias for this asset. This is purely for convenience\nin searching for and identifying multiple instances of similar\nassets."
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Block"
+            },
+            "description": "An array of reasons why the asset could be blocked\nby anything, like a label or maintenance job. This field is\nimmutable and only affected by external fields."
           },
           "bundle": {
             "type": [
@@ -2127,6 +2362,14 @@
             "type": "string",
             "format": "uuid",
             "description": "The unique identifier for this asset. This property is immutable."
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "An array of labels attached to this asset. This field is only\nmutable via its dedicated field endpoints."
           },
           "locations": {
             "$ref": "#/components/schemas/AssetLocations"
@@ -2239,6 +2482,29 @@
           }
         }
       },
+      "Block": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "label",
+              "reason"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "reason": {
+                "type": "string",
+                "enum": [
+                  "label"
+                ]
+              }
+            }
+          }
+        ]
+      },
       "ContactDetailsDto": {
         "type": "object",
         "required": [
@@ -2336,6 +2602,33 @@
           }
         }
       },
+      "CreateLabelRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "blocking"
+        ],
+        "properties": {
+          "blocking": {
+            "type": "boolean"
+          },
+          "colour": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "required": [
@@ -2374,6 +2667,38 @@
             "items": {
               "$ref": "#/components/schemas/UserDto"
             }
+          }
+        }
+      },
+      "LabelDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "blocking"
+        ],
+        "properties": {
+          "blocking": {
+            "type": "boolean"
+          },
+          "colour": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -2728,6 +3053,33 @@
           }
         }
       },
+      "UpdateLabelRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "blocking"
+        ],
+        "properties": {
+          "blocking": {
+            "type": "boolean"
+          },
+          "colour": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "UserDto": {
         "type": "object",
         "required": [
@@ -2790,6 +3142,14 @@
     {
       "name": "contact",
       "description": "Contact"
+    },
+    {
+      "name": "asset_bundle",
+      "description": "Asset Bundles"
+    },
+    {
+      "name": "label",
+      "description": "Labels"
     }
   ]
 }
