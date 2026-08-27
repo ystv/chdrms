@@ -839,7 +839,7 @@ export type ListGroupsData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/group';
+    url: '/groups';
 };
 
 export type ListGroupsResponses = {
@@ -855,7 +855,7 @@ export type CreateGroupData = {
     body: CreateGroup;
     path?: never;
     query?: never;
-    url: '/group';
+    url: '/groups';
 };
 
 export type CreateGroupResponses = {
@@ -873,7 +873,7 @@ export type GetGroupByIdData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}';
+    url: '/groups/{group_id}';
 };
 
 export type GetGroupByIdErrors = {
@@ -898,7 +898,7 @@ export type RemoveUserFromGroupData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/members';
+    url: '/groups/{group_id}/members';
 };
 
 export type RemoveUserFromGroupErrors = {
@@ -921,7 +921,7 @@ export type ListGroupMembersData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/members';
+    url: '/groups/{group_id}/members';
 };
 
 export type ListGroupMembersErrors = {
@@ -946,7 +946,7 @@ export type AddUserToGroupData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/members';
+    url: '/groups/{group_id}/members';
 };
 
 export type AddUserToGroupErrors = {
@@ -969,7 +969,7 @@ export type RemovePermissionFromGroupData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/permissions';
+    url: '/groups/{group_id}/permissions';
 };
 
 export type RemovePermissionFromGroupErrors = {
@@ -992,7 +992,7 @@ export type ListGroupPermissionsData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/permissions';
+    url: '/groups/{group_id}/permissions';
 };
 
 export type ListGroupPermissionsErrors = {
@@ -1017,7 +1017,7 @@ export type AddPermissionToGroupData = {
         group_id: string;
     };
     query?: never;
-    url: '/group/{group_id}/permissions';
+    url: '/groups/{group_id}/permissions';
 };
 
 export type AddPermissionToGroupErrors = {
@@ -1070,7 +1070,7 @@ export type ListLocationsData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/location';
+    url: '/locations';
 };
 
 export type ListLocationsErrors = {
@@ -1095,7 +1095,7 @@ export type CreateLocationData = {
     body: Location;
     path?: never;
     query?: never;
-    url: '/location';
+    url: '/locations';
 };
 
 export type CreateLocationErrors = {
@@ -1122,7 +1122,7 @@ export type DeleteLocationByIdData = {
         id: string;
     };
     query?: never;
-    url: '/location/{id}';
+    url: '/locations/{id}';
 };
 
 export type DeleteLocationByIdErrors = {
@@ -1153,7 +1153,7 @@ export type GetLocationByIdData = {
         id: string;
     };
     query?: never;
-    url: '/location/{id}';
+    url: '/locations/{id}';
 };
 
 export type GetLocationByIdErrors = {
@@ -1184,7 +1184,7 @@ export type PatchLocationByIdData = {
         id: string;
     };
     query?: never;
-    url: '/location/{id}';
+    url: '/locations/{id}';
 };
 
 export type PatchLocationByIdErrors = {
@@ -1215,7 +1215,7 @@ export type UpdateLocationByIdData = {
         id: string;
     };
     query?: never;
-    url: '/location/{id}';
+    url: '/locations/{id}';
 };
 
 export type UpdateLocationByIdErrors = {
@@ -1244,7 +1244,7 @@ export type ListManufacturersData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/manufacturer';
+    url: '/manufacturers';
 };
 
 export type ListManufacturersErrors = {
@@ -1269,7 +1269,7 @@ export type CreateManufacturerData = {
     body: Manufacturer;
     path?: never;
     query?: never;
-    url: '/manufacturer';
+    url: '/manufacturers';
 };
 
 export type CreateManufacturerErrors = {
@@ -1296,7 +1296,7 @@ export type DeleteManufacturerByIdData = {
         id: string;
     };
     query?: never;
-    url: '/manufacturer/{id}';
+    url: '/manufacturers/{id}';
 };
 
 export type DeleteManufacturerByIdErrors = {
@@ -1327,7 +1327,7 @@ export type GetManufacturerByIdData = {
         id: string;
     };
     query?: never;
-    url: '/manufacturer/{id}';
+    url: '/manufacturers/{id}';
 };
 
 export type GetManufacturerByIdErrors = {
@@ -1358,7 +1358,7 @@ export type PatchManufacturerByIdData = {
         id: string;
     };
     query?: never;
-    url: '/manufacturer/{id}';
+    url: '/manufacturers/{id}';
 };
 
 export type PatchManufacturerByIdErrors = {
@@ -1389,7 +1389,7 @@ export type UpdateManufacturerByIdData = {
         id: string;
     };
     query?: never;
-    url: '/manufacturer/{id}';
+    url: '/manufacturers/{id}';
 };
 
 export type UpdateManufacturerByIdErrors = {
@@ -1418,7 +1418,7 @@ export type ListUsersData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/user';
+    url: '/users';
 };
 
 export type ListUsersResponses = {
@@ -1434,7 +1434,7 @@ export type GetCurrentUserData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/user/@me';
+    url: '/users/@me';
 };
 
 export type GetCurrentUserResponses = {
@@ -1450,7 +1450,7 @@ export type GetCurrentUserPermissionsData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/user/@me/permissions';
+    url: '/users/@me/permissions';
 };
 
 export type GetCurrentUserPermissionsResponses = {
@@ -1468,7 +1468,7 @@ export type GetUserByIdData = {
         id: string;
     };
     query?: never;
-    url: '/user/{id}';
+    url: '/users/{id}';
 };
 
 export type GetUserByIdErrors = {
