@@ -135,6 +135,21 @@ impl AssetType {
         .fetch_one(&mut **txn)
         .await
     }
+
+    pub async fn list_by_manufacturer_id(
+        txn: &mut sqlx::PgTransaction<'_>,
+        id: Uuid,
+    ) -> sqlx::Result<Vec<AssetType>> {
+        sqlx::query_as!(
+            Self,
+            r#"SELECT id, name, manufacturer, product_url AS "product_url: _", value, created_at, created_by
+            FROM asset_types
+            WHERE manufacturer = $1;"#,
+            id
+        )
+        .fetch_all(&mut **txn)
+        .await
+    }
 }
 
 define_permissions!("asset_types" => View, Manage);

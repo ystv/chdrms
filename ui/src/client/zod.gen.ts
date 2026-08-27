@@ -519,6 +519,15 @@ export const zUpdateManufacturerByIdPath = z.object({
  */
 export const zUpdateManufacturerByIdResponse = zManufacturerInfo;
 
+export const zListManufacturerAssetTypesPath = z.object({
+    id: z.uuid()
+});
+
+/**
+ * Success
+ */
+export const zListManufacturerAssetTypesResponse = z.array(zAssetTypeDto);
+
 /**
  * Success
  */

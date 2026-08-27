@@ -12,6 +12,7 @@ use uuid::Uuid;
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
+    routes::asset_type::AssetTypeDto,
     state::AppState,
 };
 
@@ -267,6 +268,37 @@ async fn patch(
     Ok(Json(manufacturer.into()))
 }
 
+/// List all asset types of given manufacturer.
+#[utoipa::path(
+    get,
+    path = "/{id}/asset-types",
+    tag = TAG,
+    operation_id = "list_manufacturer_asset_types",
+    responses(
+        (status = OK, description = "Success", body = Vec<AssetTypeDto>),
+        (status = UNAUTHORIZED, description = "Missing permission", body = ErrorResponse),
+        (status = NOT_FOUND, description = "Manufacturer by that ID not found", body = ErrorResponse)
+    ),
+)]
+async fn list_asset_types(
+    State(state): State<AppState>,
+    _auth: RequirePermission<chdrms_database::asset_type::permission::View>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<AssetTypeDto>>> {
+    let mut txn = state.transaction().await?;
+    let id = database::Manufacturer::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .id;
+    Ok(Json(
+        chdrms_database::asset_type::AssetType::list_by_manufacturer_id(&mut txn, id)
+            .await?
+            .into_iter()
+            .map(Into::into)
+            .collect(),
+    ))
+}
+
 pub(super) fn routes() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_by_id))
@@ -274,4 +306,5 @@ pub(super) fn routes() -> OpenApiRouter<AppState> {
         .routes(routes!(delete))
         .routes(routes!(update))
         .routes(routes!(patch))
+        .routes(routes!(list_asset_types))
 }

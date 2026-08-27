@@ -1414,6 +1414,37 @@ export type UpdateManufacturerByIdResponses = {
 
 export type UpdateManufacturerByIdResponse = UpdateManufacturerByIdResponses[keyof UpdateManufacturerByIdResponses];
 
+export type ListManufacturerAssetTypesData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/manufacturers/{id}/asset-types';
+};
+
+export type ListManufacturerAssetTypesErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Manufacturer by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type ListManufacturerAssetTypesError = ListManufacturerAssetTypesErrors[keyof ListManufacturerAssetTypesErrors];
+
+export type ListManufacturerAssetTypesResponses = {
+    /**
+     * Success
+     */
+    200: Array<AssetTypeDto>;
+};
+
+export type ListManufacturerAssetTypesResponse = ListManufacturerAssetTypesResponses[keyof ListManufacturerAssetTypesResponses];
+
 export type ListUsersData = {
     body?: never;
     path?: never;

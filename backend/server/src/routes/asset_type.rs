@@ -23,13 +23,13 @@ use crate::{
 pub(super) const TAG: &str = "asset_type";
 
 #[derive(Serialize, ToSchema)]
-struct AssetTypeDto {
-    id: Uuid,
-    name: String,
-    manufacturer: Uuid,
+pub(super) struct AssetTypeDto {
+    pub id: Uuid,
+    pub name: String,
+    pub manufacturer: Uuid,
 
-    product_url: Option<Url>,
-    value: Option<SchemaDecimal>,
+    pub product_url: Option<Url>,
+    pub value: Option<SchemaDecimal>,
 }
 
 impl From<database::AssetType> for AssetTypeDto {
