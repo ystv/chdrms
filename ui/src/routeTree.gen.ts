@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as authenticatedIndexRouteImport } from './routes/(authenticated)/index'
+import { Route as AAssetTagIndexRouteImport } from './routes/a/$assetTag/index'
 import { Route as authenticatedUsersIndexRouteImport } from './routes/(authenticated)/users/index'
 import { Route as authenticatedManufacturersIndexRouteImport } from './routes/(authenticated)/manufacturers/index'
 import { Route as authenticatedLocationsIndexRouteImport } from './routes/(authenticated)/locations/index'
@@ -34,6 +35,11 @@ const authenticatedIndexRoute = authenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => authenticatedRouteRoute,
+} as any)
+const AAssetTagIndexRoute = AAssetTagIndexRouteImport.update({
+  id: '/a/$assetTag/',
+  path: '/a/$assetTag/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const authenticatedUsersIndexRoute = authenticatedUsersIndexRouteImport.update({
   id: '/users/',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/locations/': typeof authenticatedLocationsIndexRoute
   '/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/users/': typeof authenticatedUsersIndexRoute
+  '/a/$assetTag/': typeof AAssetTagIndexRoute
   '/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -104,6 +111,7 @@ export interface FileRoutesByTo {
   '/locations': typeof authenticatedLocationsIndexRoute
   '/manufacturers': typeof authenticatedManufacturersIndexRoute
   '/users': typeof authenticatedUsersIndexRoute
+  '/a/$assetTag': typeof AAssetTagIndexRoute
   '/users/$userID': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/(authenticated)/locations/': typeof authenticatedLocationsIndexRoute
   '/(authenticated)/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/(authenticated)/users/': typeof authenticatedUsersIndexRoute
+  '/a/$assetTag/': typeof AAssetTagIndexRoute
   '/(authenticated)/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/(authenticated)/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/locations/'
     | '/manufacturers/'
     | '/users/'
+    | '/a/$assetTag/'
     | '/users/$userID/'
     | '/users/@me/'
   fileRoutesByTo: FileRoutesByTo
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/locations'
     | '/manufacturers'
     | '/users'
+    | '/a/$assetTag'
     | '/users/$userID'
     | '/users/@me'
   id:
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/locations/'
     | '/(authenticated)/manufacturers/'
     | '/(authenticated)/users/'
+    | '/a/$assetTag/'
     | '/(authenticated)/users/$userID/'
     | '/(authenticated)/users/@me/'
   fileRoutesById: FileRoutesById
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
+  AAssetTagIndexRoute: typeof AAssetTagIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof authenticatedIndexRouteImport
       parentRoute: typeof authenticatedRouteRoute
+    }
+    '/a/$assetTag/': {
+      id: '/a/$assetTag/'
+      path: '/a/$assetTag'
+      fullPath: '/a/$assetTag/'
+      preLoaderRoute: typeof AAssetTagIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(authenticated)/users/': {
       id: '/(authenticated)/users/'
@@ -278,6 +298,7 @@ const authenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
+  AAssetTagIndexRoute: AAssetTagIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
