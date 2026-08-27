@@ -168,13 +168,13 @@ export const getContactDetails = <ThrowOnError extends boolean = false>(options:
 /**
  * List groups.
  */
-export const listGroups = <ThrowOnError extends boolean = false>(options?: Options<ListGroupsData, ThrowOnError>): RequestResult<ListGroupsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListGroupsResponses, unknown, ThrowOnError>({ url: '/group', ...options });
+export const listGroups = <ThrowOnError extends boolean = false>(options?: Options<ListGroupsData, ThrowOnError>): RequestResult<ListGroupsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListGroupsResponses, unknown, ThrowOnError>({ url: '/groups', ...options });
 
 /**
  * Create group.
  */
 export const createGroup = <ThrowOnError extends boolean = false>(options: Options<CreateGroupData, ThrowOnError>): RequestResult<CreateGroupResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateGroupResponses, unknown, ThrowOnError>({
-    url: '/group',
+    url: '/groups',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -185,13 +185,13 @@ export const createGroup = <ThrowOnError extends boolean = false>(options: Optio
 /**
  * Get group.
  */
-export const getGroupById = <ThrowOnError extends boolean = false>(options: Options<GetGroupByIdData, ThrowOnError>): RequestResult<GetGroupByIdResponses, GetGroupByIdErrors, ThrowOnError> => (options.client ?? client).get<GetGroupByIdResponses, GetGroupByIdErrors, ThrowOnError>({ url: '/group/{group_id}', ...options });
+export const getGroupById = <ThrowOnError extends boolean = false>(options: Options<GetGroupByIdData, ThrowOnError>): RequestResult<GetGroupByIdResponses, GetGroupByIdErrors, ThrowOnError> => (options.client ?? client).get<GetGroupByIdResponses, GetGroupByIdErrors, ThrowOnError>({ url: '/groups/{group_id}', ...options });
 
 /**
  * Remove user from group.
  */
 export const removeUserFromGroup = <ThrowOnError extends boolean = false>(options: Options<RemoveUserFromGroupData, ThrowOnError>): RequestResult<RemoveUserFromGroupResponses, RemoveUserFromGroupErrors, ThrowOnError> => (options.client ?? client).delete<RemoveUserFromGroupResponses, RemoveUserFromGroupErrors, ThrowOnError>({
-    url: '/group/{group_id}/members',
+    url: '/groups/{group_id}/members',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -202,13 +202,13 @@ export const removeUserFromGroup = <ThrowOnError extends boolean = false>(option
 /**
  * List group members.
  */
-export const listGroupMembers = <ThrowOnError extends boolean = false>(options: Options<ListGroupMembersData, ThrowOnError>): RequestResult<ListGroupMembersResponses, ListGroupMembersErrors, ThrowOnError> => (options.client ?? client).get<ListGroupMembersResponses, ListGroupMembersErrors, ThrowOnError>({ url: '/group/{group_id}/members', ...options });
+export const listGroupMembers = <ThrowOnError extends boolean = false>(options: Options<ListGroupMembersData, ThrowOnError>): RequestResult<ListGroupMembersResponses, ListGroupMembersErrors, ThrowOnError> => (options.client ?? client).get<ListGroupMembersResponses, ListGroupMembersErrors, ThrowOnError>({ url: '/groups/{group_id}/members', ...options });
 
 /**
  * Add user to group.
  */
 export const addUserToGroup = <ThrowOnError extends boolean = false>(options: Options<AddUserToGroupData, ThrowOnError>): RequestResult<AddUserToGroupResponses, AddUserToGroupErrors, ThrowOnError> => (options.client ?? client).post<AddUserToGroupResponses, AddUserToGroupErrors, ThrowOnError>({
-    url: '/group/{group_id}/members',
+    url: '/groups/{group_id}/members',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ export const addUserToGroup = <ThrowOnError extends boolean = false>(options: Op
  * Revoke permission from group.
  */
 export const removePermissionFromGroup = <ThrowOnError extends boolean = false>(options: Options<RemovePermissionFromGroupData, ThrowOnError>): RequestResult<RemovePermissionFromGroupResponses, RemovePermissionFromGroupErrors, ThrowOnError> => (options.client ?? client).delete<RemovePermissionFromGroupResponses, RemovePermissionFromGroupErrors, ThrowOnError>({
-    url: '/group/{group_id}/permissions',
+    url: '/groups/{group_id}/permissions',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -231,13 +231,13 @@ export const removePermissionFromGroup = <ThrowOnError extends boolean = false>(
 /**
  * List group permissions.
  */
-export const listGroupPermissions = <ThrowOnError extends boolean = false>(options: Options<ListGroupPermissionsData, ThrowOnError>): RequestResult<ListGroupPermissionsResponses, ListGroupPermissionsErrors, ThrowOnError> => (options.client ?? client).get<ListGroupPermissionsResponses, ListGroupPermissionsErrors, ThrowOnError>({ url: '/group/{group_id}/permissions', ...options });
+export const listGroupPermissions = <ThrowOnError extends boolean = false>(options: Options<ListGroupPermissionsData, ThrowOnError>): RequestResult<ListGroupPermissionsResponses, ListGroupPermissionsErrors, ThrowOnError> => (options.client ?? client).get<ListGroupPermissionsResponses, ListGroupPermissionsErrors, ThrowOnError>({ url: '/groups/{group_id}/permissions', ...options });
 
 /**
  * Grant permission to group.
  */
 export const addPermissionToGroup = <ThrowOnError extends boolean = false>(options: Options<AddPermissionToGroupData, ThrowOnError>): RequestResult<AddPermissionToGroupResponses, AddPermissionToGroupErrors, ThrowOnError> => (options.client ?? client).post<AddPermissionToGroupResponses, AddPermissionToGroupErrors, ThrowOnError>({
-    url: '/group/{group_id}/permissions',
+    url: '/groups/{group_id}/permissions',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -258,13 +258,13 @@ export const health2 = <ThrowOnError extends boolean = false>(options?: Options<
 /**
  * List all locations.
  */
-export const listLocations = <ThrowOnError extends boolean = false>(options?: Options<ListLocationsData, ThrowOnError>): RequestResult<ListLocationsResponses, ListLocationsErrors, ThrowOnError> => (options?.client ?? client).get<ListLocationsResponses, ListLocationsErrors, ThrowOnError>({ url: '/location', ...options });
+export const listLocations = <ThrowOnError extends boolean = false>(options?: Options<ListLocationsData, ThrowOnError>): RequestResult<ListLocationsResponses, ListLocationsErrors, ThrowOnError> => (options?.client ?? client).get<ListLocationsResponses, ListLocationsErrors, ThrowOnError>({ url: '/locations', ...options });
 
 /**
  * Create a location.
  */
 export const createLocation = <ThrowOnError extends boolean = false>(options: Options<CreateLocationData, ThrowOnError>): RequestResult<CreateLocationResponses, CreateLocationErrors, ThrowOnError> => (options.client ?? client).post<CreateLocationResponses, CreateLocationErrors, ThrowOnError>({
-    url: '/location',
+    url: '/locations',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -275,18 +275,18 @@ export const createLocation = <ThrowOnError extends boolean = false>(options: Op
 /**
  * Delete a location by its ID.
  */
-export const deleteLocationById = <ThrowOnError extends boolean = false>(options: Options<DeleteLocationByIdData, ThrowOnError>): RequestResult<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError>({ url: '/location/{id}', ...options });
+export const deleteLocationById = <ThrowOnError extends boolean = false>(options: Options<DeleteLocationByIdData, ThrowOnError>): RequestResult<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLocationByIdResponses, DeleteLocationByIdErrors, ThrowOnError>({ url: '/locations/{id}', ...options });
 
 /**
  * Get a location by its ID.
  */
-export const getLocationById = <ThrowOnError extends boolean = false>(options: Options<GetLocationByIdData, ThrowOnError>): RequestResult<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError> => (options.client ?? client).get<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError>({ url: '/location/{id}', ...options });
+export const getLocationById = <ThrowOnError extends boolean = false>(options: Options<GetLocationByIdData, ThrowOnError>): RequestResult<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError> => (options.client ?? client).get<GetLocationByIdResponses, GetLocationByIdErrors, ThrowOnError>({ url: '/locations/{id}', ...options });
 
 /**
  * Patch individual fields of a location by its ID.
  */
 export const patchLocationById = <ThrowOnError extends boolean = false>(options: Options<PatchLocationByIdData, ThrowOnError>): RequestResult<PatchLocationByIdResponses, PatchLocationByIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchLocationByIdResponses, PatchLocationByIdErrors, ThrowOnError>({
-    url: '/location/{id}',
+    url: '/locations/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ export const patchLocationById = <ThrowOnError extends boolean = false>(options:
  * Update all fields of a location by its ID.
  */
 export const updateLocationById = <ThrowOnError extends boolean = false>(options: Options<UpdateLocationByIdData, ThrowOnError>): RequestResult<UpdateLocationByIdResponses, UpdateLocationByIdErrors, ThrowOnError> => (options.client ?? client).put<UpdateLocationByIdResponses, UpdateLocationByIdErrors, ThrowOnError>({
-    url: '/location/{id}',
+    url: '/locations/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -309,13 +309,13 @@ export const updateLocationById = <ThrowOnError extends boolean = false>(options
 /**
  * List all manufacturers.
  */
-export const listManufacturers = <ThrowOnError extends boolean = false>(options?: Options<ListManufacturersData, ThrowOnError>): RequestResult<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError> => (options?.client ?? client).get<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError>({ url: '/manufacturer', ...options });
+export const listManufacturers = <ThrowOnError extends boolean = false>(options?: Options<ListManufacturersData, ThrowOnError>): RequestResult<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError> => (options?.client ?? client).get<ListManufacturersResponses, ListManufacturersErrors, ThrowOnError>({ url: '/manufacturers', ...options });
 
 /**
  * Create a manufacturer.
  */
 export const createManufacturer = <ThrowOnError extends boolean = false>(options: Options<CreateManufacturerData, ThrowOnError>): RequestResult<CreateManufacturerResponses, CreateManufacturerErrors, ThrowOnError> => (options.client ?? client).post<CreateManufacturerResponses, CreateManufacturerErrors, ThrowOnError>({
-    url: '/manufacturer',
+    url: '/manufacturers',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -326,18 +326,18 @@ export const createManufacturer = <ThrowOnError extends boolean = false>(options
 /**
  * Delete a manufacturer by its ID.
  */
-export const deleteManufacturerById = <ThrowOnError extends boolean = false>(options: Options<DeleteManufacturerByIdData, ThrowOnError>): RequestResult<DeleteManufacturerByIdResponses, DeleteManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteManufacturerByIdResponses, DeleteManufacturerByIdErrors, ThrowOnError>({ url: '/manufacturer/{id}', ...options });
+export const deleteManufacturerById = <ThrowOnError extends boolean = false>(options: Options<DeleteManufacturerByIdData, ThrowOnError>): RequestResult<DeleteManufacturerByIdResponses, DeleteManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteManufacturerByIdResponses, DeleteManufacturerByIdErrors, ThrowOnError>({ url: '/manufacturers/{id}', ...options });
 
 /**
  * Get a manufacturer by its ID.
  */
-export const getManufacturerById = <ThrowOnError extends boolean = false>(options: Options<GetManufacturerByIdData, ThrowOnError>): RequestResult<GetManufacturerByIdResponses, GetManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).get<GetManufacturerByIdResponses, GetManufacturerByIdErrors, ThrowOnError>({ url: '/manufacturer/{id}', ...options });
+export const getManufacturerById = <ThrowOnError extends boolean = false>(options: Options<GetManufacturerByIdData, ThrowOnError>): RequestResult<GetManufacturerByIdResponses, GetManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).get<GetManufacturerByIdResponses, GetManufacturerByIdErrors, ThrowOnError>({ url: '/manufacturers/{id}', ...options });
 
 /**
  * Patch individual fields of a manufacturer by its ID.
  */
 export const patchManufacturerById = <ThrowOnError extends boolean = false>(options: Options<PatchManufacturerByIdData, ThrowOnError>): RequestResult<PatchManufacturerByIdResponses, PatchManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).patch<PatchManufacturerByIdResponses, PatchManufacturerByIdErrors, ThrowOnError>({
-    url: '/manufacturer/{id}',
+    url: '/manufacturers/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -349,7 +349,7 @@ export const patchManufacturerById = <ThrowOnError extends boolean = false>(opti
  * Update all fields of a manufacturer by its ID.
  */
 export const updateManufacturerById = <ThrowOnError extends boolean = false>(options: Options<UpdateManufacturerByIdData, ThrowOnError>): RequestResult<UpdateManufacturerByIdResponses, UpdateManufacturerByIdErrors, ThrowOnError> => (options.client ?? client).put<UpdateManufacturerByIdResponses, UpdateManufacturerByIdErrors, ThrowOnError>({
-    url: '/manufacturer/{id}',
+    url: '/manufacturers/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -360,19 +360,19 @@ export const updateManufacturerById = <ThrowOnError extends boolean = false>(opt
 /**
  * List all users.
  */
-export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>): RequestResult<ListUsersResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListUsersResponses, unknown, ThrowOnError>({ url: '/user', ...options });
+export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>): RequestResult<ListUsersResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListUsersResponses, unknown, ThrowOnError>({ url: '/users', ...options });
 
 /**
  * Get current user.
  */
-export const getCurrentUser = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentUserData, ThrowOnError>): RequestResult<GetCurrentUserResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetCurrentUserResponses, unknown, ThrowOnError>({ url: '/user/@me', ...options });
+export const getCurrentUser = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentUserData, ThrowOnError>): RequestResult<GetCurrentUserResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetCurrentUserResponses, unknown, ThrowOnError>({ url: '/users/@me', ...options });
 
 /**
  * Get the current user's permissions.
  */
-export const getCurrentUserPermissions = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentUserPermissionsData, ThrowOnError>): RequestResult<GetCurrentUserPermissionsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetCurrentUserPermissionsResponses, unknown, ThrowOnError>({ url: '/user/@me/permissions', ...options });
+export const getCurrentUserPermissions = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentUserPermissionsData, ThrowOnError>): RequestResult<GetCurrentUserPermissionsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetCurrentUserPermissionsResponses, unknown, ThrowOnError>({ url: '/users/@me/permissions', ...options });
 
 /**
  * Get a user by their ID.
  */
-export const getUserById = <ThrowOnError extends boolean = false>(options: Options<GetUserByIdData, ThrowOnError>): RequestResult<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError> => (options.client ?? client).get<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError>({ url: '/user/{id}', ...options });
+export const getUserById = <ThrowOnError extends boolean = false>(options: Options<GetUserByIdData, ThrowOnError>): RequestResult<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError> => (options.client ?? client).get<GetUserByIdResponses, GetUserByIdErrors, ThrowOnError>({ url: '/users/{id}', ...options });

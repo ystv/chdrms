@@ -993,7 +993,7 @@
         }
       }
     },
-    "/group": {
+    "/groups": {
       "get": {
         "tags": [
           "group"
@@ -1046,7 +1046,7 @@
         }
       }
     },
-    "/group/{group_id}": {
+    "/groups/{group_id}": {
       "get": {
         "tags": [
           "group"
@@ -1081,7 +1081,7 @@
         }
       }
     },
-    "/group/{group_id}/members": {
+    "/groups/{group_id}/members": {
       "get": {
         "tags": [
           "group"
@@ -1188,7 +1188,7 @@
         }
       }
     },
-    "/group/{group_id}/permissions": {
+    "/groups/{group_id}/permissions": {
       "get": {
         "tags": [
           "group"
@@ -1332,7 +1332,7 @@
         }
       }
     },
-    "/location": {
+    "/locations": {
       "get": {
         "tags": [
           "location"
@@ -1405,7 +1405,7 @@
         }
       }
     },
-    "/location/{id}": {
+    "/locations/{id}": {
       "get": {
         "tags": [
           "location"
@@ -1620,7 +1620,7 @@
         }
       }
     },
-    "/manufacturer": {
+    "/manufacturers": {
       "get": {
         "tags": [
           "manufacturer"
@@ -1693,7 +1693,7 @@
         }
       }
     },
-    "/manufacturer/{id}": {
+    "/manufacturers/{id}": {
       "get": {
         "tags": [
           "manufacturer"
@@ -1908,7 +1908,7 @@
         }
       }
     },
-    "/user": {
+    "/users": {
       "get": {
         "tags": [
           "user"
@@ -1932,7 +1932,7 @@
         }
       }
     },
-    "/user/@me": {
+    "/users/@me": {
       "get": {
         "tags": [
           "user"
@@ -1953,7 +1953,7 @@
         }
       }
     },
-    "/user/@me/permissions": {
+    "/users/@me/permissions": {
       "get": {
         "tags": [
           "user"
@@ -1977,7 +1977,7 @@
         }
       }
     },
-    "/user/{id}": {
+    "/users/{id}": {
       "get": {
         "tags": [
           "user"
