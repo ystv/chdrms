@@ -11,7 +11,9 @@ use utoipa::{PartialSchema, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
-use chdrms_database::{PatchField, asset_type as database, manufacturer::Manufacturer};
+use chdrms_database::{
+    PatchField, asset::AssetRepository, asset_type as database, manufacturer::Manufacturer,
+};
 
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
@@ -192,17 +194,25 @@ async fn list_assets_of_asset_type(
     _auth: RequirePermission<database::permission::View>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<AssetDto>>> {
-    let mut txn = state.transaction().await?;
+    use chdrms_database::asset::GetAssetsByTypeIdError;
 
     // check if the asset type exists
-    let id = database::AssetType::get_by_id(&mut txn, id)
+    // todo: this check could do less
+    let id = database::AssetType::get_by_id(&mut state.transaction().await?, id)
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .id;
 
     Ok(Json(
-        chdrms_database::asset::Asset::list_of_type(id, &mut state.transaction().await?)
-            .await?
+        state
+            .repository
+            .get_assets_by_type_id(id)
+            .await
+            .map_err(|err| match err {
+                GetAssetsByTypeIdError::Backend => {
+                    AppError::internal_server_error("internal server error")
+                }
+            })?
             .into_iter()
             .map(|asset| AssetDto {
                 id: asset.id,

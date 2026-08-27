@@ -1,8 +1,10 @@
 use chdrms_database_macros::schema;
 use chrono::{DateTime, Utc};
+use thiserror::Error;
+use tracing::error;
 use uuid::Uuid;
 
-use crate::{location::Location, permission::define_permissions};
+use crate::{Postgres, permission::define_permissions};
 
 #[schema]
 struct Asset {
@@ -25,13 +27,131 @@ struct Asset {
     created_by: Uuid,
 }
 
-impl Asset {
-    pub async fn create(
-        txn: &mut sqlx::PgTransaction<'_>,
-        asset: CreateAsset,
-    ) -> sqlx::Result<Self> {
+pub trait AssetRepository {
+    fn get_assets_by_bundle_id(
+        &self,
+        id: Uuid,
+    ) -> impl Future<Output = Result<Vec<Asset>, GetAssetsByBundleIdError>> + Send;
+
+    fn create_asset(
+        &self,
+        asset: &CreateAsset,
+    ) -> impl Future<Output = Result<Asset, CreateAssetError>> + Send;
+
+    fn get_asset_by_id(
+        &self,
+        id: Uuid,
+    ) -> impl Future<Output = Result<Option<Asset>, GetAssetByIdError>> + Send;
+
+    fn delete_asset_by_id(
+        &self,
+        id: Uuid,
+    ) -> impl Future<Output = Result<(), DeleteAssetByIdError>> + Send;
+
+    fn update_asset_by_id(
+        &self,
+        id: Uuid,
+        asset: &UpdateAsset,
+    ) -> impl Future<Output = Result<Asset, UpdateAssetByIdError>> + Send;
+
+    fn list_assets(&self) -> impl Future<Output = Result<Vec<Asset>, ListAssetsError>> + Send;
+
+    fn get_assets_by_type_id(
+        &self,
+        id: Uuid,
+    ) -> impl Future<Output = Result<Vec<Asset>, GetAssetsByTypeIdError>> + Send;
+
+    fn set_asset_location_by_id(
+        &self,
+        asset: Uuid,
+        location: Uuid,
+    ) -> impl Future<Output = Result<Asset, SetAssetLocationByIdError>> + Send;
+}
+
+#[derive(Debug, Error)]
+pub enum GetAssetsByBundleIdError {
+    #[error("backend error")]
+    Backend,
+}
+
+#[derive(Debug, Error)]
+pub enum CreateAssetError {
+    #[error("backend error")]
+    Backend,
+    #[error("relationship error")]
+    Relationship,
+}
+
+#[derive(Debug, Error)]
+pub enum GetAssetByIdError {
+    #[error("backend error")]
+    Backend,
+}
+
+#[derive(Debug, Error)]
+pub enum DeleteAssetByIdError {
+    #[error("backend error")]
+    Backend,
+    #[error("relationship error")]
+    Relationship,
+    #[error("not found")]
+    NotFound,
+}
+
+#[derive(Debug, Error)]
+pub enum UpdateAssetByIdError {
+    #[error("backend error")]
+    Backend,
+    #[error("relationship error")]
+    Relationship,
+    #[error("not found")]
+    NotFound,
+}
+
+#[derive(Debug, Error)]
+pub enum ListAssetsError {
+    #[error("backend error")]
+    Backend,
+}
+
+#[derive(Debug, Error)]
+pub enum GetAssetsByTypeIdError {
+    #[error("backend error")]
+    Backend,
+}
+
+#[derive(Debug, Error)]
+pub enum SetAssetLocationByIdError {
+    #[error("backend error")]
+    Backend,
+    #[error("relationship error")]
+    Relationship,
+    #[error("not found")]
+    NotFound,
+}
+
+impl AssetRepository for Postgres {
+    async fn get_assets_by_bundle_id(
+        &self,
+        id: Uuid,
+    ) -> Result<Vec<Asset>, GetAssetsByBundleIdError> {
         sqlx::query_as!(
-            Self,
+            Asset,
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            FROM assets
+            WHERE bundle = $1;"#,
+            id,
+        )
+        .fetch_all(&mut *self.transaction().await?)
+        .await
+        .map_err(Into::into)
+    }
+
+    async fn create_asset(&self, asset: &CreateAsset) -> Result<Asset, CreateAssetError> {
+        let mut txn = self.transaction().await?;
+
+        let asset = sqlx::query_as!(
+            Asset,
             r#"INSERT INTO assets(type, alias, notes, tag, bundle, home_location, location, created_by)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
@@ -44,95 +164,57 @@ impl Asset {
             asset.location,
             asset.created_by,
         )
-        .fetch_one(&mut **txn)
-        .await
+        .fetch_one(&mut *txn)
+        .await?;
+
+        txn.commit().await?;
+
+        Ok(asset)
     }
 
-    pub async fn get_by_id(
-        txn: &mut sqlx::PgTransaction<'_>,
-        id: Uuid,
-    ) -> sqlx::Result<Option<Self>> {
+    async fn get_asset_by_id(&self, id: Uuid) -> Result<Option<Asset>, GetAssetByIdError> {
         sqlx::query_as!(
-            Self,
+            Asset,
             r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
             FROM assets
             WHERE id = $1;"#,
             id,
         )
-        .fetch_optional(&mut **txn)
-        .await
+         .fetch_optional(&mut *self.transaction().await?)
+         .await
+         .map_err(Into::into)
     }
 
-    pub async fn get_by_tag(
-        txn: &mut sqlx::PgTransaction<'_>,
-        tag: String,
-    ) -> sqlx::Result<Option<Self>> {
-        sqlx::query_as!(
-            Self,
-            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
-            FROM assets
-            WHERE tag = $1;"#,
-            tag,
-        )
-        .fetch_optional(&mut **txn)
-        .await
-    }
+    async fn delete_asset_by_id(&self, id: Uuid) -> Result<(), DeleteAssetByIdError> {
+        let mut txn = self.transaction().await?;
 
-    pub async fn list(txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Vec<Self>> {
-        sqlx::query_as!(
-            Self,
-            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
-            FROM assets;"#,
-        )
-        .fetch_all(&mut **txn)
-        .await
-    }
-
-    pub async fn list_of_type(
-        r#type: Uuid,
-        txn: &mut sqlx::PgTransaction<'_>,
-    ) -> sqlx::Result<Vec<Asset>> {
-        sqlx::query_as!(
-            Asset,
-            r#"SELECT
-                id,
-                type,
-                alias,
-                notes,
-                tag,
-                bundle,
-                home_location,
-                location,
-                created_at,
-                created_by
-            FROM assets
-            WHERE type = $1;"#,
-            r#type,
-        )
-        .fetch_all(&mut **txn)
-        .await
-    }
-
-    pub async fn delete(self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<bool> {
         let result = sqlx::query_as!(
-            Self,
+            Asset,
             r#"DELETE FROM assets
             WHERE id = $1;"#,
-            self.id,
+            id,
         )
-        .execute(&mut **txn)
+        .execute(&mut *txn)
         .await?;
 
-        Ok(result.rows_affected() != 0)
+        if result.rows_affected() == 0 {
+            return Err(DeleteAssetByIdError::NotFound);
+        }
+
+        txn.commit().await?;
+
+        Ok(())
     }
 
-    pub async fn update(
-        self,
-        txn: &mut sqlx::PgTransaction<'_>,
-        update: UpdateAsset,
-    ) -> sqlx::Result<Self> {
-        sqlx::query_as!(
-            Self,
+    async fn update_asset_by_id(
+        &self,
+        id: Uuid,
+        asset: &UpdateAsset,
+    ) -> Result<Asset, UpdateAssetByIdError> {
+        let mut txn = self.transaction().await?;
+
+        let asset = sqlx::query_as!(
+            Asset,
             r#"UPDATE assets
             SET
                 alias = $2,
@@ -153,50 +235,176 @@ impl Asset {
                 location,
                 created_at,
                 created_by;"#,
-            self.id,
-            update.alias,
-            update.notes,
-            update.tag,
-            update.bundle,
-            update.home_location,
-            update.location,
+            id,
+            asset.alias,
+            asset.notes,
+            asset.tag,
+            asset.bundle,
+            asset.home_location,
+            asset.location,
         )
-        .fetch_one(&mut **txn)
-        .await
+        // todo: switch this to fetch_one as it throws
+        //       an error when not found, which is more
+        //       idiomatic than handling an Option.
+        .fetch_optional(&mut *txn)
+        .await?;
+
+        let Some(asset) = asset else {
+            return Err(UpdateAssetByIdError::NotFound);
+        };
+
+        txn.commit().await?;
+
+        Ok(asset)
     }
 
-    pub async fn set_location(
-        &self,
-        txn: &mut sqlx::PgTransaction<'_>,
-        location: Uuid,
-    ) -> sqlx::Result<Self> {
+    async fn list_assets(&self) -> Result<Vec<Asset>, ListAssetsError> {
         sqlx::query_as!(
-            Self,
+            Asset,
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            FROM assets;"#,
+        )
+        .fetch_all(&mut *self.transaction().await?)
+        .await
+        .map_err(Into::into)
+    }
+
+    async fn get_assets_by_type_id(&self, id: Uuid) -> Result<Vec<Asset>, GetAssetsByTypeIdError> {
+        sqlx::query_as!(
+            Asset,
+            r#"SELECT
+                id,
+                type,
+                alias,
+                notes,
+                tag,
+                bundle,
+                home_location,
+                location,
+                created_at,
+                created_by
+            FROM assets
+            WHERE type = $1;"#,
+            id,
+        )
+        .fetch_all(&mut *self.transaction().await?)
+        .await
+        .map_err(Into::into)
+    }
+
+    async fn set_asset_location_by_id(
+        &self,
+        asset: Uuid,
+        location: Uuid,
+    ) -> Result<Asset, SetAssetLocationByIdError> {
+        let mut txn = self.transaction().await?;
+
+        let asset = sqlx::query_as!(
+            Asset,
             r#"UPDATE assets
             SET location = $2
             WHERE id = $1
             RETURNING id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by;"#,
-            &self.id,
+            asset,
             location,
         )
-        .fetch_one(&mut **txn)
-        .await
-    }
+         .fetch_one(&mut *txn)
+         .await?;
 
-    pub async fn get_location(&self, txn: &mut sqlx::PgTransaction<'_>) -> sqlx::Result<Location> {
-        sqlx::query_as!(
-            Location,
-            r#"SELECT locations.id, locations.name, locations.description, locations.coordinates, locations.created_at, locations.created_by
-            FROM locations
-            LEFT JOIN assets
-            ON locations.id = assets.location
-            WHERE assets.id = $1;"#,
-            &self.id,
-        )
-        .fetch_one(&mut **txn)
-        .await
-    }
+        txn.commit().await?;
 
+        Ok(asset)
+    }
+}
+
+pub enum AssetIdentifier {
+    Id(Uuid),
+    Tag(String),
+}
+
+impl From<sqlx::Error> for GetAssetsByBundleIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        GetAssetsByBundleIdError::Backend
+    }
+}
+
+impl From<sqlx::Error> for CreateAssetError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::Database(err) => match err.kind() {
+                sqlx::error::ErrorKind::ForeignKeyViolation => CreateAssetError::Relationship,
+                _ => CreateAssetError::Backend,
+            },
+            _ => CreateAssetError::Backend,
+        }
+    }
+}
+
+impl From<sqlx::Error> for GetAssetByIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        GetAssetByIdError::Backend
+    }
+}
+
+impl From<sqlx::Error> for DeleteAssetByIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::Database(err) => match err.kind() {
+                sqlx::error::ErrorKind::ForeignKeyViolation => DeleteAssetByIdError::Relationship,
+                _ => DeleteAssetByIdError::Backend,
+            },
+            _ => DeleteAssetByIdError::Backend,
+        }
+    }
+}
+
+impl From<sqlx::Error> for UpdateAssetByIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::Database(err) => match err.kind() {
+                sqlx::error::ErrorKind::ForeignKeyViolation => UpdateAssetByIdError::Relationship,
+                _ => UpdateAssetByIdError::Backend,
+            },
+            _ => UpdateAssetByIdError::Backend,
+        }
+    }
+}
+
+impl From<sqlx::Error> for ListAssetsError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        ListAssetsError::Backend
+    }
+}
+
+impl From<sqlx::Error> for GetAssetsByTypeIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        GetAssetsByTypeIdError::Backend
+    }
+}
+
+impl From<sqlx::Error> for SetAssetLocationByIdError {
+    fn from(err: sqlx::Error) -> Self {
+        error!(error = ?err, "database error occurred");
+        match err {
+            sqlx::Error::Database(err) => match err.kind() {
+                sqlx::error::ErrorKind::ForeignKeyViolation => {
+                    SetAssetLocationByIdError::Relationship
+                }
+                _ => SetAssetLocationByIdError::Backend,
+            },
+            _ => SetAssetLocationByIdError::Backend,
+        }
+    }
+}
+
+impl Asset {
     pub async fn asset_exists(
         txn: &mut sqlx::PgTransaction<'_>,
         identifier: &AssetIdentifier,
@@ -222,11 +430,21 @@ impl Asset {
         .fetch_one(&mut **txn)
         .await
     }
-}
 
-pub enum AssetIdentifier {
-    Id(Uuid),
-    Tag(String),
+    pub async fn get_by_tag(
+        txn: &mut sqlx::PgTransaction<'_>,
+        tag: String,
+    ) -> sqlx::Result<Option<Self>> {
+        sqlx::query_as!(
+            Self,
+            r#"SELECT id, type, alias, notes, tag, bundle, home_location, location, created_at, created_by
+            FROM assets
+            WHERE tag = $1;"#,
+            tag,
+        )
+        .fetch_optional(&mut **txn)
+        .await
+    }
 }
 
 define_permissions!("assets" => View, Manage);
