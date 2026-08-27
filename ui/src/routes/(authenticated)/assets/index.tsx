@@ -4,6 +4,7 @@ import { listAssetsOptions } from '#/client/@tanstack/react-query.gen';
 import { zCreateAssetBody } from '#/client/zod.gen';
 import { useAppForm } from '#/components/form';
 import {
+  ActionIcon,
   Button,
   Checkbox,
   Group,
@@ -15,7 +16,8 @@ import {
 import { useDisclosure } from '@mantine/hooks';
 import { revalidateLogic } from '@tanstack/react-form';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { ArrowRightIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export const Route = createFileRoute('/(authenticated)/assets/')({
@@ -53,7 +55,12 @@ function RouteComponent() {
           {assets.data?.map((asset) => (
             <Table.Tr key={asset.id}>
               <Table.Td>
-                <Group>{asset.tag}</Group>
+                <Group>
+                  {asset.tag}
+                  <ActionIcon ml={'auto'} component={Link} to={`./${asset.id}`}>
+                    <ArrowRightIcon />
+                  </ActionIcon>
+                </Group>
               </Table.Td>
             </Table.Tr>
           ))}

@@ -1,6 +1,6 @@
-import { getContactDetails } from '#/client';
+import { getContactDetails, getCurrentUser } from '#/client';
 import { Title } from '@mantine/core';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router';
 import z from 'zod';
 
 export const Route = createFileRoute('/a/$assetTag/')({
@@ -16,6 +16,13 @@ export const Route = createFileRoute('/a/$assetTag/')({
 
     if (!contactDetails.data) {
       throw notFound();
+    }
+
+    const me = await getCurrentUser();
+
+    if (me.data) {
+      console.log('User logged in, redirecting to asset page');
+      throw redirect({ to: `/assets/$assetID`, params: { assetID: assetTag } });
     }
 
     return { contactDetails };

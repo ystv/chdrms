@@ -21,6 +21,7 @@ import { Route as authenticatedAssetsIndexRouteImport } from './routes/(authenti
 import { Route as authenticatedAssetTypesIndexRouteImport } from './routes/(authenticated)/asset-types/index'
 import { Route as authenticatedUsersAtmeIndexRouteImport } from './routes/(authenticated)/users/@me/index'
 import { Route as authenticatedUsersUserIDIndexRouteImport } from './routes/(authenticated)/users/$userID/index'
+import { Route as authenticatedAssetsAssetIDIndexRouteImport } from './routes/(authenticated)/assets/$assetID/index'
 
 const authenticatedRouteRoute = authenticatedRouteRouteImport.update({
   id: '/(authenticated)',
@@ -88,6 +89,12 @@ const authenticatedUsersUserIDIndexRoute =
     path: '/users/$userID/',
     getParentRoute: () => authenticatedRouteRoute,
   } as any)
+const authenticatedAssetsAssetIDIndexRoute =
+  authenticatedAssetsAssetIDIndexRouteImport.update({
+    id: '/assets/$assetID/',
+    path: '/assets/$assetID/',
+    getParentRoute: () => authenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof authenticatedIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/users/': typeof authenticatedUsersIndexRoute
   '/a/$assetTag/': typeof AAssetTagIndexRoute
+  '/assets/$assetID/': typeof authenticatedAssetsAssetIDIndexRoute
   '/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/manufacturers': typeof authenticatedManufacturersIndexRoute
   '/users': typeof authenticatedUsersIndexRoute
   '/a/$assetTag': typeof AAssetTagIndexRoute
+  '/assets/$assetID': typeof authenticatedAssetsAssetIDIndexRoute
   '/users/$userID': typeof authenticatedUsersUserIDIndexRoute
   '/users/@me': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -127,6 +136,7 @@ export interface FileRoutesById {
   '/(authenticated)/manufacturers/': typeof authenticatedManufacturersIndexRoute
   '/(authenticated)/users/': typeof authenticatedUsersIndexRoute
   '/a/$assetTag/': typeof AAssetTagIndexRoute
+  '/(authenticated)/assets/$assetID/': typeof authenticatedAssetsAssetIDIndexRoute
   '/(authenticated)/users/$userID/': typeof authenticatedUsersUserIDIndexRoute
   '/(authenticated)/users/@me/': typeof authenticatedUsersAtmeIndexRoute
 }
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/manufacturers/'
     | '/users/'
     | '/a/$assetTag/'
+    | '/assets/$assetID/'
     | '/users/$userID/'
     | '/users/@me/'
   fileRoutesByTo: FileRoutesByTo
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/manufacturers'
     | '/users'
     | '/a/$assetTag'
+    | '/assets/$assetID'
     | '/users/$userID'
     | '/users/@me'
   id:
@@ -169,6 +181,7 @@ export interface FileRouteTypes {
     | '/(authenticated)/manufacturers/'
     | '/(authenticated)/users/'
     | '/a/$assetTag/'
+    | '/(authenticated)/assets/$assetID/'
     | '/(authenticated)/users/$userID/'
     | '/(authenticated)/users/@me/'
   fileRoutesById: FileRoutesById
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authenticatedUsersUserIDIndexRouteImport
       parentRoute: typeof authenticatedRouteRoute
     }
+    '/(authenticated)/assets/$assetID/': {
+      id: '/(authenticated)/assets/$assetID/'
+      path: '/assets/$assetID'
+      fullPath: '/assets/$assetID/'
+      preLoaderRoute: typeof authenticatedAssetsAssetIDIndexRouteImport
+      parentRoute: typeof authenticatedRouteRoute
+    }
   }
 }
 
@@ -276,6 +296,7 @@ interface authenticatedRouteRouteChildren {
   authenticatedLocationsIndexRoute: typeof authenticatedLocationsIndexRoute
   authenticatedManufacturersIndexRoute: typeof authenticatedManufacturersIndexRoute
   authenticatedUsersIndexRoute: typeof authenticatedUsersIndexRoute
+  authenticatedAssetsAssetIDIndexRoute: typeof authenticatedAssetsAssetIDIndexRoute
   authenticatedUsersUserIDIndexRoute: typeof authenticatedUsersUserIDIndexRoute
   authenticatedUsersAtmeIndexRoute: typeof authenticatedUsersAtmeIndexRoute
 }
@@ -288,6 +309,7 @@ const authenticatedRouteRouteChildren: authenticatedRouteRouteChildren = {
   authenticatedLocationsIndexRoute: authenticatedLocationsIndexRoute,
   authenticatedManufacturersIndexRoute: authenticatedManufacturersIndexRoute,
   authenticatedUsersIndexRoute: authenticatedUsersIndexRoute,
+  authenticatedAssetsAssetIDIndexRoute: authenticatedAssetsAssetIDIndexRoute,
   authenticatedUsersUserIDIndexRoute: authenticatedUsersUserIDIndexRoute,
   authenticatedUsersAtmeIndexRoute: authenticatedUsersAtmeIndexRoute,
 }
