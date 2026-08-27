@@ -1,3 +1,4 @@
+use chdrms_database::asset::AssetId;
 use serde::Deserialize;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -12,7 +13,7 @@ pub enum AssetIdentifier {
 impl From<AssetIdentifier> for chdrms_database::asset::AssetIdentifier {
     fn from(identifier: AssetIdentifier) -> Self {
         match identifier {
-            AssetIdentifier::Id(id) => Self::Id(id),
+            AssetIdentifier::Id(id) => Self::Id(AssetId::new(id)), // todo: this probably isn't safe
             AssetIdentifier::Tag(tag) => Self::Tag(tag),
         }
     }
