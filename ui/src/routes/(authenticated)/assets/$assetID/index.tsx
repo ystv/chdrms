@@ -11,7 +11,7 @@ import {
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router';
 import z from 'zod';
 
 export const Route = createFileRoute('/(authenticated)/assets/$assetID/')({
@@ -25,6 +25,13 @@ export const Route = createFileRoute('/(authenticated)/assets/$assetID/')({
 
     if (!asset.data) {
       throw notFound();
+    }
+
+    if (asset.data.id !== assetID) {
+      throw redirect({
+        to: '/assets/$assetID',
+        params: { assetID: asset.data.id },
+      });
     }
 
     return { asset };
