@@ -38,6 +38,7 @@ jobs:
               type=semver,pattern={{major}}
               type=ref,event=branch
               type=ref,event=pr
+              type=sha,format=long,prefix=
       - uses: docker/build-push-action@v7
         with:
           context: .
