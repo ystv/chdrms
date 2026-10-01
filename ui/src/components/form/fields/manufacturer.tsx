@@ -15,10 +15,12 @@ export default function ManufacturerField(props: SelectProps) {
   return (
     <Select
       {...props}
-      data={manufacturers.data?.map((m) => ({
-        value: m.id,
-        label: m.name,
-      }))}
+      data={manufacturers.data
+        ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+        .map((m) => ({
+          value: m.id,
+          label: m.name,
+        }))}
       searchable
       value={field.state.value}
       onChange={(e) => field.handleChange(e)}

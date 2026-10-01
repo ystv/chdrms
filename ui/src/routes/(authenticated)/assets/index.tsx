@@ -1,6 +1,10 @@
 import { createAsset } from '#/client';
 import type { CreateAssetRequest } from '#/client';
-import { listAssetsOptions } from '#/client/@tanstack/react-query.gen';
+import {
+  listAssetsOptions,
+  listAssetTypesOptions,
+  listManufacturersOptions,
+} from '#/client/@tanstack/react-query.gen';
 import { zCreateAssetBody } from '#/client/zod.gen';
 import { useAppForm } from '#/components/form';
 import {
@@ -26,11 +30,18 @@ export const Route = createFileRoute('/(authenticated)/assets/')({
 
 function RouteComponent() {
   const assets = useQuery({ ...listAssetsOptions() });
+  const assetTypes = useQuery({ ...listAssetTypesOptions() });
+  const manufacturers = useQuery({ ...listManufacturersOptions() });
 
   const [
     createModalOpened,
     { open: openCreateModal, close: closeCreateModal },
   ] = useDisclosure(false);
+
+  const assetTypesWithManufacturers = assetTypes.data?.map((type) => ({
+    ...type,
+    manufacturer: manufacturers.data?.find((v) => v.id == type.manufacturer),
+  }));
 
   return (
     <Stack>
@@ -49,21 +60,32 @@ function RouteComponent() {
         <Table.Thead>
           <Table.Tr>
             <Table.Th>Tag</Table.Th>
+            <Table.Th>Alias</Table.Th>
+            <Table.Th>Type</Table.Th>
+            <Table.Th>Manufacturer</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {assets.data?.map((asset) => (
-            <Table.Tr key={asset.id}>
-              <Table.Td>
+          {assets.data
+            ?.map((asset) => ({
+              ...asset,
+              type: assetTypesWithManufacturers?.find(
+                (v) => v.id == asset.type,
+              ),
+            }))
+            .map((asset) => (
+              <Table.Tr key={asset.id}>
+                <Table.Td>{asset.tag}</Table.Td>
+                <Table.Td>{asset.alias}</Table.Td>
+                <Table.Td>{asset.type!.name}</Table.Td>
                 <Group>
-                  {asset.tag}
+                  <Table.Td>{asset.type!.manufacturer!.name}</Table.Td>
                   <ActionIcon ml={'auto'} component={Link} to={`./${asset.id}`}>
                     <ArrowRightIcon />
                   </ActionIcon>
                 </Group>
-              </Table.Td>
-            </Table.Tr>
-          ))}
+              </Table.Tr>
+            ))}
         </Table.Tbody>
       </Table>
     </Stack>
