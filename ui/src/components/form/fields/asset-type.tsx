@@ -19,10 +19,23 @@ export default function AssetTypeField(props: SelectProps) {
   return (
     <Select
       {...props}
-      data={assetTypes.data?.map((a) => ({
-        value: a.id,
-        label: `${manufacturers.data?.find((v) => v.id == a.manufacturer)!.name} - ${a.name}`,
-      }))}
+      data={assetTypes.data
+        ?.map((type) => ({
+          ...type,
+          manufacturer: manufacturers.data?.find(
+            (v) => v.id == type.manufacturer,
+          ),
+        }))
+        .sort((a, b) =>
+          `${a.manufacturer!.name} ${a.name}` >
+          `${b.manufacturer!.name} ${b.name}`
+            ? 1
+            : -1,
+        )
+        .map((a) => ({
+          value: a.id,
+          label: `${a.manufacturer!.name} - ${a.name}`,
+        }))}
       searchable
       value={field.state.value}
       onChange={(e) => field.handleChange(e)}

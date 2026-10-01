@@ -32,15 +32,17 @@ function SubscribeButton(props: ButtonProps) {
   );
 }
 
+export const fieldComponents = {
+  AssetTypeField,
+  LocationField,
+  ManufacturerField,
+  NumberAsStringField,
+  NumberField,
+  TextField,
+};
+
 export const { useAppForm } = createFormHook({
-  fieldComponents: {
-    AssetTypeField,
-    LocationField,
-    ManufacturerField,
-    NumberAsStringField,
-    NumberField,
-    TextField,
-  },
+  fieldComponents: fieldComponents,
   formComponents: { SubscribeButton },
   fieldContext,
   formContext,
