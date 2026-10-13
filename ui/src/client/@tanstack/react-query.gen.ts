@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addPermissionToGroup, addUserToGroup, createAsset, createAssetBundle, createAssetType, createGroup, createLocation, createManufacturer, deleteAssetBundle, deleteAssetById, deleteAssetTypeById, deleteLocationById, deleteManufacturerById, getAssetBundleById, getAssetByIdOrTag, getAssetLocation, getAssetsWithinBundleById, getAssetTypeById, getContactDetails, getCurrentUser, getCurrentUserPermissions, getGroupById, getLocationById, getManufacturerById, getUserById, health, listAssetBundles, listAssets, listAssetsOfAssetType, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listLocations, listManufacturerAssetTypes, listManufacturers, listUsers, type Options, patchAssetTypeById, patchLocationById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, setAssetLocation, updateAssetById, updateAssetTypeById, updateLocationById, updateManufacturerById } from '../sdk.gen';
-import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetBundleData, CreateAssetBundleError, CreateAssetBundleResponse, CreateAssetData, CreateAssetError, CreateAssetResponse, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateLocationData, CreateLocationError, CreateLocationResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetBundleData, DeleteAssetBundleError, DeleteAssetBundleResponse, DeleteAssetByIdData, DeleteAssetByIdError, DeleteAssetByIdResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteLocationByIdData, DeleteLocationByIdError, DeleteLocationByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetBundleByIdData, GetAssetBundleByIdError, GetAssetBundleByIdResponse, GetAssetByIdOrTagData, GetAssetByIdOrTagError, GetAssetByIdOrTagResponse, GetAssetLocationData, GetAssetLocationError, GetAssetLocationResponse, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetContactDetailsData, GetContactDetailsError, GetContactDetailsResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetLocationByIdData, GetLocationByIdError, GetLocationByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, HealthData, HealthResponse, ListAssetBundlesData, ListAssetBundlesError, ListAssetBundlesResponse, ListAssetsData, ListAssetsError, ListAssetsOfAssetTypeData, ListAssetsOfAssetTypeError, ListAssetsOfAssetTypeResponse, ListAssetsResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListLocationsData, ListLocationsError, ListLocationsResponse, ListManufacturerAssetTypesData, ListManufacturerAssetTypesError, ListManufacturerAssetTypesResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchLocationByIdData, PatchLocationByIdError, PatchLocationByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, SetAssetLocationData, SetAssetLocationError, SetAssetLocationResponse, UpdateAssetByIdData, UpdateAssetByIdError, UpdateAssetByIdResponse, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateLocationByIdData, UpdateLocationByIdError, UpdateLocationByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
+import { addPermissionToGroup, addUserToGroup, createAsset, createAssetBundle, createAssetCommentByAssetId, createAssetType, createGroup, createLocation, createManufacturer, deleteAssetBundle, deleteAssetById, deleteAssetTypeById, deleteLocationById, deleteManufacturerById, getAssetBundleById, getAssetByIdOrTag, getAssetLocation, getAssetsWithinBundleById, getAssetTypeById, getContactDetails, getCurrentUser, getCurrentUserPermissions, getGroupById, getLocationById, getManufacturerById, getUserById, health, listAssetBundles, listAssetCommentsByAssetId, listAssets, listAssetsOfAssetType, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listLocations, listManufacturerAssetTypes, listManufacturers, listUsers, type Options, patchAssetTypeById, patchLocationById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, setAssetLocation, updateAssetById, updateAssetCommentByAssetAndCommentId, updateAssetTypeById, updateLocationById, updateManufacturerById } from '../sdk.gen';
+import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetBundleData, CreateAssetBundleError, CreateAssetBundleResponse, CreateAssetCommentByAssetIdData, CreateAssetCommentByAssetIdError, CreateAssetCommentByAssetIdResponse, CreateAssetData, CreateAssetError, CreateAssetResponse, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateLocationData, CreateLocationError, CreateLocationResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetBundleData, DeleteAssetBundleError, DeleteAssetBundleResponse, DeleteAssetByIdData, DeleteAssetByIdError, DeleteAssetByIdResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteLocationByIdData, DeleteLocationByIdError, DeleteLocationByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetBundleByIdData, GetAssetBundleByIdError, GetAssetBundleByIdResponse, GetAssetByIdOrTagData, GetAssetByIdOrTagError, GetAssetByIdOrTagResponse, GetAssetLocationData, GetAssetLocationError, GetAssetLocationResponse, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetContactDetailsData, GetContactDetailsError, GetContactDetailsResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetLocationByIdData, GetLocationByIdError, GetLocationByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, HealthData, HealthResponse, ListAssetBundlesData, ListAssetBundlesError, ListAssetBundlesResponse, ListAssetCommentsByAssetIdData, ListAssetCommentsByAssetIdError, ListAssetCommentsByAssetIdResponse, ListAssetsData, ListAssetsError, ListAssetsOfAssetTypeData, ListAssetsOfAssetTypeError, ListAssetsOfAssetTypeResponse, ListAssetsResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListLocationsData, ListLocationsError, ListLocationsResponse, ListManufacturerAssetTypesData, ListManufacturerAssetTypesError, ListManufacturerAssetTypesResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchLocationByIdData, PatchLocationByIdError, PatchLocationByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, SetAssetLocationData, SetAssetLocationError, SetAssetLocationResponse, UpdateAssetByIdData, UpdateAssetByIdError, UpdateAssetByIdResponse, UpdateAssetCommentByAssetAndCommentIdData, UpdateAssetCommentByAssetAndCommentIdError, UpdateAssetCommentByAssetAndCommentIdResponse, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateLocationByIdData, UpdateLocationByIdError, UpdateLocationByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -197,6 +197,23 @@ export const createAssetMutation = (options?: Partial<Options<CreateAssetData>>)
 };
 
 /**
+ * Update a comment attached to an asset based on its ID.
+ */
+export const updateAssetCommentByAssetAndCommentIdMutation = (options?: Partial<Options<UpdateAssetCommentByAssetAndCommentIdData>>): UseMutationOptions<UpdateAssetCommentByAssetAndCommentIdResponse, UpdateAssetCommentByAssetAndCommentIdError, Options<UpdateAssetCommentByAssetAndCommentIdData>> => {
+    const mutationOptions: UseMutationOptions<UpdateAssetCommentByAssetAndCommentIdResponse, UpdateAssetCommentByAssetAndCommentIdError, Options<UpdateAssetCommentByAssetAndCommentIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateAssetCommentByAssetAndCommentId({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
  * Delete an asset by its ID.
  */
 export const deleteAssetByIdMutation = (options?: Partial<Options<DeleteAssetByIdData>>): UseMutationOptions<DeleteAssetByIdResponse, DeleteAssetByIdError, Options<DeleteAssetByIdData>> => {
@@ -238,6 +255,41 @@ export const updateAssetByIdMutation = (options?: Partial<Options<UpdateAssetByI
     const mutationOptions: UseMutationOptions<UpdateAssetByIdResponse, UpdateAssetByIdError, Options<UpdateAssetByIdData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateAssetById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listAssetCommentsByAssetIdQueryKey = (options: Options<ListAssetCommentsByAssetIdData>) => createQueryKey('listAssetCommentsByAssetId', options);
+
+/**
+ * List comments attached to this asset.
+ */
+export const listAssetCommentsByAssetIdOptions = (options: Options<ListAssetCommentsByAssetIdData>) => queryOptions<ListAssetCommentsByAssetIdResponse, ListAssetCommentsByAssetIdError, ListAssetCommentsByAssetIdResponse, ReturnType<typeof listAssetCommentsByAssetIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listAssetCommentsByAssetId({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listAssetCommentsByAssetIdQueryKey(options)
+});
+
+/**
+ * Add a comment to the specified asset.
+ */
+export const createAssetCommentByAssetIdMutation = (options?: Partial<Options<CreateAssetCommentByAssetIdData>>): UseMutationOptions<CreateAssetCommentByAssetIdResponse, CreateAssetCommentByAssetIdError, Options<CreateAssetCommentByAssetIdData>> => {
+    const mutationOptions: UseMutationOptions<CreateAssetCommentByAssetIdResponse, CreateAssetCommentByAssetIdError, Options<CreateAssetCommentByAssetIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createAssetCommentByAssetId({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

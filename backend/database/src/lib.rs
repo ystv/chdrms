@@ -4,6 +4,7 @@ use sqlx::PgPool;
 pub mod asset;
 pub mod asset_type;
 pub mod bundle;
+pub mod comment;
 pub mod location;
 pub mod manufacturer;
 pub mod permission;
