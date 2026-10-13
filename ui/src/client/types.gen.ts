@@ -16,6 +16,12 @@ export type AssetDto = {
      */
     alias?: string | null;
     /**
+     * An array of reasons why the asset could be blocked
+     * by anything, like a label or maintenance job. This field is
+     * immutable and only affected by external fields.
+     */
+    blocks: Array<Block>;
+    /**
      * An optional bundle that this asset is within, as asset bundle
      * identifier.
      */
@@ -24,6 +30,11 @@ export type AssetDto = {
      * The unique identifier for this asset. This property is immutable.
      */
     id: string;
+    /**
+     * An array of labels attached to this asset. This field is only
+     * mutable via its dedicated field endpoints.
+     */
+    labels: Array<string>;
     locations: AssetLocations;
     /**
      * An optional field for miscellaneous notes about the asset.
@@ -68,6 +79,11 @@ export type AssetTypeDto = {
     value?: null | SchemaDecimal;
 };
 
+export type Block = {
+    label: string;
+    reason: 'label';
+};
+
 export type ContactDetailsDto = {
     links: Array<ContactDetailsLinkDto>;
     name?: string | null;
@@ -96,6 +112,13 @@ export type CreateGroup = {
     name: string;
 };
 
+export type CreateLabelRequest = {
+    blocking: boolean;
+    colour?: string | null;
+    description?: string | null;
+    name: string;
+};
+
 export type ErrorResponse = {
     error: string;
 };
@@ -107,6 +130,14 @@ export type GroupInfo = {
 
 export type GroupMembers = {
     members: Array<UserDto>;
+};
+
+export type LabelDto = {
+    blocking: boolean;
+    colour?: string | null;
+    description?: string | null;
+    id: string;
+    name: string;
 };
 
 export type Location = {
@@ -195,6 +226,13 @@ export type UpdateAssetRequest = {
     locations: UpdateAssetLocations;
     notes?: string | null;
     tag: string;
+};
+
+export type UpdateLabelRequest = {
+    blocking: boolean;
+    colour?: string | null;
+    description?: string | null;
+    name: string;
 };
 
 export type UserDto = {
@@ -1065,6 +1103,158 @@ export type Health2Responses = {
 };
 
 export type Health2Response = Health2Responses[keyof Health2Responses];
+
+export type ListLabelsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/labels';
+};
+
+export type ListLabelsErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type ListLabelsError = ListLabelsErrors[keyof ListLabelsErrors];
+
+export type ListLabelsResponses = {
+    /**
+     * Success
+     */
+    200: Array<LabelDto>;
+};
+
+export type ListLabelsResponse = ListLabelsResponses[keyof ListLabelsResponses];
+
+export type CreateLabelData = {
+    body: CreateLabelRequest;
+    path?: never;
+    query?: never;
+    url: '/labels';
+};
+
+export type CreateLabelErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+};
+
+export type CreateLabelError = CreateLabelErrors[keyof CreateLabelErrors];
+
+export type CreateLabelResponses = {
+    /**
+     * Success
+     */
+    200: LabelDto;
+};
+
+export type CreateLabelResponse = CreateLabelResponses[keyof CreateLabelResponses];
+
+export type DeleteLabelByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested label ID.
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/labels/{id}';
+};
+
+export type DeleteLabelByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Label by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type DeleteLabelByIdError = DeleteLabelByIdErrors[keyof DeleteLabelByIdErrors];
+
+export type DeleteLabelByIdResponses = {
+    /**
+     * Success
+     */
+    204: void;
+};
+
+export type DeleteLabelByIdResponse = DeleteLabelByIdResponses[keyof DeleteLabelByIdResponses];
+
+export type GetLabelByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested label ID.
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/labels/{id}';
+};
+
+export type GetLabelByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Label by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetLabelByIdError = GetLabelByIdErrors[keyof GetLabelByIdErrors];
+
+export type GetLabelByIdResponses = {
+    /**
+     * Success
+     */
+    200: LabelDto;
+};
+
+export type GetLabelByIdResponse = GetLabelByIdResponses[keyof GetLabelByIdResponses];
+
+export type UpdateLabelByIdData = {
+    body: UpdateLabelRequest;
+    path: {
+        /**
+         * Requested label ID.
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/labels/{id}';
+};
+
+export type UpdateLabelByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Label by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type UpdateLabelByIdError = UpdateLabelByIdErrors[keyof UpdateLabelByIdErrors];
+
+export type UpdateLabelByIdResponses = {
+    /**
+     * Success
+     */
+    200: LabelDto;
+};
+
+export type UpdateLabelByIdResponse = UpdateLabelByIdResponses[keyof UpdateLabelByIdResponses];
 
 export type ListLocationsData = {
     body?: never;

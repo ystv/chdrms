@@ -16,7 +16,7 @@ use chdrms_database::{PatchField, asset_type as database, manufacturer::Manufact
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
-    routes::asset::model::{AssetDto, AssetLocations},
+    routes::asset::model::AssetDto,
     state::AppState,
 };
 
@@ -200,23 +200,11 @@ async fn list_assets_of_asset_type(
         .ok_or_else(|| AppError::NotFound)?
         .id;
 
+    let assets =
+        chdrms_database::asset::Asset::list_of_type(id, &mut state.transaction().await?).await?;
+
     Ok(Json(
-        chdrms_database::asset::Asset::list_of_type(id, &mut state.transaction().await?)
-            .await?
-            .into_iter()
-            .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
-                alias: asset.alias,
-                notes: asset.notes,
-                tag: asset.tag,
-                bundle: asset.bundle,
-                locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
-                },
-            })
-            .collect(),
+        super::asset::populate_asset_dtos(assets, &mut txn).await?,
     ))
 }
 

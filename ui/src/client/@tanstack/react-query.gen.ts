@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addPermissionToGroup, addUserToGroup, createAsset, createAssetBundle, createAssetType, createGroup, createLocation, createManufacturer, deleteAssetBundle, deleteAssetById, deleteAssetTypeById, deleteLocationById, deleteManufacturerById, getAssetBundleById, getAssetByIdOrTag, getAssetLocation, getAssetsWithinBundleById, getAssetTypeById, getContactDetails, getCurrentUser, getCurrentUserPermissions, getGroupById, getLocationById, getManufacturerById, getUserById, health, listAssetBundles, listAssets, listAssetsOfAssetType, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listLocations, listManufacturerAssetTypes, listManufacturers, listUsers, type Options, patchAssetTypeById, patchLocationById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, setAssetLocation, updateAssetById, updateAssetTypeById, updateLocationById, updateManufacturerById } from '../sdk.gen';
-import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetBundleData, CreateAssetBundleError, CreateAssetBundleResponse, CreateAssetData, CreateAssetError, CreateAssetResponse, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateLocationData, CreateLocationError, CreateLocationResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetBundleData, DeleteAssetBundleError, DeleteAssetBundleResponse, DeleteAssetByIdData, DeleteAssetByIdError, DeleteAssetByIdResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteLocationByIdData, DeleteLocationByIdError, DeleteLocationByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetBundleByIdData, GetAssetBundleByIdError, GetAssetBundleByIdResponse, GetAssetByIdOrTagData, GetAssetByIdOrTagError, GetAssetByIdOrTagResponse, GetAssetLocationData, GetAssetLocationError, GetAssetLocationResponse, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetContactDetailsData, GetContactDetailsError, GetContactDetailsResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetLocationByIdData, GetLocationByIdError, GetLocationByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, HealthData, HealthResponse, ListAssetBundlesData, ListAssetBundlesError, ListAssetBundlesResponse, ListAssetsData, ListAssetsError, ListAssetsOfAssetTypeData, ListAssetsOfAssetTypeError, ListAssetsOfAssetTypeResponse, ListAssetsResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListLocationsData, ListLocationsError, ListLocationsResponse, ListManufacturerAssetTypesData, ListManufacturerAssetTypesError, ListManufacturerAssetTypesResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchLocationByIdData, PatchLocationByIdError, PatchLocationByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, SetAssetLocationData, SetAssetLocationError, SetAssetLocationResponse, UpdateAssetByIdData, UpdateAssetByIdError, UpdateAssetByIdResponse, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateLocationByIdData, UpdateLocationByIdError, UpdateLocationByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
+import { addPermissionToGroup, addUserToGroup, createAsset, createAssetBundle, createAssetType, createGroup, createLabel, createLocation, createManufacturer, deleteAssetBundle, deleteAssetById, deleteAssetTypeById, deleteLabelById, deleteLocationById, deleteManufacturerById, getAssetBundleById, getAssetByIdOrTag, getAssetLocation, getAssetsWithinBundleById, getAssetTypeById, getContactDetails, getCurrentUser, getCurrentUserPermissions, getGroupById, getLabelById, getLocationById, getManufacturerById, getUserById, health, listAssetBundles, listAssets, listAssetsOfAssetType, listAssetTypes, listAuthProviders, listGroupMembers, listGroupPermissions, listGroups, listLabels, listLocations, listManufacturerAssetTypes, listManufacturers, listUsers, type Options, patchAssetTypeById, patchLocationById, patchManufacturerById, removePermissionFromGroup, removeUserFromGroup, setAssetLocation, updateAssetById, updateAssetTypeById, updateLabelById, updateLocationById, updateManufacturerById } from '../sdk.gen';
+import type { AddPermissionToGroupData, AddUserToGroupData, CreateAssetBundleData, CreateAssetBundleError, CreateAssetBundleResponse, CreateAssetData, CreateAssetError, CreateAssetResponse, CreateAssetTypeData, CreateAssetTypeError, CreateAssetTypeResponse, CreateGroupData, CreateGroupResponse, CreateLabelData, CreateLabelError, CreateLabelResponse, CreateLocationData, CreateLocationError, CreateLocationResponse, CreateManufacturerData, CreateManufacturerError, CreateManufacturerResponse, DeleteAssetBundleData, DeleteAssetBundleError, DeleteAssetBundleResponse, DeleteAssetByIdData, DeleteAssetByIdError, DeleteAssetByIdResponse, DeleteAssetTypeByIdData, DeleteAssetTypeByIdError, DeleteAssetTypeByIdResponse, DeleteLabelByIdData, DeleteLabelByIdError, DeleteLabelByIdResponse, DeleteLocationByIdData, DeleteLocationByIdError, DeleteLocationByIdResponse, DeleteManufacturerByIdData, DeleteManufacturerByIdError, DeleteManufacturerByIdResponse, GetAssetBundleByIdData, GetAssetBundleByIdError, GetAssetBundleByIdResponse, GetAssetByIdOrTagData, GetAssetByIdOrTagError, GetAssetByIdOrTagResponse, GetAssetLocationData, GetAssetLocationError, GetAssetLocationResponse, GetAssetsWithinBundleByIdData, GetAssetsWithinBundleByIdError, GetAssetsWithinBundleByIdResponse, GetAssetTypeByIdData, GetAssetTypeByIdError, GetAssetTypeByIdResponse, GetContactDetailsData, GetContactDetailsError, GetContactDetailsResponse, GetCurrentUserData, GetCurrentUserPermissionsData, GetCurrentUserPermissionsResponse, GetCurrentUserResponse, GetGroupByIdData, GetGroupByIdResponse, GetLabelByIdData, GetLabelByIdError, GetLabelByIdResponse, GetLocationByIdData, GetLocationByIdError, GetLocationByIdResponse, GetManufacturerByIdData, GetManufacturerByIdError, GetManufacturerByIdResponse, GetUserByIdData, GetUserByIdError, GetUserByIdResponse, HealthData, HealthResponse, ListAssetBundlesData, ListAssetBundlesError, ListAssetBundlesResponse, ListAssetsData, ListAssetsError, ListAssetsOfAssetTypeData, ListAssetsOfAssetTypeError, ListAssetsOfAssetTypeResponse, ListAssetsResponse, ListAssetTypesData, ListAssetTypesError, ListAssetTypesResponse, ListAuthProvidersData, ListAuthProvidersResponse, ListGroupMembersData, ListGroupMembersResponse, ListGroupPermissionsData, ListGroupPermissionsResponse, ListGroupsData, ListGroupsResponse, ListLabelsData, ListLabelsError, ListLabelsResponse, ListLocationsData, ListLocationsError, ListLocationsResponse, ListManufacturerAssetTypesData, ListManufacturerAssetTypesError, ListManufacturerAssetTypesResponse, ListManufacturersData, ListManufacturersError, ListManufacturersResponse, ListUsersData, ListUsersResponse, PatchAssetTypeByIdData, PatchAssetTypeByIdError, PatchAssetTypeByIdResponse, PatchLocationByIdData, PatchLocationByIdError, PatchLocationByIdResponse, PatchManufacturerByIdData, PatchManufacturerByIdError, PatchManufacturerByIdResponse, RemovePermissionFromGroupData, RemoveUserFromGroupData, SetAssetLocationData, SetAssetLocationError, SetAssetLocationResponse, UpdateAssetByIdData, UpdateAssetByIdError, UpdateAssetByIdResponse, UpdateAssetTypeByIdData, UpdateAssetTypeByIdError, UpdateAssetTypeByIdResponse, UpdateLabelByIdData, UpdateLabelByIdError, UpdateLabelByIdResponse, UpdateLocationByIdData, UpdateLocationByIdError, UpdateLocationByIdResponse, UpdateManufacturerByIdData, UpdateManufacturerByIdError, UpdateManufacturerByIdResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -581,6 +581,78 @@ export const healthOptions = (options?: Options<HealthData>) => queryOptions<Hea
     },
     queryKey: healthQueryKey(options)
 });
+
+export const listLabelsQueryKey = (options?: Options<ListLabelsData>) => createQueryKey('listLabels', options);
+
+export const listLabelsOptions = (options?: Options<ListLabelsData>) => queryOptions<ListLabelsResponse, ListLabelsError, ListLabelsResponse, ReturnType<typeof listLabelsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listLabels({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listLabelsQueryKey(options)
+});
+
+export const createLabelMutation = (options?: Partial<Options<CreateLabelData>>): UseMutationOptions<CreateLabelResponse, CreateLabelError, Options<CreateLabelData>> => {
+    const mutationOptions: UseMutationOptions<CreateLabelResponse, CreateLabelError, Options<CreateLabelData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createLabel({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const deleteLabelByIdMutation = (options?: Partial<Options<DeleteLabelByIdData>>): UseMutationOptions<DeleteLabelByIdResponse, DeleteLabelByIdError, Options<DeleteLabelByIdData>> => {
+    const mutationOptions: UseMutationOptions<DeleteLabelByIdResponse, DeleteLabelByIdError, Options<DeleteLabelByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteLabelById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getLabelByIdQueryKey = (options: Options<GetLabelByIdData>) => createQueryKey('getLabelById', options);
+
+export const getLabelByIdOptions = (options: Options<GetLabelByIdData>) => queryOptions<GetLabelByIdResponse, GetLabelByIdError, GetLabelByIdResponse, ReturnType<typeof getLabelByIdQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLabelById({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLabelByIdQueryKey(options)
+});
+
+export const updateLabelByIdMutation = (options?: Partial<Options<UpdateLabelByIdData>>): UseMutationOptions<UpdateLabelByIdResponse, UpdateLabelByIdError, Options<UpdateLabelByIdData>> => {
+    const mutationOptions: UseMutationOptions<UpdateLabelByIdResponse, UpdateLabelByIdError, Options<UpdateLabelByIdData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateLabelById({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const listLocationsQueryKey = (options?: Options<ListLocationsData>) => createQueryKey('listLocations', options);
 

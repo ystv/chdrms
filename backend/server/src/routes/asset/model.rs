@@ -18,9 +18,17 @@ pub struct AssetDto {
     /// The asset tag attached to this asset.
     pub tag: String,
 
+    /// An array of labels attached to this asset. This field is only
+    /// mutable via its dedicated field endpoints.
+    pub labels: Vec<Uuid>,
+
     /// An optional bundle that this asset is within, as asset bundle
     /// identifier.
     pub bundle: Option<Uuid>,
+    /// An array of reasons why the asset could be blocked
+    /// by anything, like a label or maintenance job. This field is
+    /// immutable and only affected by external fields.
+    pub blocks: Vec<Block>,
 
     pub locations: AssetLocations,
 }
@@ -66,4 +74,15 @@ pub struct AssetLocations {
 #[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct UpdateAssetLocations {
     pub home: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(tag = "reason", rename_all = "snake_case")]
+pub enum Block {
+    Label { label: Uuid },
+    // Assigned {
+    //     project: Uuid,
+    //     until: DateTime<Utc>,
+    // },
+    // Maintenance { job: Uuid },
 }

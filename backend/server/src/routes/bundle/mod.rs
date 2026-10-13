@@ -13,10 +13,7 @@ use uuid::Uuid;
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
     error::{AppError, ErrorResponse, Result},
-    routes::{
-        asset::model::{AssetDto, AssetLocations},
-        bundle::model::AssetBundleDto,
-    },
+    routes::{asset::model::AssetDto, bundle::model::AssetBundleDto},
     state::AppState,
 };
 
@@ -74,26 +71,14 @@ async fn get_assets_by_id(
 ) -> Result<Json<Vec<AssetDto>>> {
     let mut txn = state.transaction().await?;
 
+    let assets = database::Bundle::get_by_id(&mut txn, id)
+        .await?
+        .ok_or_else(|| AppError::NotFound)?
+        .assets(&mut txn)
+        .await?;
+
     Ok(Json(
-        database::Bundle::get_by_id(&mut txn, id)
-            .await?
-            .ok_or_else(|| AppError::NotFound)?
-            .assets(&mut txn)
-            .await?
-            .into_iter()
-            .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
-                alias: asset.alias,
-                notes: asset.notes,
-                tag: asset.tag,
-                bundle: asset.bundle,
-                locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
-                },
-            })
-            .collect(),
+        super::asset::populate_asset_dtos(assets, &mut txn).await?,
     ))
 }
 

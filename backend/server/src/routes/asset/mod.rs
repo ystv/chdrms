@@ -14,7 +14,10 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::asset::{self as database, CreateAsset, UpdateAsset};
+use chdrms_database::{
+    asset::{self as database, CreateAsset, UpdateAsset},
+    label::LabelAndBlocking,
+};
 
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -24,7 +27,7 @@ use crate::{
     error::{AppError, ErrorResponse, Result},
     routes::{
         asset::model::{
-            AssetDto, AssetLocations, CreateAssetRequest, UpdateAssetLocationRequest,
+            AssetDto, AssetLocations, Block, CreateAssetRequest, UpdateAssetLocationRequest,
             UpdateAssetRequest,
         },
         location::LocationDto,
@@ -64,18 +67,7 @@ async fn get_by_id_or_tag(
     }?
     .ok_or_else(|| AppError::NotFound)?;
 
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+    Ok(Json(populate_asset_dto(asset, &mut txn).await?))
 }
 
 /// Create a new asset.
@@ -120,7 +112,13 @@ async fn create(
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
+        // we can assume there are no labels attach to this
+        // asset as it has just been created.
+        labels: Vec::new(),
         bundle: asset.bundle,
+        // we can assume there are no blocks on this asset
+        // as it has just been created.
+        blocks: Vec::new(),
         locations: AssetLocations {
             current: asset.location,
             home: asset.home_location,
@@ -170,18 +168,7 @@ async fn update(
         )
         .await?;
 
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+    Ok(Json(populate_asset_dto(asset, &mut txn).await?))
 }
 
 /// List all assets.
@@ -199,23 +186,10 @@ async fn list(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::View>,
 ) -> Result<Json<Vec<AssetDto>>> {
+    let mut txn = state.transaction().await?;
+
     Ok(Json(
-        database::Asset::list(&mut state.transaction().await?)
-            .await?
-            .into_iter()
-            .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
-                alias: asset.alias,
-                notes: asset.notes,
-                tag: asset.tag,
-                bundle: asset.bundle,
-                locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
-                },
-            })
-            .collect(),
+        populate_asset_dtos(database::Asset::list(&mut txn).await?, &mut txn).await?,
     ))
 }
 
@@ -312,20 +286,67 @@ async fn put_location(
         .set_location(&mut txn, location)
         .await?;
 
+    let asset = populate_asset_dto(asset, &mut txn).await?;
+
     txn.commit().await?;
 
-    Ok(Json(AssetDto {
+    Ok(Json(asset))
+}
+
+async fn populate_asset_dto(
+    asset: database::Asset,
+    txn: &mut sqlx::PgTransaction<'_>,
+) -> sqlx::Result<AssetDto> {
+    let labels =
+        chdrms_database::label::Label::list_label_and_blocking_for_asset(txn, asset.id).await?;
+    Ok(populate_asset_dto_raw(asset, labels))
+}
+
+pub(super) async fn populate_asset_dtos(
+    assets: Vec<database::Asset>,
+    txn: &mut sqlx::PgTransaction<'_>,
+) -> sqlx::Result<Vec<AssetDto>> {
+    // find labels
+    let labels = chdrms_database::label::Label::list_label_and_blocking_for_assets(
+        txn,
+        assets.iter().map(|asset| asset.id).collect(),
+    )
+    .await?;
+
+    Ok(assets
+        .into_iter()
+        .map(|asset| {
+            let labels = labels.get(&asset.id).cloned().unwrap_or_default();
+            populate_asset_dto_raw(asset, labels)
+        })
+        .collect())
+}
+
+fn populate_asset_dto_raw(asset: database::Asset, labels: Vec<LabelAndBlocking>) -> AssetDto {
+    // construct blocks
+    let blocks = labels
+        .iter()
+        .filter(|label| label.blocking)
+        .map(|label| Block::Label { label: label.id })
+        .collect();
+
+    // construct labels
+    let labels = labels.iter().map(|label| label.id).collect();
+
+    AssetDto {
         id: asset.id,
         r#type: asset.r#type,
         alias: asset.alias,
         notes: asset.notes,
         tag: asset.tag,
+        labels,
         bundle: asset.bundle,
+        blocks,
         locations: AssetLocations {
             current: asset.location,
             home: asset.home_location,
         },
-    }))
+    }
 }
 
 pub(super) fn routes() -> OpenApiRouter<AppState> {

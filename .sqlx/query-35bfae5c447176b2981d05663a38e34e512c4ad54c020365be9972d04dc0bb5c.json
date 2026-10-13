@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT labels.id\n            FROM labels\n            LEFT JOIN asset_labels\n            ON labels.id = asset_labels.label AND asset_labels.asset = $1\n            WHERE labels.blocking;",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "labels",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "35bfae5c447176b2981d05663a38e34e512c4ad54c020365be9972d04dc0bb5c"
+}

@@ -1,9 +1,10 @@
 use serde::{Deserialize, Deserializer};
-use sqlx::PgPool;
+use sqlx::{PgPool, prelude::Type};
 
 pub mod asset;
 pub mod asset_type;
 pub mod bundle;
+pub mod label;
 pub mod location;
 pub mod manufacturer;
 pub mod permission;
@@ -83,6 +84,14 @@ where
     {
         Ok(PatchField::Present(T::deserialize(deserializer)?))
     }
+}
+
+#[derive(Debug, Type, PartialEq, Eq, Clone, Copy)]
+#[sqlx(type_name = "rgb")]
+pub struct Colour {
+    r: i16,
+    g: i16,
+    b: i16,
 }
 
 #[cfg(test)]
