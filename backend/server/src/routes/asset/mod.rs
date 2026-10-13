@@ -14,7 +14,10 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::asset::{self as database, CreateAsset, UpdateAsset};
+use chdrms_database::{
+    asset::{self as database, AssetRepository, CreateAsset, UpdateAsset},
+    location::LocationRepository,
+};
 
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -57,25 +60,39 @@ async fn get_by_id_or_tag(
     _auth: RequirePermission<database::permission::View>,
     Path(id): Path<AssetIdentifier>,
 ) -> Result<Json<AssetDto>> {
-    let mut txn = state.transaction().await?;
-    let asset = match id {
-        AssetIdentifier::Id(id) => database::Asset::get_by_id(&mut txn, id).await,
-        AssetIdentifier::Tag(tag) => database::Asset::get_by_tag(&mut txn, tag).await,
-    }?
-    .ok_or_else(|| AppError::NotFound)?;
+    use database::GetAssetByIdError;
 
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+    match id {
+        AssetIdentifier::Id(id) => {
+            state
+                .repository
+                .get_asset_by_id(id)
+                .await
+                .map_err(|err| match err {
+                    GetAssetByIdError::Backend => {
+                        AppError::internal_server_error("internal server error")
+                    }
+                })?
+        }
+        AssetIdentifier::Tag(tag) => {
+            database::Asset::get_by_tag(&mut state.transaction().await?, tag).await?
+        }
+    }
+    .ok_or_else(|| AppError::NotFound)
+    .map(|asset| {
+        Json(AssetDto {
+            id: asset.id,
+            r#type: asset.r#type,
+            alias: asset.alias,
+            notes: asset.notes,
+            tag: asset.tag,
+            bundle: asset.bundle,
+            locations: AssetLocations {
+                current: asset.location,
+                home: asset.home_location,
+            },
+        })
+    })
 }
 
 /// Create a new asset.
@@ -95,11 +112,11 @@ async fn create(
     auth: AuthContext,
     Json(asset): Json<CreateAssetRequest>,
 ) -> Result<Json<AssetDto>> {
-    let mut txn = state.transaction().await?;
+    use database::CreateAssetError;
 
-    let asset = database::Asset::create(
-        &mut txn,
-        CreateAsset {
+    state
+        .repository
+        .create_asset(&CreateAsset {
             r#type: asset.r#type,
             alias: asset.alias,
             notes: asset.notes,
@@ -108,24 +125,27 @@ async fn create(
             home_location: asset.locations.home,
             location: asset.locations.current,
             created_by: auth.user().id,
-        },
-    )
-    .await?;
-
-    txn.commit().await?;
-
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+        })
+        .await
+        .map_err(|err| match err {
+            CreateAssetError::Backend | CreateAssetError::Relationship => {
+                AppError::internal_server_error("internal server error")
+            }
+        })
+        .map(|asset| {
+            Json(AssetDto {
+                id: asset.id,
+                r#type: asset.r#type,
+                alias: asset.alias,
+                notes: asset.notes,
+                tag: asset.tag,
+                bundle: asset.bundle,
+                locations: AssetLocations {
+                    current: asset.location,
+                    home: asset.home_location,
+                },
+            })
+        })
 }
 
 /// Update an asset by its ID.
@@ -149,17 +169,27 @@ async fn update(
     Path(id): Path<Uuid>,
     Json(update): Json<UpdateAssetRequest>,
 ) -> Result<Json<AssetDto>> {
-    let mut txn = state.transaction().await?;
+    use database::{GetAssetByIdError, UpdateAssetByIdError};
 
-    let asset = database::Asset::get_by_id(&mut txn, id)
-        .await?
+    // get location from existing asset
+    // todo: remove location from the update struct so that
+    //       this extra lookup isn't required.
+    let asset = state
+        .repository
+        .get_asset_by_id(id)
+        .await
+        .map_err(|err| match err {
+            GetAssetByIdError::Backend => AppError::internal_server_error("internal server error"),
+        })?
         .ok_or_else(|| AppError::NotFound)?;
-
     let location = asset.location;
-    let asset = asset
-        .update(
-            &mut txn,
-            UpdateAsset {
+
+    // update asset
+    state
+        .repository
+        .update_asset_by_id(
+            id,
+            &UpdateAsset {
                 alias: update.alias,
                 notes: update.notes,
                 tag: update.tag,
@@ -168,20 +198,28 @@ async fn update(
                 location,
             },
         )
-        .await?;
-
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+        .await
+        .map_err(|err| match err {
+            UpdateAssetByIdError::Backend => {
+                AppError::internal_server_error("internal server error")
+            }
+            UpdateAssetByIdError::Relationship => AppError::bad_request("invalid entity"),
+            UpdateAssetByIdError::NotFound => AppError::NotFound,
+        })
+        .map(|asset| {
+            Json(AssetDto {
+                id: asset.id,
+                r#type: asset.r#type,
+                alias: asset.alias,
+                notes: asset.notes,
+                tag: asset.tag,
+                bundle: asset.bundle,
+                locations: AssetLocations {
+                    current: asset.location,
+                    home: asset.home_location,
+                },
+            })
+        })
 }
 
 /// List all assets.
@@ -199,9 +237,18 @@ async fn list(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::View>,
 ) -> Result<Json<Vec<AssetDto>>> {
+    use database::ListAssetsError;
+
     Ok(Json(
-        database::Asset::list(&mut state.transaction().await?)
-            .await?
+        state
+            .repository
+            .list_assets()
+            .await
+            .map_err(|err| match err {
+                ListAssetsError::Backend => {
+                    AppError::internal_server_error("internal server error")
+                }
+            })?
             .into_iter()
             .map(|asset| AssetDto {
                 id: asset.id,
@@ -239,16 +286,20 @@ async fn delete(
     _auth: RequirePermission<database::permission::Manage>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
-    let mut txn = state.transaction().await?;
+    use database::DeleteAssetByIdError;
 
-    database::Asset::get_by_id(&mut txn, id)
-        .await?
-        .ok_or_else(|| AppError::NotFound)?
-        .delete(&mut txn)
-        .await?;
-    txn.commit().await?;
-
-    Ok(StatusCode::NO_CONTENT)
+    state
+        .repository
+        .delete_asset_by_id(id)
+        .await
+        .map_err(|err| match err {
+            DeleteAssetByIdError::Backend => {
+                AppError::internal_server_error("internal server error")
+            }
+            DeleteAssetByIdError::Relationship => AppError::conflict("failed to delete asset"),
+            DeleteAssetByIdError::NotFound => AppError::NotFound,
+        })
+        .map(|_| StatusCode::NO_CONTENT)
 }
 
 /// Get an asset's location
@@ -271,16 +322,19 @@ async fn get_location(
     _auth: RequirePermission<database::permission::Manage>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<LocationDto>> {
-    let mut txn = state.transaction().await?;
+    use chdrms_database::location::GetLocationByAssetIdError;
 
-    Ok(Json(
-        database::Asset::get_by_id(&mut txn, id)
-            .await?
-            .ok_or_else(|| AppError::NotFound)?
-            .get_location(&mut txn)
-            .await
-            .map(Into::into)?,
-    ))
+    state
+        .repository
+        .get_location_by_asset_id(id)
+        .await
+        .map_err(|err| match err {
+            GetLocationByAssetIdError::Backend => {
+                AppError::internal_server_error("internal server error")
+            }
+            GetLocationByAssetIdError::NotFound => AppError::NotFound,
+        })
+        .map(|location| Json(location.into()))
 }
 
 /// Set an asset's location.
@@ -304,28 +358,44 @@ async fn put_location(
     Path(id): Path<Uuid>,
     Json(UpdateAssetLocationRequest { location }): Json<UpdateAssetLocationRequest>,
 ) -> Result<Json<AssetDto>> {
-    let mut txn = state.transaction().await?;
+    use database::{GetAssetByIdError, SetAssetLocationByIdError};
 
-    let asset = database::Asset::get_by_id(&mut txn, id)
-        .await?
+    // check if the asset exists
+    let id = state
+        .repository
+        .get_asset_by_id(id)
+        .await
+        .map_err(|err| match err {
+            GetAssetByIdError::Backend => AppError::internal_server_error("internal server error"),
+        })?
         .ok_or_else(|| AppError::NotFound)?
-        .set_location(&mut txn, location)
-        .await?;
+        .id;
 
-    txn.commit().await?;
-
-    Ok(Json(AssetDto {
-        id: asset.id,
-        r#type: asset.r#type,
-        alias: asset.alias,
-        notes: asset.notes,
-        tag: asset.tag,
-        bundle: asset.bundle,
-        locations: AssetLocations {
-            current: asset.location,
-            home: asset.home_location,
-        },
-    }))
+    state
+        .repository
+        .set_asset_location_by_id(id, location)
+        .await
+        .map_err(|err| match err {
+            SetAssetLocationByIdError::Backend => {
+                AppError::internal_server_error("internal server error")
+            }
+            SetAssetLocationByIdError::Relationship => AppError::bad_request("invalid location"),
+            SetAssetLocationByIdError::NotFound => AppError::NotFound,
+        })
+        .map(|asset| {
+            Json(AssetDto {
+                id: asset.id,
+                r#type: asset.r#type,
+                alias: asset.alias,
+                notes: asset.notes,
+                tag: asset.tag,
+                bundle: asset.bundle,
+                locations: AssetLocations {
+                    current: asset.location,
+                    home: asset.home_location,
+                },
+            })
+        })
 }
 
 pub(super) fn routes() -> OpenApiRouter<AppState> {

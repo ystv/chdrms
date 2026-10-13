@@ -4,8 +4,8 @@ use axum::{
     http::StatusCode,
 };
 use chdrms_database::{
-    asset::permission,
-    bundle::{self as database, CreateBundle},
+    asset::{AssetRepository, permission},
+    bundle::{self as database, BundleRepository},
 };
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
@@ -44,12 +44,17 @@ async fn get_by_id(
     _auth: RequirePermission<permission::View>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<AssetBundleDto>> {
-    Ok(Json(
-        database::Bundle::get_by_id(&mut state.transaction().await?, id)
-            .await?
-            .ok_or_else(|| AppError::NotFound)
-            .map(|bundle| AssetBundleDto { id: bundle.id })?,
-    ))
+    use database::GetBundleByIdError;
+
+    state
+        .repository
+        .get_bundle_by_id(id)
+        .await
+        .map_err(|err| match err {
+            GetBundleByIdError::Backend => AppError::internal_server_error("internal server error"),
+        })?
+        .map(|bundle| Json(AssetBundleDto { id: bundle.id }))
+        .ok_or_else(|| AppError::NotFound)
 }
 
 /// Get assets within an asset bundle.
@@ -72,14 +77,31 @@ async fn get_assets_by_id(
     _auth: RequirePermission<permission::View>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<AssetDto>>> {
-    let mut txn = state.transaction().await?;
+    use chdrms_database::asset::GetAssetsByBundleIdError;
+    use database::GetBundleByIdError;
 
+    // check if bundle exists
+    let id = state
+        .repository
+        .get_bundle_by_id(id)
+        .await
+        .map_err(|err| match err {
+            GetBundleByIdError::Backend => AppError::internal_server_error("internal server error"),
+        })?
+        .ok_or_else(|| AppError::NotFound)?
+        .id;
+
+    // find associated assets
     Ok(Json(
-        database::Bundle::get_by_id(&mut txn, id)
-            .await?
-            .ok_or_else(|| AppError::NotFound)?
-            .assets(&mut txn)
-            .await?
+        state
+            .repository
+            .get_assets_by_bundle_id(id)
+            .await
+            .map_err(|err| match err {
+                GetAssetsByBundleIdError::Backend => {
+                    AppError::internal_server_error("internal server error")
+                }
+            })?
             .into_iter()
             .map(|asset| AssetDto {
                 id: asset.id,
@@ -113,20 +135,20 @@ async fn create(
     _auth: RequirePermission<permission::Manage>,
     auth: AuthContext,
 ) -> Result<Json<AssetBundleDto>> {
-    let mut txn = state.transaction().await?;
+    use database::{CreateBundle, CreateBundleError};
 
-    let bundle = database::Bundle::create(
-        &mut txn,
-        CreateBundle {
+    state
+        .repository
+        .create_bundle(&CreateBundle {
             created_by: auth.user().id,
-        },
-    )
-    .await
-    .map(|bundle| AssetBundleDto { id: bundle.id })?;
-
-    txn.commit().await?;
-
-    Ok(Json(bundle))
+        })
+        .await
+        .map(|bundle| Json(AssetBundleDto { id: bundle.id }))
+        .map_err(|err| match err {
+            CreateBundleError::Backend | CreateBundleError::Relationship => {
+                AppError::internal_server_error("internal server error")
+            }
+        })
 }
 
 /// Delete an asset bundle.
@@ -149,15 +171,17 @@ async fn delete(
     _auth: RequirePermission<permission::Manage>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
-    let mut txn = state.transaction().await?;
+    use database::DeleteBundleError;
 
-    database::Bundle::get_by_id(&mut txn, id)
-        .await?
-        .ok_or_else(|| AppError::NotFound)?
-        .delete(&mut txn)
-        .await?;
-
-    txn.commit().await?;
+    state
+        .repository
+        .delete_bundle_by_id(id)
+        .await
+        .map_err(|err| match err {
+            DeleteBundleError::Backend => AppError::internal_server_error("internal server error"),
+            DeleteBundleError::Relationship => AppError::conflict("unable to delete bundle"),
+            DeleteBundleError::NotFound => AppError::NotFound,
+        })?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -178,9 +202,18 @@ async fn list(
     State(state): State<AppState>,
     _auth: RequirePermission<permission::View>,
 ) -> Result<Json<Vec<AssetBundleDto>>> {
+    use database::ListBundlesError;
+
     Ok(Json(
-        database::Bundle::list(&mut state.transaction().await?)
-            .await?
+        state
+            .repository
+            .list_bundles()
+            .await
+            .map_err(|err| match err {
+                ListBundlesError::Backend => {
+                    AppError::internal_server_error("internal server error")
+                }
+            })?
             .into_iter()
             .map(|bundle| AssetBundleDto { id: bundle.id })
             .collect(),

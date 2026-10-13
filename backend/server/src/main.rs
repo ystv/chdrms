@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use chdrms_database::Postgres;
 use chdrms_server::{error::AppError, state::AppState};
 use sqlx::postgres::PgPoolOptions;
 use tokio::signal;
@@ -52,12 +53,9 @@ async fn main() -> Result<(), AppError> {
         .connect(&get_env!("DATABASE_URL"))
         .await?;
 
-    if let Err(e) = chdrms_database::migrate(&pool).await {
-        tracing::error!(?e, "failed to migrate database");
-        return Ok(());
-    };
+    let repository = Postgres::new(&get_env!("DATABASE_URL")).await;
 
-    let state = AppState::new(pool.clone(), config, key);
+    let state = AppState::new(pool.clone(), repository, config, key);
 
     let (app, _) = chdrms_server::routes::routes();
 
