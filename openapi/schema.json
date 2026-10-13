@@ -1700,17 +1700,6 @@
         ],
         "summary": "Get a manufacturer by its ID.",
         "operationId": "get_manufacturer_by_id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1750,17 +1739,6 @@
         ],
         "summary": "Update all fields of a manufacturer by its ID.",
         "operationId": "update_manufacturer_by_id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1810,17 +1788,6 @@
         ],
         "summary": "Delete a manufacturer by its ID.",
         "operationId": "delete_manufacturer_by_id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "responses": {
           "204": {
             "description": "Success"
@@ -1853,17 +1820,6 @@
         ],
         "summary": "Patch individual fields of a manufacturer by its ID.",
         "operationId": "patch_manufacturer_by_id",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {

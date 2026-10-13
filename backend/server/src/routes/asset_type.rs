@@ -11,7 +11,12 @@ use utoipa::{PartialSchema, ToSchema};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
-use chdrms_database::{PatchField, asset_type as database, manufacturer::Manufacturer};
+use chdrms_database::{
+    PatchField,
+    asset_type::{self as database, AssetTypeId},
+    manufacturer::{Manufacturer, ManufacturerId},
+    user::UserId,
+};
 
 use crate::{
     auth::{AuthContext, permissions::RequirePermission},
@@ -35,9 +40,9 @@ pub(super) struct AssetTypeDto {
 impl From<database::AssetType> for AssetTypeDto {
     fn from(asset_type: database::AssetType) -> Self {
         Self {
-            id: asset_type.id,
+            id: asset_type.id.into(),
             name: asset_type.name,
-            manufacturer: asset_type.manufacturer,
+            manufacturer: asset_type.manufacturer.into(),
             product_url: asset_type.product_url.map(|url| url.0),
             value: asset_type.value.map(Into::into),
         }
@@ -78,10 +83,14 @@ struct AssetType {
 }
 
 impl AssetType {
-    fn into_create(self, created_by: Uuid) -> database::CreateAssetType {
+    // todo: these methods are inherently flawed as they enforce
+    //       the entity IDs entered to be valid, these should
+    //       probably be removed.
+
+    fn into_create(self, created_by: UserId) -> database::CreateAssetType {
         database::CreateAssetType {
             name: self.name,
-            manufacturer: self.manufacturer,
+            manufacturer: ManufacturerId::new(self.manufacturer),
             product_url: self.product_url.map(Text),
             value: self.value.map(Into::into),
             created_by,
@@ -91,7 +100,7 @@ impl AssetType {
     fn into_update(self) -> database::UpdateAssetType {
         database::UpdateAssetType {
             name: self.name,
-            manufacturer: self.manufacturer,
+            manufacturer: ManufacturerId::new(self.manufacturer),
             product_url: self.product_url.map(Text),
             value: self.value.map(Into::into),
         }
@@ -119,7 +128,7 @@ impl From<PatchAssetType> for database::PatchAssetType {
     fn from(asset_type: PatchAssetType) -> Self {
         Self {
             name: asset_type.name,
-            manufacturer: asset_type.manufacturer,
+            manufacturer: asset_type.manufacturer.map(ManufacturerId::new),
             product_url: asset_type.product_url.flat_map(Text),
             value: asset_type.value,
         }
@@ -144,7 +153,7 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<AssetTypeDto>> {
     Ok(Json(
-        database::AssetType::get_by_id(&mut state.transaction().await?, id)
+        database::AssetType::get_by_id(&mut state.transaction().await?, AssetTypeId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)?
             .into(),
@@ -195,7 +204,7 @@ async fn list_assets_of_asset_type(
     let mut txn = state.transaction().await?;
 
     // check if the asset type exists
-    let id = database::AssetType::get_by_id(&mut txn, id)
+    let id = database::AssetType::get_by_id(&mut txn, AssetTypeId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .id;
@@ -205,15 +214,15 @@ async fn list_assets_of_asset_type(
             .await?
             .into_iter()
             .map(|asset| AssetDto {
-                id: asset.id,
-                r#type: asset.r#type,
+                id: asset.id.into(),
+                r#type: asset.r#type.into(),
                 alias: asset.alias,
                 notes: asset.notes,
                 tag: asset.tag,
-                bundle: asset.bundle,
+                bundle: asset.bundle.map(Into::into),
                 locations: AssetLocations {
-                    current: asset.location,
-                    home: asset.home_location,
+                    current: asset.location.into(),
+                    home: asset.home_location.into(),
                 },
             })
             .collect(),
@@ -238,8 +247,10 @@ async fn create(
     auth: AuthContext,
     Json(create): Json<AssetType>,
 ) -> Result<Json<AssetTypeDto>> {
+    let manufacturer = ManufacturerId::new(create.manufacturer);
+
     let mut txn = state.transaction().await?;
-    if let None = Manufacturer::get_by_id(&mut txn, create.manufacturer).await? {
+    if let None = Manufacturer::get_by_id(&mut txn, manufacturer).await? {
         return Err(AppError::bad_request("manufacturer not found"));
     }
     let asset_type =
@@ -267,7 +278,7 @@ async fn delete(
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
-    database::AssetType::get_by_id(&mut txn, id)
+    database::AssetType::get_by_id(&mut txn, AssetTypeId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .delete(&mut txn)
@@ -296,7 +307,7 @@ async fn update(
     Json(asset_type): Json<AssetType>,
 ) -> Result<Json<AssetTypeDto>> {
     let mut txn = state.transaction().await?;
-    let asset_type = database::AssetType::get_by_id(&mut txn, id)
+    let asset_type = database::AssetType::get_by_id(&mut txn, AssetTypeId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .update(&mut txn, asset_type.into_update())
@@ -325,7 +336,7 @@ async fn patch(
     Json(asset_type): Json<PatchAssetType>,
 ) -> Result<Json<AssetTypeDto>> {
     let mut txn = state.transaction().await?;
-    let asset_type = database::AssetType::get_by_id(&mut txn, id)
+    let asset_type = database::AssetType::get_by_id(&mut txn, AssetTypeId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .patch(&mut txn, asset_type.into())

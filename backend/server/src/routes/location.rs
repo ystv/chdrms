@@ -3,7 +3,11 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::{PatchField, location as database};
+use chdrms_database::{
+    PatchField,
+    location::{self as database, LocationId},
+    user::UserId,
+};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::types::PgPoint;
 use utoipa::ToSchema;
@@ -30,7 +34,7 @@ pub(super) struct LocationDto {
 impl From<database::Location> for LocationDto {
     fn from(location: database::Location) -> Self {
         Self {
-            id: location.id,
+            id: location.id.into(),
             name: location.name,
             description: location.description,
 
@@ -48,7 +52,7 @@ struct Location {
 }
 
 impl Location {
-    fn into_create(self, created_by: Uuid) -> database::CreateLocation {
+    fn into_create(self, created_by: UserId) -> database::CreateLocation {
         database::CreateLocation {
             name: self.name,
             description: self.description,
@@ -135,7 +139,7 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<LocationDto>> {
     Ok(Json(
-        database::Location::get_by_id(&mut state.transaction().await?, id)
+        database::Location::get_by_id(&mut state.transaction().await?, LocationId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)?
             .into(),
@@ -208,7 +212,7 @@ async fn delete(
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
-    database::Location::get_by_id(&mut txn, id)
+    database::Location::get_by_id(&mut txn, LocationId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .delete(&mut txn)
@@ -237,7 +241,7 @@ async fn update(
     Json(location): Json<Location>,
 ) -> Result<Json<LocationDto>> {
     let mut txn = state.transaction().await?;
-    let location = database::Location::get_by_id(&mut txn, id)
+    let location = database::Location::get_by_id(&mut txn, LocationId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .update(&mut txn, location.into_update())
@@ -266,7 +270,7 @@ async fn patch(
     Json(location): Json<PatchLocation>,
 ) -> Result<Json<LocationDto>> {
     let mut txn = state.transaction().await?;
-    let location = database::Location::get_by_id(&mut txn, id)
+    let location = database::Location::get_by_id(&mut txn, LocationId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .patch(&mut txn, location.into())

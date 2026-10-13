@@ -3,7 +3,11 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
 };
-use chdrms_database::{PatchField, manufacturer as database};
+use chdrms_database::{
+    PatchField,
+    manufacturer::{self as database, ManufacturerId},
+    user::UserId,
+};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -32,7 +36,7 @@ pub struct ManufacturerInfo {
 impl From<database::Manufacturer> for ManufacturerInfo {
     fn from(manufacturer: database::Manufacturer) -> Self {
         Self {
-            id: manufacturer.id,
+            id: manufacturer.id.into(),
             name: manufacturer.name,
             description: manufacturer.description,
 
@@ -54,7 +58,7 @@ pub struct Manufacturer {
 }
 
 impl Manufacturer {
-    fn into_create(self, created_by: Uuid) -> database::CreateManufacturer {
+    fn into_create(self, created_by: UserId) -> database::CreateManufacturer {
         database::CreateManufacturer {
             name: self.name,
             description: self.description,
@@ -123,7 +127,7 @@ impl From<PatchManufacturer> for database::PatchManufacturer {
 async fn get_by_id(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::View>,
-    Path(id): Path<Uuid>,
+    Path(id): Path<ManufacturerId>,
 ) -> Result<Json<ManufacturerInfo>> {
     Ok(Json(
         database::Manufacturer::get_by_id(&mut state.transaction().await?, id)
@@ -197,7 +201,7 @@ async fn create(
 async fn delete(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::Manage>,
-    Path(id): Path<Uuid>,
+    Path(id): Path<ManufacturerId>,
 ) -> Result<StatusCode> {
     let mut txn = state.transaction().await?;
     database::Manufacturer::get_by_id(&mut txn, id)
@@ -225,7 +229,7 @@ async fn delete(
 async fn update(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::Manage>,
-    Path(id): Path<Uuid>,
+    Path(id): Path<ManufacturerId>,
     Json(manufacturer): Json<Manufacturer>,
 ) -> Result<Json<ManufacturerInfo>> {
     let mut txn = state.transaction().await?;
@@ -254,7 +258,7 @@ async fn update(
 async fn patch(
     State(state): State<AppState>,
     _auth: RequirePermission<database::permission::Manage>,
-    Path(id): Path<Uuid>,
+    Path(id): Path<ManufacturerId>,
     Json(manufacturer): Json<PatchManufacturer>,
 ) -> Result<Json<ManufacturerInfo>> {
     let mut txn = state.transaction().await?;
@@ -286,7 +290,7 @@ async fn list_asset_types(
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<AssetTypeDto>>> {
     let mut txn = state.transaction().await?;
-    let id = database::Manufacturer::get_by_id(&mut txn, id)
+    let id = database::Manufacturer::get_by_id(&mut txn, ManufacturerId::new(id))
         .await?
         .ok_or_else(|| AppError::NotFound)?
         .id;

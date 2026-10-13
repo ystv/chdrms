@@ -4,7 +4,7 @@ use axum::{
     Json,
     extract::{Path, State},
 };
-use chdrms_database::user::{self, User};
+use chdrms_database::user::{self, User, UserId};
 use serde::Serialize;
 use utoipa::ToSchema;
 use utoipa_axum::{router::OpenApiRouter, routes};
@@ -29,7 +29,7 @@ pub struct UserDto {
 impl From<&User> for UserDto {
     fn from(value: &User) -> Self {
         Self {
-            id: value.id,
+            id: value.id.into(),
             email: value.email.clone(),
             name: value.name.clone(),
             is_admin: value.is_admin,
@@ -93,7 +93,7 @@ async fn get_by_id(
     Path(id): Path<Uuid>,
 ) -> Result<Json<UserDto>> {
     Ok(Json(
-        (&user::User::get_by_id(&mut state.transaction().await?, id)
+        (&user::User::get_by_id(&mut state.transaction().await?, UserId::new(id))
             .await?
             .ok_or_else(|| AppError::NotFound)?)
             .into(),

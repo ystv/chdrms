@@ -22,7 +22,7 @@ pub struct GroupInfo {
 impl From<&Group> for GroupInfo {
     fn from(value: &Group) -> Self {
         Self {
-            id: value.id,
+            id: value.id.into(),
             name: value.name.clone(),
         }
     }

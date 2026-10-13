@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
 };
 use chdrms_database::{
-    user::User,
+    user::{User, UserId},
     user_group::{self, Group},
 };
 use serde::{Deserialize, Serialize};
@@ -79,7 +79,7 @@ pub(super) async fn add(
         return Err(AppError::NotFound);
     };
 
-    let Some(user) = User::get_by_id(&mut txn, member.member).await? else {
+    let Some(user) = User::get_by_id(&mut txn, UserId::new(member.member)).await? else {
         return Err(AppError::bad_request("user not found"));
     };
 
@@ -112,7 +112,7 @@ pub(super) async fn remove(
         return Err(AppError::NotFound);
     };
 
-    let Some(user) = User::get_by_id(&mut txn, member.member).await? else {
+    let Some(user) = User::get_by_id(&mut txn, UserId::new(member.member)).await? else {
         return Err(AppError::bad_request("user not found"));
     };
 

@@ -1,0 +1,91 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO locations(name, description, coordinates, created_by)\n            VALUES ($1, $2, $3, $4)\n            RETURNING id AS \"id: _\", name, description, coordinates, created_at, created_by AS \"created_by: _\";",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id: _",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "name"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "description"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "coordinates",
+        "type_info": "Point",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "coordinates"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "created_at"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "created_by: _",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "locations",
+            "name": "created_by"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Point",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "53e64b8f91ff7517b93f803ea4bb31f689d4105c36238d842ab9b4b95d761c70"
+}
