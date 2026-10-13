@@ -195,6 +195,17 @@ export type ProviderInfo = {
 
 export type SchemaDecimal = string;
 
+export type TimelineEventDto = TimelineEventTypeDto & {
+    content: string;
+    time: string;
+    title: string;
+};
+
+export type TimelineEventTypeDto = {
+    comment: string;
+    type: 'comment';
+};
+
 export type UpdateAssetLocationRequest = {
     location: string;
 };
@@ -758,6 +769,40 @@ export type SetAssetLocationResponses = {
 };
 
 export type SetAssetLocationResponse = SetAssetLocationResponses[keyof SetAssetLocationResponses];
+
+export type GetAssetTimelineByIdData = {
+    body?: never;
+    path: {
+        /**
+         * Requested asset ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/assets/{id}/timeline';
+};
+
+export type GetAssetTimelineByIdErrors = {
+    /**
+     * Missing permission
+     */
+    401: ErrorResponse;
+    /**
+     * Asset by that ID not found
+     */
+    404: ErrorResponse;
+};
+
+export type GetAssetTimelineByIdError = GetAssetTimelineByIdErrors[keyof GetAssetTimelineByIdErrors];
+
+export type GetAssetTimelineByIdResponses = {
+    /**
+     * Success
+     */
+    200: Array<TimelineEventDto>;
+};
+
+export type GetAssetTimelineByIdResponse = GetAssetTimelineByIdResponses[keyof GetAssetTimelineByIdResponses];
 
 export type ListAuthProvidersData = {
     body?: never;
